@@ -24,7 +24,7 @@
 html{scroll-behavior:smooth;}
 body{
   background:#0a0a0a;display:flex;flex-direction:column;align-items:center;
-  min-height:100vh;margin:0;padding:0 16px 96px;
+  min-height:100vh;margin:0;padding:0 0 64px;
   font-family:'Montserrat',sans-serif;font-weight:500;position:relative;
   color:#0a0a0a;
 }
@@ -409,9 +409,6 @@ body::before{
 /* Hide blade always */
 .drawer-blade{display:none !important;}
 
-/* Slide-2 body and all backgrounds: truly seamless dark */
-
-#slide-root{background:#0a0a0a;}
 
 /* Remove any white/light from card-action-row area */
 .card-action-row{background:transparent;}
@@ -995,36 +992,19 @@ body::before{
 .card-action-btn.locked-section{opacity:0.25;pointer-events:none;filter:none;}
 
 /* ══════════════════════════════════════
-   FULLPAGE SLIDE SYSTEM — CORE
+   STEP VIEW SYSTEM — simple show/hide
    ══════════════════════════════════════ */
 
-html, body { margin:0; padding:0; overflow:hidden; height:100%; }
-
-#slide-root {
-  position:fixed; top:0; left:0;
-  width:100%; height:calc(100vh - 64px);
-  overflow:hidden; z-index:1;
-}
-
-.slide-panel {
-  position:absolute; top:0; left:0;
-  width:100%; height:100%;
-  overflow-y:auto; overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  transition: transform 0.85s cubic-bezier(0.4,0,0.2,1),
-              opacity   0.65s cubic-bezier(0.4,0,0.2,1),
-              filter    0.65s cubic-bezier(0.4,0,0.2,1);
-  will-change:transform,filter;
-}
-.slide-panel.sp-active { transform:translateY(0) scale(1);        opacity:1;   filter:brightness(1);   pointer-events:auto;  z-index:2; }
-.slide-panel.sp-above  { transform:translateY(-6%) scale(0.95);   opacity:0.5; filter:brightness(0.5); pointer-events:none;  z-index:1; }
-.slide-panel.sp-below  { transform:translateY(100%) scale(1);     opacity:0;   filter:brightness(1);   pointer-events:none;  z-index:1; }
+.step-view { display:none !important; width:100%; }
+.step-view.active { display:block !important; }
 
 /* ── SLIDE 1: dark hero ── */
+#slide-1.active { display:flex !important; }
 
-/* ── SLIDE 2: inside slide-root as standard panel ── */
+/* ── SLIDE 2 ── */
 #slide-2 {
   background:#0a0a0a;
+  min-height:calc(100vh - 64px);
 }
 .slide2-header {
   position:sticky; top:0; z-index:10;
@@ -1042,12 +1022,9 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
 
 /* ── SLIDE 3 ── */
 #slide-3 {
-  background:#111;
-  display:flex; flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  overflow-y:auto; overflow-x:hidden;
-  padding:32px 16px 24px;
+  background:#0a0a0a;
+  min-height:calc(100vh - 64px);
+  padding:32px 16px 120px;
 }
 #slide-3 > * { max-width:720px; width:100%; }
 
@@ -1135,6 +1112,7 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
   background:#050505;
   display:flex; align-items:center; justify-content:center;
   overflow:hidden; position:relative;
+  min-height:calc(100vh - 64px);
 }
 /* Micro-grain texture */
 #slide-1::before{
@@ -1339,12 +1317,10 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
 </head>
 <body>
 
-<div id="slide-root">
-
 <!-- ═══════════════════════════════════════
      SLIDE 1: HERO + STEP 1 (Browse Styles)
      ═══════════════════════════════════════ -->
-<div class="slide-panel sp-active" id="slide-1">
+<div class="step-view active" id="slide-1">
   <div class="hero-1col">
 
     <div class="hero-wordmark">
@@ -1379,7 +1355,7 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
 <!-- ═══════════════════════════════════════
      SLIDE 2: BUILD ROOM CARDS
      ═══════════════════════════════════════ -->
-<div class="slide-panel sp-below" id="slide-2">
+<div class="step-view" id="slide-2">
   <div class="slide2-header">
     <div class="slide-step-header">
       <div class="slide-step-num">2</div>
@@ -1402,7 +1378,7 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
 <!-- ═══<!-- ═══════════════════════════════════════
      SLIDE 3: CONFIRM & SUBMIT
      ═══════════════════════════════════════ -->
-<div class="slide-panel sp-below" id="slide-3">
+<div class="step-view" id="slide-3">
   <div class="slide-step-header">
     <div class="slide-step-num">3</div>
     <div class="slide-step-title">ALMOST DONE.</div>
@@ -1429,8 +1405,6 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
   </div>
   
 </div>
-
-</div><!-- end #slide-root -->
 
 <!-- ═══ BOTTOM TAB BAR ═══ -->
 <div id="bottom-tab-bar">
@@ -1509,14 +1483,14 @@ function goToSlide(n) {
   [1,2,3].forEach(i => {
     const el = document.getElementById('slide-' + i);
     if (!el) return;
-    el.classList.remove('sp-active','sp-above','sp-below');
-    if (i < n)        el.classList.add('sp-above');
-    else if (i === n) el.classList.add('sp-active');
-    else              el.classList.add('sp-below');
+    if (i === n) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
   });
   currentSlide = n;
-  const active = document.getElementById('slide-' + n);
-  if (active) active.scrollTop = 0;
+  window.scrollTo(0, 0);
 }
 
 function updateBottomTabs(step1Done, step2Done, step3Active) {
