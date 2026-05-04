@@ -411,8 +411,6 @@ body::before{
 
 /* Slide-2 body and all backgrounds: truly seamless dark */
 
-.slide2-header{background:transparent;border-bottom:1px solid rgba(255,255,255,0.04);}
-.slide2-body{background:transparent;}
 #slide-root{background:#0a0a0a;}
 
 /* Remove any white/light from card-action-row area */
@@ -1026,7 +1024,7 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
 
 /* ── SLIDE 2: inside slide-root as standard panel ── */
 #slide-2 {
-  background:#0a0a0a;
+  background:radial-gradient(ellipse at 50% 30%, #1a1a1a 0%, #111 30%, #0a0a0a 60%);
 }
 .slide2-header {
   position:sticky; top:0; z-index:10;
@@ -1037,7 +1035,6 @@ html, body { margin:0; padding:0; overflow:hidden; height:100%; }
 }
 .slide2-body {
   padding:24px 16px 120px;
-  background:radial-gradient(ellipse at 50% 30%, #252525 0%, #141414 40%, #0a0a0a 100%);
   position:relative;
 }
 .slide2-body::after {
