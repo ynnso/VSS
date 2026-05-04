@@ -2060,6 +2060,7 @@ function createCard(restoreData, editorsChoice) {
         roomHdr.querySelector('.room-header-question').style.display = 'none';
         tiles.forEach(t => t.style.display = 'none');
         tileGrid.style.display = 'block';
+        roomHdr.style.padding = '0';
         drawer.style.cssText = 'display:block;border-radius:20px;border:1px solid rgba(255,255,255,0.07);opacity:1;max-height:none;width:100%;overflow:visible;';
         drawer.classList.add('drawer-hero-mode');
         /* nudge already sits as sibling to footer-left — just show it */
@@ -2130,6 +2131,7 @@ function createCard(restoreData, editorsChoice) {
     tiles.forEach(t => t.style.display = ''); /* restore tiles */
     tileGrid.style.display = '';       /* restore grid layout */
     tileGrid.style.position = '';
+    roomHdr.style.padding = '';
     roomHdr.querySelector('.room-header-question').style.display = ''; /* restore question bar */
     drawer.classList.remove('open','drawer-hero-mode');
     drawer.style.cssText = '';
