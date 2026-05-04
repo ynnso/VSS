@@ -613,19 +613,7 @@ body::before{
 .staged-image.image-revealed{filter:grayscale(0) brightness(1);}
 
 /* Tiny frosted X — top-right of image area */
-.edit-trigger-btn{
-  position:absolute;top:10px;right:10px;z-index:50;
-  background:rgba(255,255,255,0.09) !important;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,0.1) !important;
-  border-radius:50% !important;box-shadow:none !important;
-  width:20px !important;height:20px !important;
-  padding:0;color:rgba(255,255,255,0.5);font-size:9px;font-weight:600;line-height:1;
-  cursor:pointer;display:none;
-  align-items:center;justify-content:center;
-  transition:background 0.3s,color 0.3s;
-}
-.edit-trigger-btn:hover{background:rgba(255,255,255,0.18) !important;color:white !important;}
+.edit-trigger-btn{ display:none !important; }
 
 
 /* ── CARD FOOTER — Obsidian Tray ── */
