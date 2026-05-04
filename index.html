@@ -160,24 +160,14 @@ body::before{
 
 /* ── CARD GRID ── */
 .placeholder-container{
-  display:flex;flex-wrap:wrap;gap:24px;
-  width:100%;max-width:960px;
-  justify-content:center;
-  align-items:flex-start;
-  margin:0 auto;
-}
-/* Single card: large centered spotlight */
-.placeholder-container.single-card{
-  align-items:center;
-  flex:1;
-  justify-content:center;
+  display:block;
+  width:100%;
 }
 .placeholder-container.single-card .placeholder-card{
-  flex:0 0 auto;width:100%;max-width:760px;min-width:0;
+  width:100%;max-width:760px;min-width:0;margin:0 auto;
 }
-/* Multi card: disabled — always single column */
 .placeholder-container.multi-card .placeholder-card{
-  flex:0 0 auto;width:100%;max-width:760px;min-width:0;
+  width:100%;max-width:760px;min-width:0;margin:0 auto 24px;
 }
 
 /* APPLE #3: card entrance */
@@ -206,7 +196,7 @@ body::before{
              0 8px 32px rgba(0,0,0,0.5);
   overflow:hidden;display:flex;flex-direction:column;
   animation:cardIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
-  flex:1 1 340px;max-width:420px;min-width:300px;
+  width:100%;max-width:760px;margin:0 auto 24px;
   scroll-margin-top:110px;
 }
 
