@@ -188,12 +188,11 @@ body::before{
 }
 .placeholder-card{
   background:#0a0a0a;
-  border:1px solid rgba(255,255,255,0.07);
+  border:none;
   border-radius:32px;
   padding:0;position:relative;
   transition:box-shadow 0.4s cubic-bezier(0.4,0,0.2,1),transform 0.4s cubic-bezier(0.4,0,0.2,1);
-  box-shadow:0 0 0 1px rgba(255,255,255,0.04),
-             0 8px 24px rgba(0,0,0,0.4);
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
   overflow:hidden;display:flex;flex-direction:column;
   animation:cardIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
   width:100%;max-width:760px;margin:0 auto 24px;
@@ -1228,16 +1227,16 @@ body::before{
 
 /* Persistent card delete X — top-right of card, always visible */
 .card-delete-x{
-  position:absolute;top:10px;right:10px;z-index:100;
-  width:28px;height:28px;border-radius:50%;
+  position:absolute;top:20px;right:20px;z-index:100;
+  width:32px;height:32px;border-radius:50%;
   background:rgba(0,0,0,0.5);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.18);
-  color:rgba(255,255,255,0.7);font-size:11px;font-weight:700;
+  border:none;
+  color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;transition:background 0.2s,color 0.2s;
 }
-.card-delete-x:hover{background:var(--s2s-red);color:white;border-color:var(--s2s-red);}
+.card-delete-x:hover{background:var(--s2s-red);color:white;}
 
 /* Clean up old hidden copy hint */
 .copy-hint { display: none !important; }
@@ -2061,7 +2060,7 @@ function createCard(restoreData, editorsChoice) {
         tiles.forEach(t => t.style.display = 'none');
         tileGrid.style.display = 'block';
         roomHdr.style.padding = '0';
-        drawer.style.cssText = 'display:block;border-radius:20px;border:1px solid rgba(255,255,255,0.07);opacity:1;max-height:none;width:100%;overflow:visible;';
+        drawer.style.cssText = 'display:block;border:none;border-radius:0;opacity:1;max-height:none;width:100%;overflow:visible;';
         drawer.classList.add('drawer-hero-mode');
         /* nudge already sits as sibling to footer-left — just show it */
         /* Wire X btn to reset */
