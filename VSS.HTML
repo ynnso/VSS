@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Virtual Staging Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --s2s-red:#CC1500; --s2s-red-light:#E8321A; --s2s-red-glow:rgba(200,20,0,0.18);
+  --s2s-red-ultra-soft:#FFF0ED; --apple-black:#141414; --s2s-charcoal:#1C1C1E;
+  --secondary-text:#6E6E73; --tertiary-text:#AEAEB2;
+  --bg-gradient:linear-gradient(160deg,#FAFAFA 0%,#F4F4F6 60%,#EFEFEF 100%);
+  --card-bg:rgba(255,255,255,0.82); --card-border:rgba(255,255,255,0.95);
+  --card-shadow:0 8px 32px rgba(20,20,20,0.08),0 2px 8px rgba(20,20,20,0.04);
+  --field-bg:rgba(20,20,20,0.04); --s2s-green:#30D158; --s2s-green-dark:#28C24A;
+  --border-soft:rgba(20,20,20,0.09); --border-medium:rgba(20,20,20,0.14);
+  --soft-red:#FFECEA; --section-accent:rgba(200,20,0,0.08);
+}
+
+/* ── BASE ── */
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;font-family:'Montserrat',sans-serif;}
+html{scroll-behavior:smooth;}
+body{
+  background:#0a0a0a;display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;margin:0;padding:0 16px 96px;
+  font-family:'Montserrat',sans-serif;font-weight:500;position:relative;
+  color:#0a0a0a;
+}
+
+/* ── APPLE #1: GRAIN SHIMMER ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size:200px 200px;opacity:0.022;
+  animation:grainShift 8s ease-in-out infinite;
+}
+@keyframes grainShift{0%,100%{transform:translate(0,0)}25%{transform:translate(-1px,1px)}75%{transform:translate(1px,-1px)}}
+
+/* ── PROGRESS BAR ── */
+#top-progress-container{
+  position:fixed;top:0;left:0;width:100%;
+  background:rgba(250,250,250,0.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1.5px solid var(--border-soft);
+  z-index:9999;padding:6px 0;display:flex;justify-content:center;
+}
+.stepper-wrapper{display:flex;align-items:center;width:100%;max-width:800px;padding:0 12px;}
+.step-item{display:flex;flex-direction:column;align-items:center;position:relative;flex:1;}
+.step-dot{
+  width:27px;height:27px;border:1.5px solid var(--border-medium);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:13px;background:white;z-index:2;
+  color:var(--apple-black);transition:background 0.4s,border-color 0.4s,box-shadow 0.4s,color 0.4s;
+}
+/* Completed: black fill, bright green halo, white checkmark */
+.step-dot.completed{
+  background:#0a0a0a;border-color:#0a0a0a;color:white;
+  box-shadow:0 0 0 3px rgba(48,209,88,0.9),0 0 0 6px rgba(48,209,88,0.18);
+}
+/* Step label: full black opacity when step is completed */
+.step-text{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;color:var(--apple-black);opacity:0.55;transition:opacity 0.4s,font-weight 0.4s;}
+.step-item:has(.step-dot.completed) .step-text{opacity:1;font-weight:700;}
+.step-line{
+  position:absolute;height:1px;background:var(--border-soft);top:13.5px;left:50%;width:100%;z-index:1;
+  transition:background 0.4s;
+}
+.step-item:has(.step-dot.completed) .step-line{background:#0a0a0a;}
+
+/* CTA pulse — slow green glow on black button */
+@keyframes catalogPulse {
+  0%,100%{ box-shadow: 0 4px 16px rgba(10,10,10,0.22), inset 0 0 0 rgba(204,21,0,0); }
+  50%    { box-shadow: 0 6px 20px rgba(10,10,10,0.28), inset 0 0 22px rgba(204,21,0,0.28); }
+}
+.btn-catalog-pulse {
+  animation: catalogPulse 3s ease-in-out infinite;
+}
+/* Black filled catalog CTA — half-width pill */
+.btn-catalog{
+  width:auto;max-width:340px;padding:13px 28px;border-radius:50px;
+  background:#0a0a0a;color:white;
+  border:1.5px solid #0a0a0a;
+  font-size:14px;font-weight:700;letter-spacing:0.05em;
+  transition:background 0.18s;
+}
+.btn-catalog:hover{background:#2a2a2a;}
+/* Submit CTA — black, half-width, inner green glow */
+.btn-submit-compact{
+  width:auto;max-width:340px;padding:13px 28px;border-radius:50px;font-size:14px;font-weight:700;letter-spacing:0.05em;
+  background:var(--s2s-red) !important;color:white !important;
+  border:none;border-bottom:none;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.25), 0 4px 18px rgba(204,21,0,0.35) !important;
+  transition:box-shadow 0.3s,background 0.3s;
+}
+.btn-submit-compact:not(.locked-section):hover{
+  background:var(--s2s-red-light) !important;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.4), 0 6px 22px rgba(204,21,0,0.5) !important;
+}
+/* Checkmark micro-action on submit */
+@keyframes checkPop{
+  0%  {transform:scale(0.6);opacity:0;}
+  60% {transform:scale(1.2);opacity:1;}
+  100%{transform:scale(1);opacity:1;}
+}
+.submit-check-anim{display:inline-block;animation:checkPop 0.4s cubic-bezier(0.22,1,0.36,1) both;}
+
+/* ── STEP CIRCLE ── */
+.step-circle{
+  background:var(--s2s-charcoal);
+  color:white;width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;
+  margin-bottom:16px;
+  box-shadow:0 4px 14px rgba(10,10,10,0.22),0 0 0 8px rgba(10,10,10,0.06);
+}
+
+/* ── SECTIONS ── */
+.main-section{
+  width:100%;max-width:800px;display:flex;flex-direction:column;align-items:center;
+  margin-bottom:80px;padding-top:70px;scroll-margin-top:70px;position:relative;
+}
+.main-section+.main-section::before{
+  content:'';position:absolute;top:30px;left:50%;transform:translateX(-50%);
+  width:48px;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(20,20,20,0.12),transparent);
+  border-radius:1px;
+}
+/* APPLE #7: smooth grayscale unlock */
+.locked-section{opacity:0.4;pointer-events:none;filter:grayscale(1);transition:opacity 0.5s ease,filter 0.5s ease;}
+.step-label{font-family:'Montserrat',sans-serif;font-weight:600;font-size:18px;color:#0a0a0a;margin-bottom:12px;text-align:center;letter-spacing:-0.02em;}
+
+/* Very dark text for all body copy */
+.intro-text,.step-subtitle{color:#0a0a0a !important;font-weight:500;}
+
+/* ── BUTTONS ── */
+.action-button{
+  font-family:'Montserrat',sans-serif;font-weight:600;color:white;text-decoration:none;
+  font-size:13px;padding:20px;border-radius:18px;transition:0.25s cubic-bezier(0.2,0,0,1);
+  display:flex;align-items:center;justify-content:center;width:100%;text-align:center;
+  border:none;cursor:pointer;letter-spacing:0.01em;
+}
+/* APPLE #6: btn-red inner bevel — kept for "Stage another listing" */
+.btn-red{
+  background:linear-gradient(180deg,#232325 0%,#0A0A0A 100%);
+  color:var(--s2s-red-light);font-size:22px;border-bottom:3px solid #000;
+  box-shadow:0 12px 32px rgba(10,10,10,0.35),0 2px 8px rgba(10,10,10,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
+  position:relative;overflow:hidden;
+}
+.btn-green{
+  background:linear-gradient(180deg,#44E872 0%,#25B845 100%);
+  border-bottom:3px solid #1E9E3B;box-shadow:0 10px 28px rgba(40,194,74,0.28);
+}
+@media(hover:hover){
+  .action-button:hover{transform:translateY(-2px);filter:brightness(1.12);}
+  .add-card-icon:hover{background:rgba(235,235,237,0.9);transform:scale(1.01);}
+  .delete-card:hover{background:var(--s2s-red);color:white;border-color:var(--s2s-red);}
+  .option-card:hover{border-color:var(--border-medium);box-shadow:0 4px 16px rgba(20,20,20,0.08);}
+  .placeholder-card:hover{box-shadow:0 16px 48px rgba(20,20,20,0.14),0 4px 12px rgba(20,20,20,0.07);transform:translateY(-2px);}
+}
+
+/* ── CARD GRID ── */
+.placeholder-container{
+  display:flex;flex-wrap:wrap;gap:24px;
+  width:100%;max-width:960px;
+  justify-content:center;
+  align-items:flex-start;
+  margin:0 auto;
+}
+/* Single card: large centered spotlight */
+.placeholder-container.single-card{
+  align-items:center;
+  flex:1;
+  justify-content:center;
+}
+.placeholder-container.single-card .placeholder-card{
+  flex:0 0 auto;width:100%;max-width:760px;min-width:0;
+}
+/* Multi card: disabled — always single column */
+.placeholder-container.multi-card .placeholder-card{
+  flex:0 0 auto;width:100%;max-width:760px;min-width:0;
+}
+
+/* APPLE #3: card entrance */
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Clockwise red border glow — micro-success handshake on image load */
+@keyframes redBorderTravel {
+  0%   { box-shadow: 4px 0   0 0 rgba(204,21,0,0.0),  0 0 0 1px rgba(204,21,0,0.08); }
+  15%  { box-shadow: 4px 0   0 0 rgba(204,21,0,0.7),  0 0 0 1px rgba(204,21,0,0.08); }
+  30%  { box-shadow: 0   4px 0 0 rgba(204,21,0,0.7),  0 0 0 1px rgba(204,21,0,0.08); }
+  50%  { box-shadow: -4px 0  0 0 rgba(204,21,0,0.7),  0 0 0 1px rgba(204,21,0,0.08); }
+  70%  { box-shadow: 0  -4px 0 0 rgba(204,21,0,0.7),  0 0 0 1px rgba(204,21,0,0.08); }
+  85%  { box-shadow: 4px 0   0 0 rgba(204,21,0,0.4),  0 0 0 1px rgba(204,21,0,0.08); }
+  100% { box-shadow: 0   0   0 0 rgba(204,21,0,0.0),  0 0 0 1px rgba(10,10,10,0.06); }
+}
+.card-success-pulse {
+  animation: redBorderTravel 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.placeholder-card{
+  background:#0a0a0a;
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:32px;
+  padding:0;position:relative;
+  transition:box-shadow 0.4s cubic-bezier(0.4,0,0.2,1),transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.04),
+             0 8px 32px rgba(0,0,0,0.5);
+  overflow:hidden;display:flex;flex-direction:column;
+  animation:cardIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+  flex:1 1 340px;max-width:420px;min-width:300px;
+  scroll-margin-top:110px;
+}
+
+/* ── ROOM PICKER TILE GRID ── */
+.room-header{
+  background:transparent;padding:16px 12px 14px;
+  border-bottom:none;
+  transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1),padding 0.35s ease,opacity 0.25s ease;
+  width:100%;position:relative;overflow:visible;
+}
+.room-header.collapsed{
+  max-height:0 !important;height:0 !important;min-height:0 !important;
+  overflow:hidden !important;padding-top:0 !important;padding-bottom:0 !important;
+  border:none !important;opacity:0;margin:0 !important;
+  transition:max-height 0.4s ease,opacity 0.3s ease;
+}
+/* ══ UNIFIED STUDIO CONSOLE — DRAWER SYSTEM ══ */
+
+/* Grid wrapper needed for drawer injection */
+.room-tile-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+  overflow:visible;position:relative;
+}
+
+/* Lights Out — 5% on inactive tiles */
+.room-tile-grid.drawer-open .room-tile:not(.selected){
+  opacity:0.05;transition:opacity 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.room-tile-grid.drawer-open .room-tile.selected{
+  border-color:rgba(204,21,0,0.5)!important;
+  box-shadow:inset 0 0 22px rgba(204,21,0,0.2),0 0 18px rgba(204,21,0,0.12),0 0 0 1px rgba(204,21,0,0.4)!important;
+}
+
+/* Tether line */
+.tile-tether{
+  position:absolute;width:1px;background:var(--s2s-red);z-index:10;
+  opacity:0;transform:scaleY(0);transform-origin:top;
+  transition:opacity 0.3s,transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  pointer-events:none;box-shadow:0 0 4px rgba(204,21,0,0.6);
+}
+.tile-tether.active{opacity:0.6;transform:scaleY(1);}
+
+/* Obsidian drawer */
+.studio-drawer{
+  grid-column:1 / -1;
+  background:rgba(6,6,6,0.98);
+  border:1px solid rgba(255,255,255,0.05);
+  border-top:1px solid rgba(204,21,0,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  max-height:0;opacity:0;
+  transition:max-height 0.55s cubic-bezier(0.4,0,0.2,1),opacity 0.35s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 8px 40px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.03);
+  position:relative;
+}
+.studio-drawer.open{max-height:800px;opacity:1;}
+
+/* Ghost icon — EVICTED. Hidden entirely. */
+.drawer-ghost{display:none;}
+
+/* Milled obsidian slot — SINGLE ROW */
+.drawer-input-wrap{
+  position:relative;padding:12px 14px 12px;
+  display:flex;flex-direction:column;align-items:stretch;gap:8px;
+  z-index:2;font-family:'Montserrat',sans-serif;
+}
+/* REF ID — top-right of tray after validation */
+.drawer-ref-id{
+  position:absolute;top:10px;right:16px;
+  font-family:'Montserrat',sans-serif;font-size:10px;font-weight:500;
+  color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;
+}
+/* Single milled slot row */
+.drawer-slot-row{
+  display:flex;align-items:center;gap:0;
+  background:rgba(0,0,0,0.72);
+  border-top:1px solid rgba(255,255,255,0.14);
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  box-shadow:inset 0 4px 18px rgba(0,0,0,0.85),inset 0 1px 0 rgba(255,255,255,0.05);
+  position:relative;
+}
+/* Left: id-tag icon */
+.drawer-anchor-icon{
+  padding:0 8px 0 12px;
+  color:white;z-index:3;display:flex;align-items:center;flex-shrink:0;
+}
+.drawer-anchor-icon svg{width:18px;height:18px;}
+/* STYLE ID label */
+.drawer-style-label{
+  font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;
+  color:white;letter-spacing:0.04em;text-transform:uppercase;
+  white-space:nowrap;padding-right:6px;flex-shrink:0;border-right:none;
+}
+/* Input — ID number: white, prominent */
+.drawer-omnibox{
+  flex:1;padding:18px 10px 18px 6px;
+  border:none;background:transparent;box-shadow:none;
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:22px;
+  color:white;outline:none;letter-spacing:0.04em;
+  transition:none;caret-color:var(--s2s-red);min-width:0;
+}
+.drawer-omnibox::placeholder{
+  color:rgba(255,255,255,0.18);font-size:22px;letter-spacing:0.45em;
+  font-family:'Montserrat',sans-serif;font-weight:300;
+}
+/* Divider */
+.drawer-slot-divider{
+  width:1px;height:24px;background:rgba(255,255,255,0.1);flex-shrink:0;margin:0 12px;
+}
+/* Room icon: grey */
+.drawer-status-icon{
+  width:22px;height:22px;opacity:0.45;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;margin-right:6px;
+}
+.drawer-status-icon svg{width:22px;height:22px;stroke:rgba(255,255,255,0.5);color:rgba(255,255,255,0.5);}
+/* Room label: grey, right-justified */
+.drawer-room-label{
+  font-family:'Montserrat',sans-serif;
+  font-size:12px;font-weight:600;
+  color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;
+  white-space:nowrap;margin-right:10px;
+}
+.drawer-room-label svg{display:none;}
+/* Frosted lens — inline right end */
+.drawer-submit{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;margin-right:8px;
+  background:rgba(255,255,255,0.04);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:rgba(255,255,255,0.15);
+  transition:background 0.3s,box-shadow 0.3s,color 0.3s,border-color 0.3s;
+  flex-shrink:0;
+}
+.drawer-submit.lit{
+  background:rgba(204,21,0,0.88);border-color:rgba(204,21,0,0.7);
+  color:white;box-shadow:0 0 18px rgba(204,21,0,0.55),inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.drawer-submit:hover{background:var(--s2s-red);border-color:var(--s2s-red);color:white;box-shadow:0 0 26px rgba(204,21,0,0.65);}
+/* Footer: hidden in select phase */
+.drawer-footer-hidden{display:none!important;}
+/* Footer: shown in hero phase */
+.drawer-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 4px 6px;
+}
+.drawer-footer-left{display:flex;align-items:center;gap:14px;}
+/* +NOTE at 30% opacity */
+.drawer-add-note-btn{
+  background:none;border:none;cursor:pointer;
+  font-family:'Montserrat',sans-serif;font-size:10px;font-weight:500;
+  color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;
+  padding:0;transition:color 0.25s;
+}
+.drawer-add-note-btn:hover{color:rgba(255,255,255,0.6);}
+
+/* Igniting Lens — replaces Approve chip, with slow pulse when ready */
+@keyframes lensReadyPulse{
+  0%,100%{box-shadow:0 0 6px rgba(204,21,0,0.4),0 0 0 1px rgba(204,21,0,0.25);}
+  50%    {box-shadow:0 0 18px rgba(204,21,0,0.75),0 0 0 2px rgba(204,21,0,0.5),0 0 30px rgba(204,21,0,0.2);}
+}
+.overlay-confirm{
+  flex-shrink:0;height:32px;padding:0 14px;border-radius:20px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.2);
+  border:1px solid rgba(255,255,255,0.08);
+  transition:all 0.3s ease;display:none;
+  align-items:center;justify-content:center;gap:5px;
+  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;
+}
+.overlay-confirm.ready{
+  display:flex;
+  background:rgba(8,8,8,0.9);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.14);
+  color:white;
+  box-shadow:0 2px 12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);
+  animation:lensReadyPulse 2.8s ease-in-out infinite;
+}
+.overlay-confirm.verified{
+  display:flex;
+  background:rgba(8,8,8,0.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.2);
+  color:white;animation:none;
+  box-shadow:0 2px 14px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.confirm-check{color:#2ECC5A;font-size:11px;font-weight:800;}
+
+/* Hide submit arrow when drawer is in hero mode (image loaded) */
+.drawer-hero-mode .drawer-submit{display:none!important;}
+
+/* Hero tray: show footer row with +NOTE and lens */
+.drawer-hero-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 4px 8px;
+}
+.drawer-hero-footer .drawer-footer-left{display:flex;align-items:center;gap:12px;}
+
+/* Hero single-row tray overrides */
+.drawer-hero-tray .drawer-slot-row{
+  /* ID value shown as text, not editable input */
+}
+.drawer-id-display{
+  font-family:'Montserrat',sans-serif;font-weight:600;font-size:15px;
+  color:white;letter-spacing:0.04em;flex:1;padding:14px 8px 14px 12px;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* Hide blade always */
+.drawer-blade{display:none !important;}
+
+/* Slide-2 body and all backgrounds: truly seamless dark */
+
+.slide2-header{background:transparent;border-bottom:1px solid rgba(255,255,255,0.04);}
+.slide2-body{background:transparent;}
+#slide-root{background:#0a0a0a;}
+
+/* Remove any white/light from card-action-row area */
+.card-action-row{background:transparent;}
+/* Staged image */
+.drawer-staged-img{
+  width:100%;height:auto;max-height:55vh;object-fit:contain;display:none;
+  filter:grayscale(1) brightness(0.4);
+  transition:filter 1.4s cubic-bezier(0.4,0,0.2,1);
+  background:#0a0a0a;
+}
+.drawer-staged-img.revealed{filter:grayscale(0) brightness(1);}
+.drawer-img-wrap{position:relative;overflow:hidden;}
+/* 20px vignette bleed bottom of image into tray */
+.drawer-img-fade{
+  position:absolute;bottom:0;left:0;right:0;height:20px;
+  background:linear-gradient(to bottom,transparent,rgba(6,6,6,0.98));
+  pointer-events:none;z-index:2;
+}
+/* X — high contrast frosted, inlaid top-right of image */
+.drawer-x-btn{
+  position:absolute;top:12px;right:12px;z-index:10;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.22);
+  border-radius:50%;width:26px;height:26px;
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;color:rgba(255,255,255,0.8);font-size:10px;font-weight:700;
+  transition:background 0.25s,color 0.25s;
+}
+.drawer-x-btn:hover{background:rgba(0,0,0,0.7);color:white;}
+.drawer-shimmer{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,#0a0a0a 25%,#161616 50%,#0a0a0a 75%);
+  background-size:200% 100%;animation:shimmer 1.5s infinite linear;
+  display:none;z-index:3;
+}
+/* ══ END DRAWER SYSTEM ══ */
+/* Portrait obsidian tile */
+.room-tile{
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  gap:0;padding:0 0 14px;border-radius:14px;cursor:pointer;min-height:130px;
+  background:rgba(255,255,255,0.03);
+  border:none;
+  /* Rim light: 0.5px inner stroke top+left glass-cut effect */
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,0.08),inset 0 0 0 1px rgba(255,255,255,0.04);
+  overflow:hidden;position:relative;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),
+             box-shadow 0.35s cubic-bezier(0.4,0,0.2,1),
+             background 0.35s cubic-bezier(0.4,0,0.2,1);
+  -webkit-tap-highlight-color:transparent;
+  will-change:transform;
+}
+/* Blueprint silhouette layer — desaturated bg image */
+.room-tile::after{
+  content:'';position:absolute;inset:0;opacity:0;
+  background-size:cover;background-position:center;
+  filter:grayscale(1) brightness(0.18);
+  transition:opacity 0.5s cubic-bezier(0.4,0,0.2,1);pointer-events:none;z-index:0;
+}
+/* Red aura */
+.room-tile::before{
+  content:'';position:absolute;inset:0;opacity:0;
+  background:radial-gradient(ellipse at 50% 100%,rgba(204,21,0,0.2) 0%,transparent 65%);
+  transition:opacity 0.35s cubic-bezier(0.4,0,0.2,1);pointer-events:none;z-index:1;
+}
+.room-tile:hover::before{opacity:1;}
+.room-tile:hover::after{opacity:1;}
+.room-tile:hover{
+  background:rgba(255,255,255,0.07);
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,0.14),inset 0 0 0 1px rgba(204,21,0,0.25),
+             0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(204,21,0,0.06);
+}
+.room-tile:active{transform:translateY(-1px) scale(0.99);}
+.room-tile.selected{
+  background:#0a0a0a;
+  box-shadow:inset 0 0 22px rgba(204,21,0,0.2),inset 1px 1px 0 rgba(255,255,255,0.07),
+             0 0 18px rgba(204,21,0,0.12),0 0 0 1px rgba(204,21,0,0.4);
+  transform:none;
+}
+/* Serial corner tag */
+.room-tile-serial{display:none;}
+.room-tile-icon-wrap{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;
+}
+.room-tile svg{width:56px;height:56px;display:block;color:rgba(255,255,255,0.6);
+  transition:color 0.35s,transform 0.35s cubic-bezier(0.4,0,0.2,1);stroke:rgba(255,255,255,0.6);}
+.room-tile:hover svg{color:rgba(255,255,255,0.92);stroke:rgba(255,255,255,0.92);transform:scale(1.08);}
+.room-tile.selected svg{color:white;stroke:white;}
+.room-tile-label{
+  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;
+  color:rgba(255,255,255,0.45);text-align:center;letter-spacing:0.16em;text-transform:uppercase;
+  line-height:1;transition:color 0.35s;position:relative;z-index:2;
+  padding:0 6px 2px;
+}
+.room-tile:hover .room-tile-label{color:rgba(255,255,255,0.85);}
+.room-tile.selected .room-tile-label{color:rgba(255,255,255,0.8);}
+/* Delete/Cancel button in header */
+.room-header .delete-card{position:absolute;right:10px;top:10px;}
+
+/* ── CARD BODY ── */
+.card-body{padding:0;display:flex;flex-direction:column;overflow:hidden;position:relative;background:#0a0a0a;}
+
+/* ── INPUT AREA — full image container ── */
+/* ── INPUT AREA — image only, no strip overlay ── */
+.unified-input-area{
+  width:100%;min-height:220px;background:#0a0a0a;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.single-card .unified-input-area{min-height:280px;}
+.single-card .unified-input-area:has(.staged-image[style*="block"]){min-height:45vh;height:auto;}
+.multi-card .unified-input-area{min-height:220px;}
+/* Tighten slot-row fonts in multi-card narrow layout */
+.multi-card .drawer-style-label{font-size:14px;}
+.multi-card .drawer-omnibox{font-size:18px;}
+.multi-card .drawer-omnibox::placeholder{font-size:18px;}
+
+/* Ghost room icon — 150px centered watermark */
+.ghost-room-icon{
+  position:absolute;left:0;right:0;top:0;bottom:56px;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;z-index:0;opacity:0.05;
+  transition:opacity 0.4s;
+}
+.ghost-room-icon svg{width:150px;height:150px;stroke:white;color:white;}
+.unified-input-area:has(.staged-image[style*="block"]) .ghost-room-icon{opacity:0;}
+
+/* Red blade — bloom pulse, hides after submit */
+@keyframes bladePulse{
+  0%,100%{box-shadow:2px 0 8px rgba(204,21,0,0.55),4px 0 18px rgba(204,21,0,0.28);}
+  50%    {box-shadow:2px 0 16px rgba(204,21,0,0.9),5px 0 30px rgba(204,21,0,0.45);}
+}
+.red-blade{
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--s2s-red);z-index:5;
+  transform:scaleY(0);transform-origin:bottom;
+  transition:transform 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.4s;
+  opacity:1;
+}
+.red-blade.active{transform:scaleY(1);animation:bladePulse 1.8s ease-in-out infinite;}
+.red-blade.hidden{opacity:0;animation:none;}
+
+.input-wrapper{
+  position:relative;width:82%;display:flex;align-items:center;z-index:2;
+}
+.unified-input-area::before {
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,#0d0d0d 8%,#161616 18%,#0d0d0d 33%);
+  background-size:200% 100%;
+  animation:ambientShimmer 2.4s ease-in-out infinite;
+  z-index:0;pointer-events:none;
+}
+.unified-input-area:has(.staged-image[style*="block"])::before{display:none;}
+@keyframes ambientShimmer{
+  0%{background-position:100% 0}100%{background-position:-100% 0}
+}
+
+/* Recessed obsidian tray — rim light top edge, inner depth shadow */
+
+.unified-input-area input{
+  width:100%;padding:16px 52px 16px 20px;
+  border-radius:0;border:none;
+  border-top:1px solid rgba(255,255,255,0.15);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  background:rgba(0,0,0,0.5);
+  box-shadow:inset 0 3px 14px rgba(0,0,0,0.65),inset 0 1px 0 rgba(255,255,255,0.03);
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;
+  color:white;outline:none;text-align:center;
+  transition:border-top-color 0.3s,box-shadow 0.3s,background 0.3s;
+  letter-spacing:0.2em;
+}
+.unified-input-area input:focus{
+  background:rgba(0,0,0,0.6);
+  border-top-color:rgba(255,255,255,0.28);
+  box-shadow:inset 0 3px 18px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.unified-input-area input::placeholder{
+  color:rgba(255,255,255,0.14);font-weight:600;font-size:11px;
+  letter-spacing:0.3em;text-transform:uppercase;
+  font-family:'Montserrat',sans-serif;
+}
+
+/* Frosted circular lens — ignites red on valid 4-digit input */
+.stage-btn{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:50%;width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:rgba(255,255,255,0.25);font-size:13px;
+  transition:background 0.3s,box-shadow 0.3s,color 0.3s,border-color 0.3s;
+  flex-shrink:0;
+}
+.stage-btn.lit{
+  background:rgba(204,21,0,0.12);border-color:rgba(204,21,0,0.35);
+  color:var(--s2s-red);
+  box-shadow:0 0 10px rgba(204,21,0,0.28),inset 0 0 6px rgba(204,21,0,0.08);
+}
+.stage-btn:hover{
+  background:rgba(204,21,0,0.22);border-color:rgba(204,21,0,0.55);
+  color:white;box-shadow:0 0 18px rgba(204,21,0,0.4);
+}
+
+.staged-image{
+  width:100%;height:100%;object-fit:cover;display:none;cursor:pointer;
+  filter:grayscale(1) brightness(0.4);
+  transition:filter 1.4s cubic-bezier(0.4,0,0.2,1);
+  margin:0;padding:0;vertical-align:bottom;
+}
+.staged-image.image-revealed{filter:grayscale(0) brightness(1);}
+
+/* Tiny frosted X — top-right of image area */
+.edit-trigger-btn{
+  position:absolute;top:10px;right:10px;z-index:50;
+  background:rgba(255,255,255,0.09) !important;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.1) !important;
+  border-radius:50% !important;box-shadow:none !important;
+  width:20px !important;height:20px !important;
+  padding:0;color:rgba(255,255,255,0.5);font-size:9px;font-weight:600;line-height:1;
+  cursor:pointer;display:none;
+  align-items:center;justify-content:center;
+  transition:background 0.3s,color 0.3s;
+}
+.edit-trigger-btn:hover{background:rgba(255,255,255,0.18) !important;color:white !important;}
+
+
+/* ── CARD FOOTER — Obsidian Tray ── */
+.card-footer{
+  display:none;flex-direction:column;
+  background:#0a0a0a;
+  border-top:1px solid rgba(255,255,255,0.07);
+}
+.card-footer.visible{display:flex;}
+.footer-row-1{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.footer-room-group{display:flex;align-items:center;gap:7px;}
+.footer-room-icon{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);}
+.footer-room-icon svg{width:18px;height:18px;display:block;stroke:rgba(255,255,255,0.5);}
+.footer-room-label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.6);letter-spacing:0;}
+.footer-id-group{display:flex;align-items:center;gap:6px;}
+.footer-id-icon{display:flex;align-items:center;color:rgba(255,255,255,0.4);flex-shrink:0;}
+.footer-id-icon svg{width:16px;height:16px;display:block;stroke:rgba(255,255,255,0.4);}
+.footer-id-sep{display:none;}
+.footer-id-label{display:none;}
+.footer-id-number{font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:white;letter-spacing:0.1em;line-height:1;}
+.footer-row-2{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px;}
+.footer-request-group{display:flex;align-items:center;gap:8px;}
+.footer-request-label{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;color:rgba(255,255,255,0.3);letter-spacing:0.01em;}
+
+@keyframes lensPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(204,21,0,0),inset 0 0 0 rgba(204,21,0,0);}
+  50%    {box-shadow:0 0 12px 2px rgba(204,21,0,0.25),inset 0 0 8px rgba(204,21,0,0.15);}
+}
+/* Approve chip → Igniting Lens circle */
+.confirm-check{color:#2ECC5A;font-size:12px;font-weight:800;margin-right:3px;}
+
+/* YES/NO */
+.binary-pills{
+  display:flex;gap:4px;background:none;border:none;padding:0;
+}
+.pill-btn{
+  height:24px;padding:0 10px;min-width:46px;border-radius:12px;cursor:pointer;
+  font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.03em;
+  /* Inactive: ghost — border only, no fill, dim text */
+  background:transparent;
+  color:rgba(10,10,10,0.28);
+  border:1px solid rgba(10,10,10,0.14);
+  transition:background 0.18s,color 0.18s,border-color 0.18s,box-shadow 0.18s;
+  line-height:1;text-align:center;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;
+}
+/* Active: solid black glass — identical structure to Approve chip */
+.pill-btn.active{
+  background:linear-gradient(180deg,#232325 0%,#0a0a0a 100%);
+  color:white;
+  border-color:transparent;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3),
+             inset 0 1px 0 rgba(255,255,255,0.12),
+             inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+.pill-btn:not(.active):hover{
+  border-color:rgba(10,10,10,0.3);
+  color:rgba(10,10,10,0.5);
+}
+
+/* Notes textarea — below footer when YES selected */
+.notes-content{display:none;width:100%;padding:0 14px 10px;}
+.notes-content.active{display:block;}
+.notes-content textarea{
+  width:100%;height:34px;min-height:34px;
+  border:1px solid rgba(255,255,255,0.12);border-radius:10px;
+  padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.4;
+  resize:none;outline:none;background:rgba(255,255,255,0.05);
+  transition:border-color 0.3s,box-shadow 0.3s;
+  color:white;overflow:hidden;display:block;
+}
+.notes-content textarea:focus{border-color:rgba(255,255,255,0.3);box-shadow:0 0 0 3px rgba(255,255,255,0.04);}
+.notes-content textarea::placeholder{color:rgba(255,255,255,0.2);}
+.notes-expand-hint{display:none !important;}
+/* notes-choice-container no longer used as standalone */
+.notes-choice-container{display:none;}
+
+
+
+/* ── PROGRESSIVE REVEAL ── */
+
+/* Pulse room header once on card arrival to direct attention */
+@keyframes roomPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(200,20,0,0.5); }
+  60%  { box-shadow: 0 0 0 10px rgba(200,20,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(200,20,0,0); }
+}
+.room-header.pulse-room { animation: roomPulse 1s ease-out 2; }
+
+/* Hidden card sections */
+.card-reveal-hidden {
+  display: none;
+}
+/* Revealed — fade-in animation, no dead space */
+.card-reveal-visible {
+  display: block;
+  animation: revealIn 0.35s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes revealIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* unified-input-area is a flex container */
+.unified-input-area.card-reveal-visible {
+  display: flex;
+}
+/* card-footer uses .visible class directly */
+/* bottom-row permanently hidden */
+.bottom-row { display: none !important; }
+
+
+@keyframes attention-pulse{
+  0%{box-shadow:0 0 0 0 rgba(10,10,10,0.3);}
+  50%{box-shadow:0 0 0 8px rgba(10,10,10,0);}
+  100%{box-shadow:0 0 0 0 rgba(10,10,10,0);}
+}
+.pulse-attention{animation:attention-pulse 1.5s infinite;}
+
+/* ── OPTION CARDS ── */
+.option-card{
+  background:white;padding:20px;border-radius:20px;margin-bottom:12px;
+  border:1.5px solid var(--border-soft);display:flex;align-items:flex-start;gap:16px;
+  cursor:pointer;width:100%;transition:0.18s;position:relative;
+  box-shadow:0 2px 8px rgba(20,20,20,0.04);
+}
+.option-card input[type="radio"]{margin-top:5px;accent-color:#0a0a0a;transform:scale(1.2);}
+.option-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;color:#0a0a0a;display:flex;align-items:center;gap:8px;letter-spacing:-0.01em;flex-wrap:wrap;}
+.option-desc{font-family:'Montserrat',sans-serif;font-size:14px;color:#0a0a0a;line-height:1.5;margin-top:4px;opacity:0.72;}
+.recommended-badge{
+  background:#0a0a0a;color:white;
+  font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;letter-spacing:0.06em;flex-shrink:0;
+}
+.option-card.option-recommended{border:1.5px solid var(--border-soft);background:white;}
+.option-card:has(input:checked){border-color:#0a0a0a !important;box-shadow:0 0 0 3px rgba(10,10,10,0.08),0 4px 16px rgba(20,20,20,0.08);}
+
+/* ── ADD CARD ── */
+.add-card-icon{
+  display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:400px;
+  border:2px dashed rgba(20,20,20,0.18);border-radius:28px;cursor:pointer;position:relative;
+  background:rgba(245,245,247,0.7);transition:0.3s;
+}
+.add-card-icon span{font-size:64px;font-weight:200;color:rgba(20,20,20,0.3);pointer-events:none;line-height:1;}
+.add-card-icon .add-label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:rgba(20,20,20,0.35);text-transform:uppercase;margin-top:8px;letter-spacing:0.12em;}
+.add-card-icon.locked-section{opacity:0.12;pointer-events:none;}
+
+/* ── DELETE ── */
+/* Delete card — visible in room picker */
+.delete-card{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:22px;height:22px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:9px;cursor:pointer;border:1px solid var(--border-soft);
+  backdrop-filter:blur(8px);transition:0.18s;
+}
+/* When room NOT yet selected — show as "Cancel" text link */
+.room-header:not(.collapsed) .delete-card{
+  width:auto;height:auto;padding:4px 8px;border-radius:8px;font-size:10px;font-family:'Montserrat',sans-serif;font-weight:600;
+  color:rgba(10,10,10,0.4);background:none;border:none;transform:translateY(-50%);
+  letter-spacing:0.02em;
+}
+.room-header:not(.collapsed) .delete-card:hover{color:#0a0a0a;background:rgba(10,10,10,0.05);}
+
+/* ── CONFIRM CHECK — now handled by .overlay-confirm inside overlay strip ── */
+@keyframes trigger-pulse{
+  0%{box-shadow:0 0 0 0 rgba(48,209,88,0.6);}
+  50%{box-shadow:0 0 0 10px rgba(48,209,88,0);}
+  100%{box-shadow:0 0 0 0 rgba(48,209,88,0);}
+}
+.confirm-hint{display:none;}
+
+/* ── NAV BUTTONS ── */
+.nav-cta-container{display:flex;gap:16px;width:100%;max-width:800px;margin-top:20px;}
+.nav-btn{
+  flex:1;padding:18px;border-radius:16px;font-family:'Montserrat',sans-serif;
+  font-weight:700;cursor:pointer;border:none;text-transform:uppercase;
+  font-size:14px;letter-spacing:0.04em;transition:0.18s;
+}
+.btn-back{background:#EBEBED;color:var(--s2s-charcoal);}
+.btn-next{background:var(--s2s-charcoal);color:white;}
+
+
+/* Ghost note button — single tap to expand textarea */
+.add-note-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  background:transparent;
+  border:1px dashed rgba(255,255,255,0.2);
+  border-radius:10px;padding:6px 12px;
+  font-family:'Montserrat',sans-serif;
+  font-size:11px; font-weight:500;color:rgba(255,255,255,0.35);
+  cursor:pointer;transition:border-color 0.3s,color 0.3s,background 0.3s;
+  letter-spacing:0;
+}
+.add-note-btn:hover{border-color:rgba(255,255,255,0.4);color:rgba(255,255,255,0.6);}
+.add-note-btn.expanded{border-style:solid;border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.5);}
+.add-note-btn.has-content{border-style:solid;border-color:rgba(255,255,255,0.5);color:white;}
+.add-note-icon {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:14px; height:14px;
+  font-weight:600; font-size:13px; line-height:1;
+}
+.add-note-btn.has-content .add-note-icon::before {
+  content:'✓'; font-size:11px;
+}
+.add-note-btn.has-content .add-note-icon { display:inline-flex; }
+.add-note-btn.has-content .add-note-icon { font-size:0; }
+.add-note-btn.has-content .add-note-icon::before { font-size:11px; }
+
+/* ── MISC CARD ELEMENTS ── */
+.loading-shimmer{position:absolute;inset:0;background:linear-gradient(90deg,#0a0a0a 25%,#1a1a1a 50%,#0a0a0a 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;display:none;z-index:3;}
+.staged-image{width:100%;height:100%;object-fit:contain;display:none;cursor:pointer;background:#FAFAFA;margin-bottom:0;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.room-error{background:#F5F5F5 !important;animation:shake 0.3s ease-in-out;}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* ── CONSENT ── */
+.final-consent-container{
+  margin-top:24px;padding:16px 20px;background:#FAFAF8;border-radius:16px;
+  border:1.5px solid var(--border-soft);
+  display:none;align-items:center;gap:12px;width:100%;transition:0.3s;
+}
+.final-consent-container.visible{display:flex;}
+.final-consent-container input{width:20px;height:20px;accent-color:#0a0a0a;cursor:pointer;flex-shrink:0;}
+.final-consent-container label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#0a0a0a;cursor:pointer;line-height:1.5;opacity:0.8;}
+
+/* APPLE #5: identity field focus glow */
+.identity-section{
+  width:100%;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);
+  border-radius:24px;border:1px solid var(--card-border);
+  box-shadow:var(--card-shadow);
+  padding:22px 24px;margin-bottom:28px;display:flex;flex-direction:column;gap:10px;
+}
+.identity-field{
+  display:flex;align-items:center;gap:12px;
+  background:#F5F5F6;border-radius:14px;border:1.5px solid transparent;padding:0 16px 0 14px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.identity-field:focus-within{border-color:#0a0a0a;background:white;box-shadow:0 0 0 3px rgba(10,10,10,0.08);}
+.identity-field-icon{width:18px;height:18px;flex-shrink:0;opacity:0.55;display:flex;align-items:center;justify-content:center;}
+.identity-field-icon svg{width:18px;height:18px;display:block;}
+.identity-field input{
+  flex:1;border:none;background:transparent;font-family:'Montserrat',sans-serif;
+  font-size:16px;font-weight:500;color:#0a0a0a;padding:13px 0;outline:none;
+}
+.identity-field input::placeholder{color:var(--tertiary-text);font-weight:400;}
+
+/* ── RESTORE BANNER — never shown on fresh load ── */
+.restore-banner{
+  width:100%;max-width:800px;background:#FFFBEE;border:1.5px solid #EEC830;
+  border-radius:18px;padding:14px 20px;margin-bottom:24px;
+  display:none;align-items:center;justify-content:space-between;gap:12px;
+}
+.restore-banner-text{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;color:#0a0a0a;}
+.restore-banner-actions{display:flex;gap:8px;flex-shrink:0;}
+.restore-btn{padding:8px 16px;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;border:none;}
+.restore-btn-yes{background:var(--s2s-charcoal);color:white;}
+.restore-btn-no{background:rgba(0,0,0,0.07);color:var(--s2s-charcoal);}
+
+/* ── EDITORS CHOICE — hidden, JS preserved ── */
+.editors-choice-link{display:none;}
+
+/* APPLE #10: submit unlock pulse */
+@keyframes submitUnlock{
+  0%{box-shadow:0 8px 32px rgba(204,21,0,0.35),0 0 0 0 rgba(204,21,0,0.5);}
+  60%{box-shadow:0 8px 32px rgba(204,21,0,0.35),0 0 0 16px rgba(204,21,0,0);}
+  100%{box-shadow:0 8px 32px rgba(204,21,0,0.35),0 0 0 0 rgba(204,21,0,0);}
+}
+.submit-unlock-pulse{animation:submitUnlock 0.8s cubic-bezier(0.22,1,0.36,1) forwards;}
+
+/* APPLE #9: haptic press — mobile only */
+@media(hover:none){
+  .placeholder-card:active{transform:scale(0.99);}
+  .pill-btn:active{transform:scale(0.97);}
+  .nav-btn:active{transform:scale(0.97);}
+  .action-button:active{transform:scale(0.98);}
+  .delete-card:active{transform:translateY(-50%) scale(0.93);}
+}
+
+/* ── TABLET ── */
+@media(max-width:768px){
+  .placeholder-container{flex-direction:column;align-items:center;}
+  .add-card-icon{min-height:180px;}
+  .btn-red{font-size:18px;}
+}
+
+/* ── MOBILE ── */
+@media(max-width:480px){
+  body{padding:0 12px 96px;}
+  .step-text{font-size:9px;}
+  .step-dot{width:24px;height:24px;font-size:12px;}
+  .step-line{top:12px;}
+  .main-section{padding-top:60px;scroll-margin-top:60px;margin-bottom:56px;}
+  h1{margin-top:24px;margin-bottom:16px;}
+  .placeholder-container{flex-direction:column;align-items:center;gap:16px;}
+  .placeholder-card{border-radius:24px;}
+  .add-card-icon{min-height:140px;border-radius:24px;}
+  .add-card-icon span{font-size:48px;}
+  .btn-red{font-size:16px;padding:18px 12px;}
+  .room-header{padding:12px 16px;}
+  .restore-banner{flex-direction:column;align-items:flex-start;gap:10px;}
+  .restore-banner-actions{width:100%;}
+  .restore-btn{flex:1;text-align:center;padding:10px 8px;}
+  .option-card{padding:16px 14px;}
+  .recommended-badge{font-size:9px;padding:2px 6px;}
+  .identity-section{padding:16px;border-radius:18px;}
+  .nav-btn{padding:16px 10px;font-size:13px;}
+  .final-consent-container{padding:14px;}
+  .action-button{font-size:15px;padding:18px;}
+}
+
+/* ── ROOM HEADER QUESTION ── */
+.room-header-question{
+  display:flex;align-items:center;gap:14px;
+  margin:0 0 12px;padding:0;
+}
+.room-header-line{
+  flex:1;height:1px;background:rgba(255,255,255,0.15);
+}
+.room-header-title{
+  font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;
+  color:rgba(255,255,255,0.5);letter-spacing:0.28em;text-transform:uppercase;white-space:nowrap;
+}
+.room-header-step-tag{display:none;}
+
+/* ── CARD ACTION ROW ── */
+.card-action-row{
+  display:flex;gap:12px;justify-content:center;align-items:center;
+  width:100%;max-width:760px;margin:16px auto 8px;padding:0 16px;
+  background:transparent;
+  scroll-margin-top:110px;
+}
+.card-action-btn{
+  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.04em;
+  border:none;border-radius:50px;cursor:pointer;padding:11px 0;
+  transition:transform 0.18s,box-shadow 0.18s,opacity 0.18s;
+  white-space:nowrap;flex:1;max-width:220px;text-align:center;
+}
+.card-action-add{
+  background:transparent;color:rgba(255,255,255,0.7);
+  border:1.5px solid rgba(255,255,255,0.2);
+  box-shadow:none;
+  transition:background 0.3s cubic-bezier(0.4,0,0.2,1),border-color 0.3s cubic-bezier(0.4,0,0.2,1),color 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.card-action-add:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.4);color:white;}
+.card-action-submit{
+  background:var(--s2s-red);color:white;font-weight:800;
+  box-shadow:0 4px 16px rgba(204,21,0,0.3);
+  transition:background 0.3s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s cubic-bezier(0.4,0,0.2,1),transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.card-action-submit:hover{background:var(--s2s-red-light);transform:translateY(-2px);box-shadow:0 6px 20px rgba(204,21,0,0.4);}
+.card-action-btn.locked-section{opacity:0.25;pointer-events:none;filter:none;}
+
+/* ══════════════════════════════════════
+   FULLPAGE SLIDE SYSTEM — CORE
+   ══════════════════════════════════════ */
+
+html, body { margin:0; padding:0; overflow:hidden; height:100%; }
+
+#slide-root {
+  position:fixed; top:0; left:0;
+  width:100%; height:calc(100vh - 64px);
+  overflow:hidden; z-index:1;
+}
+
+.slide-panel {
+  position:absolute; top:0; left:0;
+  width:100%; height:100%;
+  overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  transition: transform 0.85s cubic-bezier(0.4,0,0.2,1),
+              opacity   0.65s cubic-bezier(0.4,0,0.2,1),
+              filter    0.65s cubic-bezier(0.4,0,0.2,1);
+  will-change:transform,filter;
+}
+.slide-panel.sp-active { transform:translateY(0) scale(1);        opacity:1;   filter:brightness(1);   pointer-events:auto;  z-index:2; }
+.slide-panel.sp-above  { transform:translateY(-6%) scale(0.95);   opacity:0.5; filter:brightness(0.5); pointer-events:none;  z-index:1; }
+.slide-panel.sp-below  { transform:translateY(100%) scale(1);     opacity:0;   filter:brightness(1);   pointer-events:none;  z-index:1; }
+
+/* ── SLIDE 1: dark hero ── */
+
+/* ── SLIDE 2: ejected from slide-root — natural page scroll ── */
+#slide-2 {
+  background:#0a0a0a;
+  padding-bottom:120px;
+}
+.slide2-header {
+  position:sticky; top:0; z-index:10;
+  background:#0a0a0a;
+  text-align:center;
+  padding:24px 16px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.slide2-body {
+  display:block;
+  padding:24px 16px 40px;
+  background:radial-gradient(ellipse at 50% 30%, #252525 0%, #141414 40%, #0a0a0a 100%);
+  position:relative;
+}
+.slide2-body::after {
+  content:'';pointer-events:none;position:absolute;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size:200px 200px;opacity:0.035;
+}
+.slide2-body > * { position:relative;z-index:1; }
+.slide2-body > * { max-width:760px; width:100%; margin-left:auto; margin-right:auto; }
+.slide2-body .placeholder-container { width:100%; }
+
+/* ── SLIDE 3 ── */
+#slide-3 {
+  background:#111;
+  display:flex; flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  overflow-y:auto; overflow-x:hidden;
+  padding:32px 16px 24px;
+}
+#slide-3 > * { max-width:720px; width:100%; }
+
+/* ══════════════════════════════════════
+   BOTTOM TAB BAR — WHITE CLEAN
+   ══════════════════════════════════════ */
+#bottom-tab-bar {
+  position:fixed; bottom:0; left:0;
+  width:100%; height:64px; z-index:9999;
+  background:white;
+  border-top:2px solid rgba(0,0,0,0.08);
+  display:flex; align-items:stretch;
+  box-shadow:0 -2px 20px rgba(0,0,0,0.07);
+}
+.btab {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;
+  cursor:pointer; border:none; background:transparent;
+  padding:0 8px; position:relative; overflow:visible;
+  height:64px;
+  transition:background 0.18s;
+  -webkit-tap-highlight-color:transparent;
+}
+/* Tab dividers via span injected in HTML */
+.btab-divider {
+  position:absolute;
+  left:0; top:50%;
+  transform:translateY(-50%);
+  width:1.5px; height:44px;
+  background:#000;
+  opacity:0.4;
+  pointer-events:none;
+}
+/* Tab number */
+.btab-num {
+  font-family:'Montserrat',sans-serif;
+  font-size:11px; font-weight:400; letter-spacing:0.04em;
+  transition:font-size 0.2s, font-weight 0.2s, color 0.2s;
+  line-height:1;
+}
+/* Tab label */
+.btab-label {
+  font-family:'Montserrat',sans-serif;
+  font-size:8px; font-weight:600;
+  letter-spacing:0.1em; text-transform:uppercase;
+  transition:color 0.2s; white-space:nowrap;
+}
+/* Red top indicator */
+.btab::after {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:2px;
+  background:var(--s2s-red);
+  transform:scaleX(0);
+  transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  transform-origin:left;
+  /* Red underglow — light bouncing off surface below */
+  box-shadow:0 2px 8px rgba(204,21,0,0.5),0 4px 18px rgba(204,21,0,0.18);
+}
+/* ── LOCKED ── */
+.btab[data-state="locked"] { cursor:not-allowed; pointer-events:none; }
+.btab[data-state="locked"] .btab-num   { color:rgba(0,0,0,0.4); font-weight:500; font-size:11px; }
+.btab[data-state="locked"] .btab-label { color:rgba(0,0,0,0.4); }
+/* ── ACTIVE — larger, bold, solid black ── */
+.btab[data-state="active"]::after { transform:scaleX(1); }
+.btab[data-state="active"] .btab-num {
+  color:#0a0a0a; font-weight:900; font-size:18px; letter-spacing:-0.03em;
+}
+.btab[data-state="active"] .btab-label { color:#0a0a0a; font-weight:800; font-size:9px; }
+/* ── COMPLETE ── */
+.btab[data-state="complete"] .btab-num   { color:var(--s2s-red); font-weight:700; font-size:12px; }
+.btab[data-state="complete"] .btab-label { color:rgba(0,0,0,0.45); font-weight:600; }
+.btab[data-state="complete"]::after { transform:scaleX(1); background:var(--s2s-red); }
+
+@keyframes tabActivate {
+  0%  {background:rgba(204,21,0,0.03);}
+  50% {background:rgba(204,21,0,0.07);}
+  100%{background:transparent;}
+}
+.btab.tab-just-activated { animation:tabActivate 0.55s ease forwards; }
+
+/* ══════════════════════════════════════
+   HERO — ARCHITECTURAL REFINEMENT
+   ══════════════════════════════════════ */
+#slide-1 {
+  background:#050505;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; position:relative;
+}
+/* Micro-grain texture */
+#slide-1::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size:200px 200px;opacity:0.02;
+}
+/* Studio lamp — top-down radial */
+#slide-1::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(255,255,255,0.04) 0%,transparent 70%);
+}
+.hero-1col {
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  text-align:center;
+  width:100%; max-width:760px;
+  flex:1; padding:6vh 48px 10vh;
+  margin:0 auto; position:relative; z-index:1;
+  box-sizing:border-box;
+}
+/* Watermark wordmark — integrated, not a sticker */
+.hero-wordmark {
+  display:inline-flex; align-items:center; gap:12px;
+  margin-bottom:48px; opacity:0.35;
+  mix-blend-mode:screen;
+}
+.wm-mono {
+  font-family:'Montserrat',sans-serif;
+  font-size:11px; font-weight:700;
+  letter-spacing:0.18em; text-transform:uppercase;
+  color:rgba(255,255,255,0.9);
+  background:none; padding:0; border-radius:0; line-height:1;
+}
+.wm-sep {
+  width:1px; height:16px;
+  background:rgba(255,255,255,0.4);
+}
+.wm-name {
+  font-family:'Montserrat',sans-serif;
+  font-size:11px; font-weight:400;
+  letter-spacing:0.14em; text-transform:uppercase;
+  color:rgba(255,255,255,0.9);
+}
+/* Property badge */
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:50px; padding:6px 16px 6px 10px;
+  margin-bottom:32px; width:fit-content; align-self:center;
+}
+.hero-badge-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(255,255,255,0.7); flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(255,255,255,0.12),0 0 8px rgba(255,255,255,0.25);
+}
+.hero-badge-text {
+  font-family:'Montserrat',sans-serif;
+  font-size:13px; font-weight:400;
+  color:rgba(255,255,255,0.45); letter-spacing:0.04em;
+}
+/* Headline: two-weight granite block */
+.hero-h1 {
+  font-family:'Montserrat',sans-serif;
+  font-weight:200;
+  font-size:clamp(2.2rem,5.5vw,4.2rem);
+  color:rgba(255,255,255,0.92); letter-spacing:0.01em;
+  line-height:0.9; margin:0 0 28px;
+  text-transform:uppercase;
+  word-break:keep-all; overflow-wrap:normal;
+}
+/* Second line — flush width match to "CHOOSE YOUR" */
+.hero-h1-line2 { font-weight:900; font-size:2.9em; letter-spacing:-0.02em; margin-right:0.02em; display:block; line-height:0.95; }
+.hero-sub {
+  font-family:'Montserrat',sans-serif;
+  font-size:15px; font-weight:300;
+  color:rgba(255,255,255,0.28);
+  line-height:1.7; margin:0 0 32px; max-width:460px;
+  letter-spacing:0.05em;
+}
+.hero-time-note { display:none; }
+/* CTA: Industrial Frosted Lens */
+.hero-cta-area { width:68%; max-width:420px; align-self:center; }
+.hero-cta-area .btn-catalog {
+  width:100% !important; max-width:100% !important;
+  border-radius:0 !important; height:72px;
+  background:transparent !important;
+  color:rgba(255,255,255,0.95) !important;
+  border:1.5px solid rgba(255,255,255,0.7) !important;
+  box-shadow:inset 0 0 0 0 var(--s2s-red) !important;
+  font-family:'Montserrat',sans-serif !important;
+  font-size:19.5px !important; font-weight:400 !important;
+  letter-spacing:0.18em !important;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  position:relative; overflow:hidden;
+  transition:border-color 0.3s ease !important;
+}
+/* Subtle red pulse via pseudo-element */
+.hero-cta-area .btn-catalog::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 120%, rgba(204,21,0,0.35) 0%, transparent 70%);
+  animation:ctaRedPulse 2.8s ease-in-out infinite;
+  pointer-events:none;z-index:0;
+}
+/* Fill left-to-right on hover */
+.hero-cta-area .btn-catalog::after {
+  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
+  background:var(--s2s-red);
+  transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+  pointer-events:none;z-index:0;
+}
+.hero-cta-area .btn-catalog:hover::after { width:100%; }
+.hero-cta-area .btn-catalog:hover { border-color:var(--s2s-red) !important; }
+.hero-cta-area .btn-catalog > * { position:relative;z-index:1; }
+@keyframes ctaRedPulse {
+  0%,100%{ opacity:0.5; }
+  50%    { opacity:1;   }
+}
+
+.hero-micro {
+  font-family:'Montserrat',sans-serif;
+  font-size:12px; font-weight:300;
+  color:rgba(255,255,255,0.22);
+  margin-top:20px; line-height:1.7;
+  letter-spacing:0.05em;
+}
+
+@media(max-width:680px) {
+  .hero-1col { padding:24px 28px; }
+  .hero-h1   { font-size:clamp(2rem,9vw,3.5rem); }
+  .hero-sub  { font-size:14px; }
+}
+@media(max-width:480px) {
+  .hero-1col { padding:20px 20px; }
+  .hero-h1   { font-size:clamp(1.8rem,10vw,3rem); letter-spacing:0.08em; }
+}
+
+@media(max-width:480px) {
+  #bottom-tab-bar { height:60px; }
+  .btab-num  { font-size:12px; }
+  .btab-label{ font-size:8px; }
+}
+
+
+
+
+
+
+/* Persistent card delete X — top-right of card, always visible */
+.card-delete-x{
+  position:absolute;top:10px;right:10px;z-index:100;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.7);font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background 0.2s,color 0.2s;
+}
+.card-delete-x:hover{background:var(--s2s-red);color:white;border-color:var(--s2s-red);}
+
+/* Clean up old hidden copy hint */
+.copy-hint { display: none !important; }
+.copy-toast { display: none !important; }
+
+/* ══════════════════════════════════════
+   STEP HEADERS — PROMINENT NUMBERS
+   ══════════════════════════════════════ */
+.slide-step-header {
+  text-align:center; padding:0;
+  display:flex; flex-direction:column; align-items:center;
+}
+.slide-step-num {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:48px; height:48px; border-radius:14px;
+  background:rgba(255,255,255,0.08); color:white;
+  font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800;
+  margin-bottom:12px;
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 4px 18px rgba(0,0,0,0.4);
+}
+.slide-step-title {
+  font-family:'Montserrat',sans-serif; font-size:16px; font-weight:700;
+  color:white; letter-spacing:-0.02em;
+  display:block; text-align:center;
+}
+.slide-step-sub {
+  font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500;
+  color:rgba(255,255,255,0.4); margin-top:4px; line-height:1.5;
+  display:block; text-align:center;
+}
+
+/* Step 3 alignment */
+#slide-3 .slide-step-header { width:100%; }
+
+/* Step 3 option cards — compact */
+.option-card { padding:16px 18px !important; }
+.option-title { font-size:15px !important; }
+.option-desc  { font-size:12px !important; margin-top:2px !important; line-height:1.45 !important; }
+</style>
+</head>
+<body>
+
+<div id="slide-root">
+
+<!-- ═══════════════════════════════════════
+     SLIDE 1: HERO + STEP 1 (Browse Styles)
+     ═══════════════════════════════════════ -->
+<div class="slide-panel sp-active" id="slide-1">
+  <div class="hero-1col">
+
+    <div class="hero-wordmark">
+      <span class="wm-mono">S2S</span>
+      <span class="wm-sep"></span>
+      <span class="wm-name">Virtual Staging Studio</span>
+    </div>
+
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      <span class="hero-badge-text">742 Evergreen Terrace, Dallas TX 75201</span>
+    </div>
+
+    <h1 class="hero-h1" id="hero-h1-text">CHOOSE YOUR<br><span class="hero-h1-line2">STYLE</span></h1>
+
+    <p class="hero-sub">Pick the look for each room.<br>Our editors handle everything else.</p>
+    <p class="hero-time-note">2 minute setup</p>
+
+    <div class="hero-cta-area" id="section-1">
+      <a href="https://virtualstaginglibrary.com/" id="browse-link" target="_blank"
+         class="action-button btn-catalog btn-catalog-pulse">
+        <span style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;">ENTER GALLERY
+        <svg width="39" height="22" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="12" x2="44" y2="12"/><polyline points="37 5 44 12 37 19"/></svg></span>
+      </a>
+      <p class="hero-micro">Open the catalog, find a style you like, and copy the Style ID.<br>Paste it into each room card below — that's all we need from you.</p>
+      <span class="editors-choice-link" id="editors-choice-link"></span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 2: BUILD ROOM CARDS — ejected from slide-root, natural scroll
+     ═══════════════════════════════════════ -->
+<div id="slide-2" style="display:none;">
+  <div class="slide2-header">
+    <div class="slide-step-header">
+      <div class="slide-step-num">2</div>
+      <span class="slide-step-title">STYLE YOUR ROOMS</span>
+      <span class="slide-step-sub">One style per room. Our editors take it from there.</span>
+    </div>
+  </div>
+  <div class="slide2-body">
+    <div id="section-2" style="width:100%;max-width:760px;margin:0 auto;">
+      <div class="placeholder-container" id="placeholderContainer">
+      </div>
+      <div class="card-action-row" id="cardActionRow" style="display:none;">
+        <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">ADD ANOTHER ROOM +</button>
+        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">READY TO FINALIZE →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══<!-- ═══════════════════════════════════════
+     SLIDE 3: CONFIRM & SUBMIT
+     ═══════════════════════════════════════ -->
+<div class="slide-panel sp-below" id="slide-3">
+  <div class="slide-step-header">
+    <div class="slide-step-num">3</div>
+    <div class="slide-step-title">ALMOST DONE.</div>
+    <div class="slide-step-sub" style="margin-bottom:28px;">Tell us how you'd like your photos handled — then we've got it.</div>
+  </div>
+  <div id="section-3" style="width:100%;max-width:720px;margin:0 auto;">
+      <label class="option-card option-recommended"><input type="radio" name="preference" value="A"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:#0a0a0a;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width:22px;height:22px;"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></svg></span> We'll pick the best shot<span class="recommended-badge">RECOMMENDED</span></div><div class="option-desc">We've staged 1,000+ rooms and know which angle sells. Our editors choose the strongest image from your gallery — zero follow-up needed from you.</div></div></label>
+  <label class="option-card"><input type="radio" name="preference" value="B"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:var(--s2s-charcoal);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width:22px;height:22px;"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></svg></span> I'll choose after my shoot</div><div class="option-desc">Once your photos are delivered, we'll send you a link to select your preferred image. Respond within 48 hours — if we don't hear back, our editors will step in so there's no delay.</div></div></label>
+
+  <div class="final-consent-container" id="consent-container">
+    <input type="checkbox" id="tat-acknowledgement">
+    <label for="tat-acknowledgement">Got it — staging begins after my photos are delivered, not today. I'm locking in my style selections now.</label>
+  </div>
+
+  <button class="action-button btn-green btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;display:block;margin-left:auto;margin-right:auto;max-width:340px;">SUBMIT MY ORDER →</button>
+    </div>
+    <div id="submit-success" style="display:none;width:100%;max-width:800px;margin-top:20px;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid var(--card-border);box-shadow:var(--card-shadow);padding:36px 28px;text-align:center;">
+  <div style="width:52px;height:52px;background:linear-gradient(135deg,#44E872,#25B845);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(48,209,88,0.35);">
+    <span style="font-size:22px;color:white;">✓</span>
+  </div>
+  <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;color:#0a0a0a;margin-bottom:10px;letter-spacing:-0.03em;">You're all set.</div>
+  <div style="font-family:'Montserrat',sans-serif;font-size:15px;color:#0a0a0a;opacity:0.72;line-height:1.65;max-width:420px;margin:0 auto 24px;">Your style selections are locked in. Once your shoot is delivered, our editors get to work — staged images land in your gallery within 1–2 business days. No follow-up needed from you.</div>
+  <div><button class="action-button btn-red" style="max-width:300px;margin:0 auto;font-size:14px;padding:16px;" onclick="resetForm()">Stage rooms for another listing ↗</button></div>
+  </div>
+  
+</div>
+
+</div><!-- end #slide-root -->
+
+<!-- ═══ BOTTOM TAB BAR ═══ -->
+<div id="bottom-tab-bar">
+  <button class="btab" id="btab-1" data-state="active" onclick="btabClick(1)">
+    <span class="btab-num" id="btab-num-1">01</span>
+    <span class="btab-label">Browse Styles</span>
+  </button>
+  <button class="btab" id="btab-2" data-state="locked" onclick="btabClick(2)">
+    <span class="btab-divider"></span>
+    <span class="btab-num" id="btab-num-2">02</span>
+    <span class="btab-label">Style Rooms</span>
+  </button>
+  <button class="btab" id="btab-3" data-state="locked" onclick="btabClick(3)">
+    <span class="btab-divider"></span>
+    <span class="btab-num" id="btab-num-3">03</span>
+    <span class="btab-label">Confirm &amp; Submit</span>
+  </button>
+</div>
+
+<!-- Restore banner (outside slide-root, hidden) -->
+<div class="restore-banner" id="restore-banner" style="display:none;">
+  <div class="restore-banner-text">Your order is saved — pick up right where you left off.</div>
+  <div class="restore-banner-actions">
+    <button class="restore-btn restore-btn-yes" onclick="restoreSavedState()">Continue</button>
+    <button class="restore-btn restore-btn-no" onclick="clearSavedState()">Start fresh</button>
+  </div>
+</div>
+<script>
+const roomTypes = ["Living Room","Bedroom","Kitchen/Dining","Outdoor","Study/Office","Entertainment"];
+const roomSerials = {"Living Room":"RM-LR-01","Bedroom":"RM-BR-02","Kitchen/Dining":"RM-KD-03","Outdoor":"RM-OD-04","Study/Office":"RM-SO-05","Entertainment":"RM-EN-06"};
+
+/* SVG icon strings per room type — injected into overlay-room-icon */
+const roomIconSVGs = {
+  "Living Room": `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M56.58,29.4V19.94a6.41,6.41,0,0,0-6.41-6.4H15.42A6.41,6.41,0,0,0,9,19.94V29.4"/><path d="M58.69,29.4h-2A1.55,1.55,0,0,0,55.14,31s0,4,0,4.92c0,.38-1,.2-2.4.15H12.85c-.77,0-2.38.28-2.38,0,0-1.49,0-5,0-5A1.56,1.56,0,0,0,8.9,29.4h-2A1.56,1.56,0,0,0,5.34,31V46A1.16,1.16,0,0,0,6.5,47.16H59.08A1.16,1.16,0,0,0,60.25,46V31A1.56,1.56,0,0,0,58.69,29.4Z"/><line x1="11.86" y1="51.68" x2="11.86" y2="47.16"/><line x1="52.97" y1="51.68" x2="52.97" y2="47.16"/></svg>`,
+  "Bedroom": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.91" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"><line x1="2.45" y1="23.45" x2="2.45" y2="20.59"/><rect x="1.5" y="15.82" width="21" height="4.77"/><path d="M6.52,11h11a4.07,4.07,0,0,1,4.07,4.07v.7H2.45v-.7A4.07,4.07,0,0,1,6.52,11Z"/><path d="M7.23,7.23H9.14A2.86,2.86,0,0,1,12,10.09v1H4.36v-1A2.86,2.86,0,0,1,7.23,7.23Z"/><path d="M14.86,7.23h1.91a2.86,2.86,0,0,1,2.86,2.86v1H12v-1A2.86,2.86,0,0,1,14.86,7.23Z"/><rect x="4.36" y="3.41" width="15.27" height="7.64"/><line x1="21.55" y1="23.45" x2="21.55" y2="20.59"/><line x1="4.36" y1="0.55" x2="4.36" y2="3.41"/><line x1="19.64" y1="0.55" x2="19.64" y2="3.41"/></svg>`,
+  "Kitchen/Dining": `<svg viewBox="0 -1.05 48.095 48.095" fill="currentColor"><path d="M9 0A1 1 0 0 0 8 1L8 4.48L1.42 9.19A1 1 0 0 0 1 10L1 14A1 1 0 0 0 2 15L24 15A1 1 0 0 0 25 14L25 10A1 1 0 0 0 24.58 9.19L18 4.49L18 1A1 1 0 0 0 17 0L9 0zM10 2L16 2L16 5A1 1 0 0 0 16.42 5.81L23 10.51L23 13L3 13L3 10.51L9.58 5.81A1 1 0 0 0 10 5L10 2zM5.5 21C4.85 21 4.3 21.42 4.09 22L1 22A1 1 0 0 0 0 23L0 45A1 1 0 0 0 1 46L47.1 46A1 1 0 0 0 48.1 45L48.1 23A1 1 0 0 0 47.1 22L21.91 22C21.7 21.42 21.15 21 20.5 21L5.5 21zM2 24L5.5 24L20.5 24L24.1 24L24.1 44L2 44L2 24zM26.1 24L46.1 24L46.1 30L26.1 30L26.1 24zM5 26A1 1 0 0 0 4 27L4 41A1 1 0 0 0 5 42L21 42A1 1 0 0 0 22 41L22 27A1 1 0 0 0 21 26L5 26zM6 28L20 28L20 40L6 40L6 28zM26.1 32L46.1 32L46.1 44L26.1 44L26.1 32zM30 34.99A1 1 0 0 0 29 36L29 41A1 1 0 1 0 31 41L31 36A1 1 0 0 0 30 34.99z"/></svg>`,
+  "Outdoor": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.91" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"><polygon points="20.61 7.24 3.39 7.24 3.39 6.28 12 1.5 20.61 6.28 20.61 7.24"/><line x1="12" y1="7.24" x2="12" y2="23.5"/><polyline points="15.83 23.5 15.83 19.67 20.61 19.67 20.61 23.5"/><line x1="20.61" y1="13.93" x2="20.61" y2="19.67"/><polyline points="8.17 23.5 8.17 19.67 3.39 19.67 3.39 23.5"/><line x1="3.39" y1="13.93" x2="3.39" y2="19.67"/><line x1="6.26" y1="15.85" x2="17.74" y2="15.85"/></svg>`,
+  "Study/Office": `<svg viewBox="0 0 512 512" fill="currentColor"><path d="M290.4,196.3h-0.1c-4.7,0-8.5,3.8-8.5,8.5c0,4.7,3.9,8.5,8.6,8.5s8.5-3.8,8.5-8.5C298.9,200.1,295.1,196.3,290.4,196.3z"/><path d="M110.9,256c4.7,0,8.5-3.8,8.5-8.5v-34.1c0-4.7,3.8-8.5,8.5-8.5s8.5,3.8,8.5,8.5v34.1c0,4.7,3.8,8.5,8.5,8.5c4.7,0,8.5-3.8,8.5-8.5v-34l8.5-169.9c1.5-12.8,10.1-26.6,25.7-26.6h136.5c15.5,0,24.2,13.8,25.6,26l8.5,170.2v34.1c0,4.7,3.8,8.5,8.5,8.5s8.5-3.8,8.5-8.5v-34.1c0-4.7,3.8-8.5,8.5-8.5s8.5,3.8,8.5,8.5v34.1c0,4.7,3.8,8.5,8.5,8.5c4.7,0,8.5-3.8,8.5-8.5v-34.1c0-14.1-11.5-25.6-25.6-25.6c-3.4,0-6.7,0.7-9.7,1.9l-7.4-148c-2.8-24.7-20.7-42.2-42.7-42.2H187.7c-21.9,0-39.9,17.5-42.7,42.2l-7.4,147.4c-3-1.2-6.3-1.9-9.7-1.9c-14.1,0-25.6,11.5-25.6,25.6v34.1C102.4,252.2,106.2,256,110.9,256z"/><path d="M503.5,273.1H8.5C3.8,273.1,0,276.9,0,281.6s3.8,8.5,8.5,8.5H17v42.7c0,4.7,3.8,8.5,8.5,8.5h25.6v162.1c0,4.7,3.8,8.5,8.5,8.5h34.1c4.7,0,8.5-3.8,8.5-8.5V366.9c0-4.7-3.8-8.5-8.5-8.5s-8.5,3.8-8.5,8.5v128H68.3V332.8c0-4.7-3.8-8.5-8.5-8.5H34.1V290h443.7v34.1h-25.6c-4.7,0-8.5,3.8-8.5,8.5s3.8,8.5,8.5,8.5h34.1c4.7,0,8.5-3.8,8.5-8.5v-42.7h8.5c4.7,0,8.5-3.8,8.5-8.5S508.2,273.1,503.5,273.1z"/><path d="M452.3,358.4c-4.7,0-8.5,3.8-8.5,8.5v128h-17.1V332.8c0-4.7-3.8-8.5-8.5-8.5H93.9c-4.7,0-8.5,3.8-8.5,8.5s3.8,8.5,8.5,8.5H409.6v162.1c0,4.7,3.8,8.5,8.5,8.5h34.1c4.7,0,8.5-3.8,8.5-8.5V366.9C460.8,362.2,457,358.4,452.3,358.4z"/><path d="M349.9,375.5c4.7,0,8.5-3.8,8.5-8.5s-3.8-8.5-8.5-8.5H162.1c-4.7,0-8.5,3.8-8.5,8.5s3.8,8.5,8.5,8.5h85.3v30.6l-57.3,57.3c-3.3-1.6-7-2.6-11-2.6c-14.1,0-25.6,11.5-25.6,25.6s11.5,25.6,25.6,25.6s25.6-11.5,25.6-25.6c0-3.9-1-7.6-2.6-11l45.2-45.2v32.2c-9.9,3.5-17.1,12.9-17.1,24c0,14.1,11.5,25.6,25.6,25.6s25.6-11.5,25.6-25.6c0-11.1-7.2-20.5-17.1-24v-32.2l45.2,45.2c-1.6,3.3-2.6,7-2.6,11c0,14.1,11.5,25.6,25.6,25.6c14.1,0,25.6-11.5,25.6-25.6s-11.5-25.6-25.6-25.6c-3.9,0-7.6,1-11,2.6l-57.3-57.3v-30.6H349.9z"/></svg>`,
+  "Entertainment": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.91" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"><circle cx="12.02" cy="12" r="10.52"/><circle cx="12.02" cy="6.26" r="1.91"/><circle cx="12.02" cy="17.74" r="1.91"/><circle cx="6.28" cy="12" r="1.91"/><circle cx="17.76" cy="12" r="1.91"/><line x1="23.5" y1="22.52" x2="12.02" y2="22.52"/><line x1="11.07" y1="12" x2="12.98" y2="12"/></svg>`
+};
+let step1Clicked = false;
+let catalogClickTime = 0;
+const CATALOG_RETURN_WINDOW_MS = 30 * 60 * 1000;
+
+/* APPLE #3: IntersectionObserver — declared first so delete handler can reference it */
+const cardObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+      cardObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+function triggerCheckPulse() {
+  document.querySelectorAll('.overlay-confirm.ready:not(.verified)').forEach(check => {
+    check.classList.remove('pulse-trigger');
+    void check.offsetWidth;
+    check.classList.add('pulse-trigger');
+  });
+}
+
+function clearSavedState() {
+  try { localStorage.removeItem('vs_state'); } catch(e) {}
+  document.getElementById('restore-banner').style.display = 'none';
+}
+function restoreSavedState() {
+  document.getElementById('restore-banner').style.display = 'none';
+}
+function resetForm() { clearSavedState(); location.reload(); }
+
+/* ── SLIDE SYSTEM: declare before updateProgress ── */
+let currentSlide = 1;
+
+function goToSlide(n) {
+  const slide2 = document.getElementById('slide-2');
+
+  if (n === 2) {
+    /* Show slide-2 as natural page, hide slide-root */
+    document.getElementById('slide-root').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    slide2.style.display = 'block';
+    window.scrollTo(0, 0);
+  } else {
+    /* Hide slide-2, restore slide-root */
+    slide2.style.display = 'none';
+    document.getElementById('slide-root').style.display = '';
+    document.body.style.overflow = 'hidden';
+    [1,3].forEach(i => {
+      const el = document.getElementById('slide-' + i);
+      if (!el) return;
+      el.classList.remove('sp-active','sp-above','sp-below');
+      if (i < n)        el.classList.add('sp-above');
+      else if (i === n) el.classList.add('sp-active');
+      else              el.classList.add('sp-below');
+    });
+    const active = document.getElementById('slide-' + n);
+    if (active) active.scrollTop = 0;
+  }
+  currentSlide = n;
+}
+
+function updateBottomTabs(step1Done, step2Done, step3Active) {
+  const states = {
+    1: step1Done ? 'complete' : 'active',
+    2: !step1Done ? 'locked' : (step2Done ? 'complete' : 'active'),
+    3: !step2Done ? 'locked' : (step3Active ? 'active' : 'locked'),
+  };
+  [1,2,3].forEach(i => {
+    const tab = document.getElementById('btab-' + i);
+    const num = document.getElementById('btab-num-' + i);
+    if (!tab || !num) return;
+    const prev = tab.dataset.state;
+    const next = states[i];
+    tab.dataset.state = next;
+    if (next === 'complete') {
+      num.innerHTML = '<span style="color:var(--s2s-red);font-size:11px;vertical-align:middle;margin-right:4px;">✓</span>0' + i;
+    } else {
+      num.textContent = '0' + i;
+    }
+    tab.style.pointerEvents = next === 'locked' ? 'none' : 'auto';
+    if (prev !== 'active' && next === 'active') {
+      tab.classList.remove('tab-just-activated');
+      void tab.offsetWidth;
+      tab.classList.add('tab-just-activated');
+      tab.addEventListener('animationend', () => tab.classList.remove('tab-just-activated'), {once:true});
+    }
+  });
+}
+
+function btabClick(n) {
+  const tab = document.getElementById('btab-' + n);
+  if (!tab || tab.dataset.state === 'locked') return;
+  goToSlide(n);
+}
+
+/* ── PANEL STATE HELPERS (no-op stubs — panels replaced by slides) ── */
+function setPanel(id, state) {}
+function setPanelStatus(id, text) {}
+function setPanelNum(id, content) {}
+
+function updateProgress() {
+  const finalBtn = document.getElementById('final-submit');
+  let _s1done = step1Clicked;
+  let _s2done = false;
+  let _s3active = false;
+  const addBtn = document.getElementById('addCardButton');
+  const goSubmitBtn = document.getElementById('goToSubmitBtn');
+  const cardActionRow = document.getElementById('cardActionRow');
+  const consent = document.getElementById('consent-container');
+  const tat = document.getElementById('tat-acknowledgement');
+
+  /* Step 1 */
+  if (step1Clicked) {
+    if (currentSlide === 1) goToSlide(2);
+  }
+
+  /* Step 2 */
+  let allVerified = true;
+  const cards = document.querySelectorAll('.placeholder-card');
+  /* Card layout: single = large spotlight, multi = 2-col rows */
+  const container = document.getElementById('placeholderContainer');
+  if (container) {
+    container.classList.add('single-card');
+    container.classList.remove('multi-card');
+  }
+  cards.forEach(card => {
+    const hasRoom = !!card.querySelector('.room-tile.selected');
+    // drawer-staged-img may be reparented outside card — find by data reference
+    const drawerImgEl = card._drawerImg || card.querySelector('.drawer-staged-img');
+    const hasImg = drawerImgEl && drawerImgEl.style.display === 'block';
+    const notesOk = card.dataset.notesAcknowledge === 'true';
+    // nudge may be reparented — use stored ref
+    const nudge = card._nudge || card.querySelector('.overlay-confirm');
+    if (!nudge) { allVerified = false; return; }
+    const txt = card.querySelector('textarea') ? card.querySelector('textarea').value.trim() : '';
+    const addNotesEl = card.querySelector('.add-notes-btn');
+    const isCustom = addNotesEl && addNotesEl.classList.contains('expanded');
+    const met = hasRoom && hasImg && notesOk && (!isCustom || txt !== '');
+
+    if (met) {
+      if (!nudge.classList.contains('verified')) {
+        nudge.classList.add('ready');
+        allVerified = false;
+      }
+    } else {
+      nudge.classList.remove('ready','verified');
+      allVerified = false;
+    }
+  });
+
+  const anyVerified = Array.from(cards).some(c => (c._nudge || c.querySelector('.overlay-confirm'))?.classList.contains('verified'));
+
+  if (cards.length > 0 && allVerified) {
+    _s2done = true;
+    if (addBtn) addBtn.classList.remove('locked-section');
+    if (goSubmitBtn) goSubmitBtn.classList.remove('locked-section');
+    if (cardActionRow) cardActionRow.style.display = 'flex';
+  } else {
+    if (finalBtn) finalBtn.classList.add('locked-section');
+    if (addBtn) {
+      if (anyVerified) addBtn.classList.remove('locked-section');
+      else addBtn.classList.add('locked-section');
+    }
+    if (goSubmitBtn) goSubmitBtn.classList.add('locked-section');
+    if (cardActionRow) cardActionRow.style.display = cards.length > 0 ? 'flex' : 'none';
+  }
+
+  /* Step 3 */
+  if (consent) {
+    const radioSel = document.querySelector('input[name="preference"]:checked');
+    if (radioSel) {
+      consent.classList.add('visible');
+      if (tat && tat.checked) {
+        _s3active = true;
+        const wasLocked = finalBtn && finalBtn.classList.contains('locked-section');
+        if (finalBtn) finalBtn.classList.remove('locked-section');
+        if (wasLocked && finalBtn) {
+          finalBtn.classList.remove('submit-unlock-pulse');
+          void finalBtn.offsetWidth;
+          finalBtn.classList.add('submit-unlock-pulse');
+        }
+      } else {
+        if (finalBtn) finalBtn.classList.add('locked-section');
+      }
+    } else {
+      consent.classList.remove('visible');
+      if (finalBtn) finalBtn.classList.add('locked-section');
+    }
+  }
+
+  updateBottomTabs(_s1done, _s2done, _s3active);
+
+}
+
+document.getElementById('browse-link').addEventListener('click', () => {
+  step1Clicked = true;
+  catalogClickTime = Date.now();
+  updateProgress();
+  /* Transition to slide 2 happens inside updateProgress on step1Clicked */
+});
+
+function handleCatalogReturn() {
+  const elapsed = Date.now() - catalogClickTime;
+  if (step1Clicked && catalogClickTime > 0 && elapsed < CATALOG_RETURN_WINDOW_MS) {
+    catalogClickTime = 0;
+    setTimeout(() => { if (currentSlide === 1) goToSlide(2); }, 300);
+  }
+}
+window.addEventListener('focus', handleCatalogReturn);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') handleCatalogReturn(); });
+
+document.getElementById('final-submit').addEventListener('click', async () => {
+  const name    = (document.getElementById('client-name') || {value:''}).value.trim();
+  const address = (document.getElementById('property-address') || {value:''}).value.trim();
+  const pref    = document.querySelector('input[name="preference"]:checked')?.value;
+  const rooms   = Array.from(document.querySelectorAll('.placeholder-card')).map(c => ({
+    roomType: (c.querySelector('.room-tile.selected') || {}).dataset?.room || '',
+    styleId:  c.querySelector('.footer-id-number').innerText,
+    notes:    c.querySelector('textarea').value.trim()
+  }));
+  const payload = { name, address, preference: pref, rooms, submittedAt: new Date().toISOString() };
+  const btn = document.getElementById('final-submit');
+  const orig = btn.innerText;
+  /* Checkmark micro-action */
+  btn.innerHTML = '<span class="submit-check-anim">✓</span>';
+  btn.disabled = true;
+  await new Promise(r => setTimeout(r, 420));
+  btn.innerHTML = 'Submitting…'; btn.style.opacity = '0.7';
+  try {
+    /* REPLACE URL with your actual endpoint */
+    const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Server error');
+    clearSavedState();
+    document.getElementById('section-3').style.display = 'none';
+    document.getElementById('submit-success').style.display = 'block';
+    document.getElementById('submit-success').scrollIntoView({ behavior:'smooth', block:'center' });
+  } catch(err) {
+    btn.innerHTML = orig; btn.disabled = false; btn.style.opacity = '1';
+    let el = document.getElementById('submit-error-msg');
+    if (!el) {
+      el = document.createElement('p'); el.id = 'submit-error-msg';
+      el.style.cssText = "color:var(--s2s-red);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;text-align:center;margin-top:12px;";
+      btn.parentNode.insertBefore(el, btn.nextSibling);
+    }
+    el.innerText = 'Something went wrong — please try again or call us directly.';
+  }
+});
+
+document.getElementById('editors-choice-link').addEventListener('click', () => {
+  step1Clicked = true; catalogClickTime = 0; updateProgress();
+  setTimeout(() => {
+    const c = createCard(null, true);
+    if (c) {  }
+    updateProgress();
+    document.getElementById('section-2').scrollIntoView({ behavior:'smooth' });
+  }, 200);
+});
+
+function createCard(restoreData, editorsChoice) {
+  const card = document.createElement('div');
+  card.className = 'placeholder-card';
+  card.dataset.notesAcknowledge = 'false';
+  card.innerHTML = `
+    <div class="room-header">
+      <div class="room-header-question">
+        <span class="room-header-line"></span>
+        <span class="room-header-title">SELECT ROOM TO STYLE</span>
+        <span class="room-header-line"></span>
+      </div>
+      <div class="room-tile-grid">
+        ${roomTypes.map(r => `<button class="room-tile" data-room="${r}" type="button">
+          <span class="room-tile-serial">${roomSerials[r]||''}</span>
+          <span class="room-tile-icon-wrap"><span class="room-tile-icon"></span></span>
+          <span class="room-tile-label">${r}</span>
+        </button>`).join('')}
+        <!-- Obsidian Drawer — spans full 3-col width -->
+        <div class="studio-drawer">
+          <div class="drawer-blade"></div>
+          <div class="drawer-ghost"></div>
+          <div class="drawer-shimmer"></div>
+          <div class="drawer-img-wrap" style="position:relative;">
+            <img class="drawer-staged-img" src="">
+            <!-- X strictly inlaid in image corner -->
+            <button class="drawer-x-btn" type="button">✕</button>
+            <!-- Gradient bleed from image into tray -->
+            <div class="drawer-img-fade"></div>
+          </div>
+          <div class="drawer-input-wrap">
+            <div class="drawer-ref-id" style="display:none;"></div>
+            <div class="drawer-slot-row">
+              <span class="drawer-anchor-icon">
+                <svg viewBox="0 0 32 32" width="13" height="13" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M5.87 3.205v25.59l10.129-7.464 10.13 7.464v-25.59h-20.259zM25.063 26.685l-9.064-6.678-9.063 6.678v-22.414h18.127v22.414z"/><path d="M10.668 9.602h10.663v1.066h-10.663v-1.066z"/><path d="M10.668 13.867h10.663v1.066h-10.663v-1.066z"/></svg>
+              </span>
+              <span class="drawer-style-label">STYLE ID</span>
+              <input class="drawer-omnibox" type="text" placeholder="_ _ _ _">
+              <span class="drawer-slot-divider"></span>
+              <span class="drawer-status-icon"></span>
+              <span class="drawer-room-label"></span>
+              <button class="drawer-submit" type="button">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+            <!-- Notes: hidden in select phase, shown in hero phase -->
+            <div class="drawer-footer drawer-footer-hidden">
+              <div class="drawer-footer-left">
+                <button class="drawer-add-note-btn add-notes-btn" type="button">+ NOTE</button>
+              </div>
+              <button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button>
+            </div>
+            <div class="notes-content" style="display:none;padding:0 0 8px;">
+              <textarea placeholder="Note for the editor..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);outline:none;resize:none;min-height:32px;"></textarea>
+              <button class="notes-expand-hint" type="button" style="display:none;">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="delete-card">Cancel</button>
+    </div>
+    <button class="card-delete-x" type="button" title="Remove card">✕</button>
+    <div class="card-body" style="display:none;">
+      <div class="room-error-msg" style="display:none;"></div>
+      <button class="edit-trigger-btn" type="button" aria-label="Reset" style="display:none;">✕</button>
+      <div class="unified-input-area card-reveal-hidden" style="display:none;"></div>
+      <!-- Obsidian tray footer — kept for approve/notes data binding -->
+      <div class="card-footer">
+        <div class="footer-row-1">
+          <div class="footer-room-group">
+            <span class="footer-room-icon"></span>
+            <span class="footer-room-label"></span>
+          </div>
+          <div class="footer-id-group">
+            <span class="footer-id-number">---</span>
+          </div>
+        </div>
+        <div class="footer-row-2">
+          <button class="add-note-btn add-notes-btn no-notes-btn" type="button">
+            <span class="add-note-icon">+</span>
+            <span class="add-note-label">Add a note for the editor</span>
+          </button>
+        </div>
+        <div class="notes-content">
+          <textarea placeholder="Add a note for your designer..."></textarea>
+          <button class="notes-expand-hint" type="button">+</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const container = document.getElementById('placeholderContainer');
+  container.appendChild(card);
+
+  /* ── DRAWER REFS ── */
+  const nudge       = card.querySelector('.overlay-confirm');
+  const input       = card.querySelector('.drawer-omnibox');
+  const stageBtn    = card.querySelector('.drawer-submit');
+  const drawer      = card.querySelector('.studio-drawer');
+  const drawerBlade = card.querySelector('.drawer-blade');
+  const drawerGhost = card.querySelector('.drawer-ghost');
+  const drawerImg   = card.querySelector('.drawer-staged-img');
+  const drawerShimmer = card.querySelector('.drawer-shimmer');
+  const drawerRoomLabel = card.querySelector('.drawer-room-label');
+  const tileGrid    = card.querySelector('.room-tile-grid');
+  /* Legacy refs — kept for submit payload and notes binding */
+  const addNotes    = card.querySelector('.add-notes-btn');
+  const notesArea   = card.querySelector('.notes-content');
+  const notesTa     = card.querySelector('textarea');
+  const expandHint  = card.querySelector('.notes-expand-hint');
+  const overlayId   = card.querySelector('.footer-id-number');
+  const overlayRoom = card.querySelector('.footer-room-label');
+  const overlayIcon = card.querySelector('.footer-room-icon');
+  const roomHdr     = card.querySelector('.room-header');
+  const editBtn     = card.querySelector('.edit-trigger-btn');
+  const stagedImg   = drawerImg; /* alias for shared performStaging logic */
+  const cardFooter  = card.querySelector('.card-footer');
+
+  /* Store refs on card element — survives DOM reparenting */
+  card._nudge     = nudge;
+  card._drawerImg = drawerImg;
+
+  /* ── PASTE AUTO-TRIGGER — longer delay for URLs ── */
+  input.addEventListener('paste', (e) => {
+    const pasted = (e.clipboardData || window.clipboardData).getData('text').trim();
+    const isUrl = pasted.startsWith('http');
+    setTimeout(() => { if (input.value.trim()) performStaging(); }, isUrl ? 150 : 50);
+  });
+
+  let selectedRoom = '';
+  const tiles = card.querySelectorAll('.room-tile');
+
+  /* Inject SVG icons into tiles */
+  tiles.forEach(tile => {
+    const roomName = tile.dataset.room;
+    const iconSpan = tile.querySelector('.room-tile-icon');
+    if (roomIconSVGs[roomName]) iconSpan.innerHTML = roomIconSVGs[roomName];
+    const svg = iconSpan.querySelector('svg');
+    if (svg) { svg.style.width = '56px'; svg.style.height = '56px'; }
+  });
+
+  function selectRoom(roomName) {
+    selectedRoom = roomName;
+    tiles.forEach(t => t.classList.toggle('selected', t.dataset.room === roomName));
+    nudge.classList.remove('ready','verified','pulse-trigger');
+
+    /* Mini status icon — 16px room indicator right of input */
+    const statusIcon = drawer.querySelector('.drawer-status-icon');
+    if (statusIcon && roomIconSVGs[roomName]) {
+      statusIcon.innerHTML = roomIconSVGs[roomName];
+      const si = statusIcon.querySelector('svg');
+      if (si) { si.style.width='28px'; si.style.height='28px'; si.style.stroke='rgba(255,255,255,0.5)'; }
+    }
+    /* Room label inline in slot */
+    if (drawerRoomLabel) drawerRoomLabel.textContent = roomName;
+
+    /* Dim inactive tiles, open drawer */
+    tileGrid.classList.add('drawer-open');
+    drawer.classList.add('open');
+
+    /* Focus input after animation */
+    setTimeout(() => { input.focus(); }, 400);
+    updateProgress();
+  }
+
+  tiles.forEach(tile => {
+    tile.addEventListener('click', () => selectRoom(tile.dataset.room));
+  });
+
+  /* Progressive reveal helpers — no-ops now (drawer handles reveal) */
+  const inputArea = card.querySelector('.unified-input-area');
+  function revealInputArea() {}
+  function revealNotes() { cardFooter.classList.add('visible'); }
+  function hideInputAndNotes() { cardFooter.classList.remove('visible'); }
+
+  /* Pulse room header once on fresh card to direct attention */
+  if (!restoreData && !editorsChoice) {
+    setTimeout(() => {
+      roomHdr.classList.add('pulse-room');
+      roomHdr.addEventListener('animationend', () => roomHdr.classList.remove('pulse-room'), { once: true });
+    }, 300);
+  }
+
+
+  let stagingAttempted = false;
+
+  /* Wire drawer +NOTE btn */
+  const drawerNoteBtn = drawer.querySelector('.drawer-add-note-btn');
+  const drawerNoteArea = drawer.querySelector('.notes-content');
+  const drawerNoteTa = drawer.querySelector('textarea');
+  if (drawerNoteBtn && drawerNoteArea) {
+    drawerNoteBtn.addEventListener('click', () => {
+      const open = drawerNoteArea.style.display !== 'none' && drawerNoteArea.style.display !== '';
+      drawerNoteArea.style.display = open ? 'none' : 'block';
+      drawerNoteBtn.style.color = open ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)';
+      if (!open && drawerNoteTa) drawerNoteTa.focus();
+    });
+    drawerNoteArea.style.display = 'none';
+    if (drawerNoteTa) drawerNoteTa.addEventListener('input', () => {
+      notesTa.value = drawerNoteTa.value;
+      updateProgress();
+    });
+  }
+
+  /* Mobile scroll on focus — disabled to prevent scroll-jam on room tile select */
+  // input.addEventListener('focus', () => {
+  //   setTimeout(() => input.scrollIntoView({ behavior:'smooth', block:'center' }), 300);
+  // });
+
+  // Ghost note button — single tap toggles expanded textarea
+  // First click: expand. With content: marks complete. Empty re-click: collapse.
+  addNotes.addEventListener('click', () => {
+    const isExpanded = notesArea.classList.contains('active');
+    const hasText = notesTa.value.trim().length > 0;
+    if (!isExpanded) {
+      // Expand
+      notesArea.classList.add('active');
+      addNotes.classList.add('expanded');
+      addNotes.querySelector('.add-note-label').textContent = 'Note for the editor';
+      card.dataset.notesAcknowledge = 'true';
+      nudge.classList.remove('verified');
+      setTimeout(() => { autoResizeTa(); notesTa.focus(); }, 50);
+    } else if (!hasText) {
+      // Collapse if empty
+      notesArea.classList.remove('active');
+      addNotes.classList.remove('expanded','has-content');
+      addNotes.querySelector('.add-note-label').textContent = 'Add a note for the editor';
+      card.dataset.notesAcknowledge = 'true';
+      nudge.classList.remove('verified');
+    }
+    updateProgress();
+  });
+  // Set notesAcknowledge true by default — note is now optional
+  card.dataset.notesAcknowledge = 'true';
+
+  /* Auto-resize textarea to fit content */
+  function autoResizeTa() {
+    notesTa.style.height = '34px';
+    notesTa.style.height = notesTa.scrollHeight + 'px';
+  }
+
+  notesTa.addEventListener('focus', () => { autoResizeTa(); });
+  notesTa.addEventListener('blur',  () => {
+    if (!notesTa.value.trim()) notesTa.style.height = '34px';
+  });
+  notesTa.addEventListener('input', () => {
+    autoResizeTa();
+    nudge.classList.remove('verified');
+    if (notesTa.value.trim().length > 0) {
+      addNotes.classList.add('has-content');
+      addNotes.querySelector('.add-note-label').textContent = 'Note added';
+    } else {
+      addNotes.classList.remove('has-content');
+      addNotes.querySelector('.add-note-label').textContent = 'Note for the editor';
+    }
+    updateProgress();
+  });
+
+  /* +/- toggle */
+  expandHint.addEventListener('click', e => {
+    e.stopPropagation();
+    if (notesTa.classList.contains('expanded')) {
+      notesTa.classList.remove('expanded'); expandHint.textContent = '+';
+    } else {
+      notesTa.classList.add('expanded'); expandHint.textContent = '−'; notesTa.focus();
+    }
+  });
+
+  card.addEventListener('click', e => {
+    if (nudge.classList.contains('ready') && !nudge.classList.contains('verified')
+        && !e.target.closest('.overlay-confirm') && !e.target.closest('.delete-card')) {
+      triggerCheckPulse();
+    }
+  });
+
+  nudge.addEventListener('click', e => {
+    e.stopPropagation();
+    nudge.classList.remove('ready','pulse-trigger');
+    nudge.classList.add('verified');
+    nudge.querySelector('.confirm-check').style.display = 'inline';
+    const _cl = nudge.querySelector('.confirm-label'); if(_cl) _cl.textContent = 'Approved';
+    
+    updateProgress();
+    /* Scroll action buttons into view so user sees ADD/FINALIZE */
+    const actionRow = document.getElementById('cardActionRow');
+    if (actionRow && actionRow.style.display !== 'none') {
+      setTimeout(() => actionRow.scrollIntoView({ behavior:'smooth', block:'nearest' }), 300);
+    }
+  });
+
+  card.querySelector('.delete-card').addEventListener('click', e => {
+    e.stopPropagation();
+    /* If drawer is open but no image loaded — retract drawer, deselect room */
+    if (drawer.classList.contains('open') && drawerImg.style.display !== 'block') {
+      drawer.classList.remove('open');
+      tileGrid.classList.remove('drawer-open');
+      tiles.forEach(t => t.classList.remove('selected'));
+      selectedRoom = '';
+      if (drawerBlade) drawerBlade.classList.remove('active','hidden');
+      input.value = '';
+      stageBtn.classList.remove('lit');
+      nudge.classList.remove('ready','verified');
+      card.dataset.notesAcknowledge = 'true';
+      updateProgress();
+      return;
+    }
+    /* Remove this card from DOM */
+    card.remove();
+    /* If no cards left, create a fresh blank one */
+    const remaining = document.querySelectorAll('.placeholder-card');
+    if (!remaining.length) {
+      const c = createCard();
+      if (c) {  }
+    }
+    updateProgress();
+  });
+
+  /* Persistent top-right X — always removes the card */
+  card.querySelector('.card-delete-x').addEventListener('click', e => {
+    e.stopPropagation();
+    card.remove();
+    const remaining = document.querySelectorAll('.placeholder-card');
+    if (!remaining.length) {
+      const c = createCard();
+      if (c) {  }
+    }
+    updateProgress();
+  });
+
+  input.addEventListener('input', () => {
+    const val = input.value.trim();
+    if (val.length >= 4) {
+      stageBtn.classList.add('lit');
+    } else {
+      stageBtn.classList.remove('lit');
+    }
+    const e = card.querySelector('.img-error-msg'); if (e) e.remove();
+    if (drawerBlade) drawerBlade.classList.toggle('active', val.length > 0);
+  });
+
+  const performStaging = () => {
+    const val = input.value.trim(); if (!val) return;
+    if (!selectedRoom) return;
+
+    const showError = () => {
+      stagingAttempted = false;
+      drawerImg.style.display = 'none';
+      drawerShimmer.style.display = 'none';
+      const ex = card.querySelector('.img-error-msg'); if (ex) ex.remove();
+      const err = document.createElement('p');
+      err.className = 'img-error-msg';
+      err.style.cssText = "color:var(--s2s-red);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;text-align:center;padding:8px 0;letter-spacing:0.08em;";
+      err.innerText = 'ID NOT FOUND — CHECK AND RETRY';
+      drawer.querySelector('.drawer-input-wrap').prepend(err);
+      nudge.classList.remove('ready','verified','pulse-trigger');
+      updateProgress();
+    };
+
+    drawerShimmer.style.display = 'block';
+    const ex = card.querySelector('.img-error-msg'); if (ex) ex.remove();
+    const img = drawerImg;
+    const displayId = val.startsWith('http')
+      ? val.split('/').pop().split('-')[0].split('.')[0]   /* URL → extract numeric ID for REF */
+      : val;  /* raw ID — show as-is */
+    const baseUrl = 'https://virtualstaginglibrary.com/wp-content/uploads/';
+    const urlPatterns = val.startsWith('http') ? [val] : [
+      `${baseUrl}2022/10/${val}.jpg`,
+      `${baseUrl}2023/11/${val}.jpg`,
+      `${baseUrl}2024/01/${val}.jpg`,
+      `${baseUrl}2024/03/${val}.jpg`,
+      `${baseUrl}2024/06/${val}.jpg`,
+      `${baseUrl}2024/09/${val}.jpg`,
+      `${baseUrl}2025/01/${val}.jpg`,
+    ];
+    let attemptIdx = 0;
+
+    const tryNext = () => {
+      if (attemptIdx >= urlPatterns.length) { showError(); return; }
+      const newSrc = urlPatterns[attemptIdx++];
+      img.onload = null; img.onerror = null;
+      img.onload = () => {
+        if (!stagingAttempted) return;
+        img.style.display = 'block';
+        setTimeout(() => img.classList.add('revealed'), 80);
+        drawerShimmer.style.display = 'none';
+        /* Show X inside image */
+        const xBtn = drawer.querySelector('.drawer-x-btn');
+        if (xBtn) xBtn.style.display = 'flex';
+        /* Always display numeric ID — never raw URL */
+        input.value = displayId;
+        input.style.pointerEvents = 'none'; /* read-only display */
+        /* Show REF ID top-right */
+        const refEl = drawer.querySelector('.drawer-ref-id');
+        if (refEl) { refEl.textContent = 'REF. ' + displayId; refEl.style.display = 'block'; }
+        /* Reveal +NOTE footer */
+        const footer = drawer.querySelector('.drawer-footer,.drawer-footer-hidden');
+        if (footer) { footer.className = 'drawer-footer'; }
+        /* Show Igniting Lens (overlay-confirm) in footer */
+        nudge.style.display = 'flex';
+        nudge.classList.add('ready');
+        /* Hero mode — hide question bar and tiles, keep roomHdr so drawer stays in DOM */
+        roomHdr.querySelector('.room-header-question').style.display = 'none';
+        tiles.forEach(t => t.style.display = 'none');
+        drawer.style.cssText = 'display:block;border-radius:20px;border:1px solid rgba(255,255,255,0.07);opacity:1;max-height:none;width:100%;';
+        drawer.classList.add('drawer-hero-mode');
+        /* nudge already sits as sibling to footer-left — just show it */
+        /* Wire X btn to reset */
+        if (xBtn) xBtn.addEventListener('click', e => { e.stopPropagation(); editBtn.click(); }, {once:true});
+        overlayId.innerText = displayId;
+        overlayRoom.innerText = selectedRoom;
+        overlayIcon.innerHTML = roomIconSVGs[selectedRoom] || '';
+        card.dataset.notesAcknowledge = 'true';
+        cardFooter.classList.add('visible');
+        card.classList.remove('card-success-pulse');
+        void card.offsetWidth;
+        card.classList.add('card-success-pulse');
+        card.addEventListener('animationend', () => card.classList.remove('card-success-pulse'), {once:true});
+        /* Scroll action buttons into view */
+        setTimeout(() => {
+          const row = document.getElementById('cardActionRow');
+          if (row) row.scrollIntoView({ behavior:'smooth', block:'nearest' });
+        }, 300);
+        updateProgress();
+      };
+      img.onerror = () => { if (stagingAttempted) tryNext(); };
+      img.src = ''; img.setAttribute('src', newSrc);
+    };
+
+    img.onload = null; img.onerror = null;
+    stagingAttempted = true;
+    tryNext();
+  };
+
+  stageBtn.addEventListener('click', performStaging);
+  input.addEventListener('keypress', e => { if (e.key === 'Enter') performStaging(); });
+  input.addEventListener('keydown',  e => { if (e.key === 'Enter') performStaging(); });
+
+  editBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    /* Reset drawer */
+    drawerImg.style.display = 'none';
+    drawerImg.classList.remove('revealed');
+    drawerImg.onload = null; drawerImg.onerror = null; drawerImg.src = '';
+    stagingAttempted = false;
+    drawerShimmer.style.display = 'none';
+    if (drawerBlade) { drawerBlade.classList.remove('active','hidden'); }
+    /* Hide X button */
+    const _xb = drawer.querySelector('.drawer-x-btn'); if(_xb) _xb.style.display='none';
+    /* Hide REF ID */
+    const _ref = drawer.querySelector('.drawer-ref-id'); if(_ref) _ref.style.display='none';
+    cardFooter.classList.remove('visible');
+    overlayId.innerText = '---'; overlayRoom.innerText = ''; overlayIcon.innerHTML = '';
+    nudge.classList.remove('ready','verified','pulse-trigger');
+    card.dataset.notesAcknowledge = 'true';
+    addNotes.classList.remove('active','expanded','has-content');
+    if (addNotes.querySelector('.add-note-label')) addNotes.querySelector('.add-note-label').textContent = 'Add a note for the editor';
+    notesArea.classList.remove('active');
+    notesTa.value = ''; notesTa.style.height = '34px';
+    input.value = '';
+    input.style.pointerEvents = '';
+    stageBtn.classList.remove('lit');
+    /* Re-hide footer row for next selection */
+    const _df = drawer.querySelector('.drawer-footer,.drawer-footer-hidden');
+    if (_df) { _df.className = 'drawer-footer-hidden'; }
+    nudge.style.display = 'none';
+    nudge.classList.remove('ready','verified','pulse-trigger');
+    const errMsg = card.querySelector('.img-error-msg'); if (errMsg) errMsg.remove();
+    /* Reset to tile selection */
+    selectedRoom = '';
+    tiles.forEach(t => t.classList.remove('selected'));
+    tiles.forEach(t => t.style.display = ''); /* restore tiles */
+    tileGrid.style.position = '';
+    roomHdr.querySelector('.room-header-question').style.display = ''; /* restore question bar */
+    drawer.classList.remove('open','drawer-hero-mode');
+    drawer.style.cssText = '';
+    /* Ensure drawer is inside tileGrid where it belongs */
+    if (!tileGrid.contains(drawer)) tileGrid.appendChild(drawer);
+    updateProgress();
+  });
+
+  if (editorsChoice) {
+    revealInputArea(); revealNotes();
+    overlayId.innerText = 'EDITORS';
+    stagedImg.style.display = 'none';
+    const _iw = card.querySelector('.input-wrapper'); if(_iw) _iw.style.display='none';
+    const lbl = document.createElement('p');
+    lbl.style.cssText = 'font-size:13px;font-weight:700;color:var(--secondary-text);text-align:center;padding:0 16px;';
+    lbl.innerText = 'Our editors will select the best style for this room.';
+    card.querySelector('.unified-input-area').appendChild(lbl);
+    card.dataset.editorsChoice = 'true';
+    card.dataset.notesAcknowledge = 'true';
+  }
+
+  if (restoreData) {
+    if (restoreData.roomType) {
+      selectedRoom = restoreData.roomType;
+      tiles.forEach(t => t.classList.toggle('selected', t.dataset.room === restoreData.roomType));
+      roomHdr.classList.add('collapsed');
+      revealInputArea();
+    }
+    if (restoreData.imgVisible && restoreData.imgSrc) {
+      revealNotes();
+      input.value = restoreData.styleId;
+      overlayId.innerText = restoreData.styleId;
+      stagedImg.src = restoreData.imgSrc; stagedImg.style.display = 'block';
+      const _iw = card.querySelector('.input-wrapper'); if(_iw) _iw.style.display='none';
+      overlayRoom.innerText = restoreData.roomType || '';
+      overlayIcon.innerHTML = roomIconSVGs[restoreData.roomType] || roomIconSVGs['Living Room'];
+      cardFooter.classList.add('visible');
+      editBtn.style.display = 'flex';
+    }
+    if (restoreData.notesAcknowledge === 'true') {
+      card.dataset.notesAcknowledge = 'true';
+      if (restoreData.notesActive) {
+        notesArea.classList.add('active');
+        addNotes.classList.add('expanded');
+        notesTa.value = restoreData.notesText || '';
+        if (notesTa.value) {
+          addNotes.classList.add('has-content');
+          addNotes.querySelector('.add-note-label').textContent = 'Note added';
+        }
+      }
+    }
+    if (restoreData.verified) {
+      nudge.classList.add('verified');
+      nudge.querySelector('.confirm-check').style.display = 'inline';
+      const _cl = nudge.querySelector('.confirm-label'); if(_cl) _cl.textContent = 'Approved';
+      cardFooter.classList.add('visible');
+      overlayId.innerText = restoreData.styleId || '---';
+      overlayRoom.innerText = restoreData.roomType || '';
+      editBtn.style.display = 'flex';
+    }
+  }
+
+  return card;
+}
+
+document.getElementById('addCardButton').addEventListener('click', () => {
+  if (document.querySelectorAll('.overlay-confirm.ready:not(.verified)').length) {
+    triggerCheckPulse();
+  } else {
+    const c = createCard();
+    if (c) {
+      
+      cardObserver.observe(c);
+      setTimeout(() => c.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
+    }
+    updateProgress();
+  }
+});
+
+document.getElementById('goToSubmitBtn').addEventListener('click', () => {
+  setPanel(3, 'active');
+  setPanelNum(3, '3');
+  setPanelStatus(3, 'In progress…');
+  goToSlide(3);
+});
+
+document.addEventListener('change', e => {
+  if (e.target.name === 'preference' || e.target.id === 'tat-acknowledgement') updateProgress();
+});
+
+/* ── INIT: always fresh — runs last ── */
+(function init() {
+  localStorage.removeItem('vs_state');
+  const c = createCard();
+  if (c) c.style.animation = 'none';
+  const row = document.getElementById('cardActionRow');
+  if (row) row.style.display = 'flex';
+  updateProgress();
+})();
+
+
+
+</script>
+</body>
+</html>
