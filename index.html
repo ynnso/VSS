@@ -405,8 +405,49 @@ body::before{
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
-/* Hide blade always */
-.drawer-blade{display:none !important;}
+/* ── HERO INFO BAR — single row: STYLE ID  2222  ·  ICON  ROOM  [APPROVE] ── */
+.hero-info-bar {
+  display:flex; align-items:center; gap:10px;
+  padding:14px 16px 10px;
+  flex-wrap:nowrap; overflow:hidden;
+}
+.hero-id-label {
+  font-family:'Montserrat',sans-serif; font-size:16px; font-weight:700;
+  color:white; white-space:nowrap; letter-spacing:0.04em; flex-shrink:0;
+}
+.hero-id-value {
+  font-family:'Montserrat',sans-serif; font-size:16px; font-weight:700;
+  color:white; white-space:nowrap; letter-spacing:0.04em; flex-shrink:0;
+}
+.hero-room-sep {
+  color:rgba(255,255,255,0.3); font-size:16px; flex-shrink:0;
+}
+.hero-room-icon {
+  display:flex; align-items:center; flex-shrink:0;
+  width:18px; height:18px; opacity:0.5;
+}
+.hero-room-icon svg { width:18px; height:18px; stroke:rgba(255,255,255,0.6); }
+.hero-room-name {
+  font-family:'Montserrat',sans-serif; font-size:16px; font-weight:500;
+  color:rgba(255,255,255,0.45); letter-spacing:0.04em;
+  flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.hero-info-bar .overlay-confirm {
+  margin-left:auto; flex-shrink:0;
+}
+.hero-notes-row {
+  display:none;
+  padding:0 16px 12px;
+}
+.hero-note-btn {
+  background:none; border:none; cursor:pointer;
+  font-family:'Montserrat',sans-serif; font-size:11px; font-weight:500;
+  color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase;
+  padding:0; transition:color 0.25s;
+}
+.hero-note-btn:hover { color:rgba(255,255,255,0.6); }
+
+
 
 
 /* Remove any white/light from card-action-row area */
@@ -1699,12 +1740,22 @@ function createCard(restoreData, editorsChoice) {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </button>
             </div>
-            <!-- Notes: hidden in select phase, shown in hero phase -->
+            <!-- Hero info bar: STYLE ID 2222 · ROOM [APPROVE] -->
             <div class="drawer-footer drawer-footer-hidden">
-              <div class="drawer-footer-left">
+              <div class="hero-info-bar">
+                <span class="hero-id-label">STYLE ID</span>
+                <span class="hero-id-value drawer-id-display"></span>
+                <span class="hero-room-sep">·</span>
+                <span class="hero-room-icon drawer-status-icon-hero"></span>
+                <span class="hero-room-name drawer-room-label-hero"></span>
+                <button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button>
+              </div>
+              <div class="drawer-footer-left" style="display:none;">
                 <button class="drawer-add-note-btn add-notes-btn" type="button">+ NOTE</button>
               </div>
-              <button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button>
+            </div>
+            <div class="hero-notes-row">
+              <button class="drawer-add-note-btn add-notes-btn hero-note-btn" type="button">+ NOTE</button>
             </div>
             <div class="notes-content" style="display:none;padding:0 0 8px;">
               <textarea placeholder="Note for the editor..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);outline:none;resize:none;min-height:32px;"></textarea>
@@ -1840,17 +1891,19 @@ function createCard(restoreData, editorsChoice) {
 
   let stagingAttempted = false;
 
-  /* Wire drawer +NOTE btn */
+  /* Wire drawer +NOTE btn (both hero-note-btn and drawer-add-note-btn) */
   const drawerNoteBtn = drawer.querySelector('.drawer-add-note-btn');
+  const heroNoteBtn = drawer.querySelector('.hero-note-btn');
   const drawerNoteArea = drawer.querySelector('.notes-content');
   const drawerNoteTa = drawer.querySelector('textarea');
-  if (drawerNoteBtn && drawerNoteArea) {
-    drawerNoteBtn.addEventListener('click', () => {
-      const open = drawerNoteArea.style.display !== 'none' && drawerNoteArea.style.display !== '';
-      drawerNoteArea.style.display = open ? 'none' : 'block';
-      drawerNoteBtn.style.color = open ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)';
-      if (!open && drawerNoteTa) drawerNoteTa.focus();
-    });
+  const toggleNote = () => {
+    const open = drawerNoteArea.style.display !== 'none' && drawerNoteArea.style.display !== '';
+    drawerNoteArea.style.display = open ? 'none' : 'block';
+    if (!open && drawerNoteTa) drawerNoteTa.focus();
+  };
+  if (drawerNoteBtn) drawerNoteBtn.addEventListener('click', toggleNote);
+  if (heroNoteBtn) heroNoteBtn.addEventListener('click', toggleNote);
+  if (drawerNoteArea) {
     drawerNoteArea.style.display = 'none';
     if (drawerNoteTa) drawerNoteTa.addEventListener('input', () => {
       notesTa.value = drawerNoteTa.value;
@@ -2048,10 +2101,20 @@ function createCard(restoreData, editorsChoice) {
         /* Show REF ID top-right */
         const refEl = drawer.querySelector('.drawer-ref-id');
         if (refEl) { refEl.textContent = 'REF. ' + displayId; refEl.style.display = 'block'; }
-        /* Reveal +NOTE footer */
+        /* Populate hero info bar */
+        const heroIdVal = drawer.querySelector('.hero-id-value');
+        const heroRoomIcon = drawer.querySelector('.hero-room-icon');
+        const heroRoomName = drawer.querySelector('.hero-room-name');
+        if (heroIdVal) heroIdVal.textContent = displayId;
+        if (heroRoomIcon && roomIconSVGs[selectedRoom]) heroRoomIcon.innerHTML = roomIconSVGs[selectedRoom];
+        if (heroRoomName) heroRoomName.textContent = selectedRoom;
+        /* Reveal info bar footer */
         const footer = drawer.querySelector('.drawer-footer,.drawer-footer-hidden');
         if (footer) { footer.className = 'drawer-footer'; }
-        /* Show Igniting Lens (overlay-confirm) in footer */
+        /* Show notes row */
+        const notesRow = drawer.querySelector('.hero-notes-row');
+        if (notesRow) notesRow.style.display = 'block';
+        /* Show APPROVE in info bar */
         nudge.style.display = 'flex';
         nudge.classList.add('ready');
         /* Hero mode — hide question bar and tiles, switch grid to block for full-width drawer */
