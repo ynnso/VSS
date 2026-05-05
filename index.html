@@ -407,7 +407,7 @@ body::before{
 .hero-info-bar {
   display:flex; align-items:center; gap:0;
   padding:16px 16px 12px;
-  flex-wrap:nowrap; overflow:hidden;
+  width:100%; box-sizing:border-box;
 }
 .hero-id-label {
   font-family:'Montserrat',sans-serif; font-size:20px; font-weight:700;
@@ -416,22 +416,23 @@ body::before{
 .hero-id-value {
   font-family:'Montserrat',sans-serif; font-size:20px; font-weight:700;
   color:white; white-space:nowrap; letter-spacing:0.01em; flex-shrink:0;
-  margin-left:8px;
+  margin-left:6px;
 }
 .hero-room-sep { display:none; }
 .hero-room-icon {
   display:flex; align-items:center; flex-shrink:0;
   width:24px; height:24px; opacity:0.45;
-  margin-left:20px;
+  margin-left:12px;
 }
 .hero-room-icon svg { width:24px; height:24px; stroke:rgba(255,255,255,0.6); }
 .hero-room-name {
   font-family:'Montserrat',sans-serif; font-size:20px; font-weight:500;
   color:rgba(255,255,255,0.4); letter-spacing:0.01em;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  margin-left:6px; flex:1;
+  white-space:nowrap; margin-left:5px;
+  flex-shrink:1; min-width:0; overflow:hidden; text-overflow:ellipsis;
 }
-.hero-info-bar .overlay-confirm { margin-left:auto; flex-shrink:0; }
+.hero-info-bar-spacer { flex:1; min-width:8px; }
+.hero-info-bar .overlay-confirm { flex-shrink:0; }
 .hero-notes-row { display:none; padding:0 16px 14px; }
 .hero-note-btn {
   background:none; border:none; cursor:pointer;
@@ -1742,6 +1743,7 @@ function createCard(restoreData, editorsChoice) {
                 <span class="hero-room-sep">·</span>
                 <span class="hero-room-icon drawer-status-icon-hero"></span>
                 <span class="hero-room-name drawer-room-label-hero"></span>
+                <span class="hero-info-bar-spacer"></span>
                 <button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button>
               </div>
               <div class="drawer-footer-left" style="display:none;">
