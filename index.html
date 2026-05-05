@@ -274,11 +274,7 @@ body::before{
   position:relative;
 }
 /* Left: id-tag icon */
-.drawer-anchor-icon{
-  padding:0 8px 0 12px;
-  color:white;z-index:3;display:flex;align-items:center;flex-shrink:0;
-}
-.drawer-anchor-icon svg{width:18px;height:18px;}
+.drawer-anchor-icon{ display:none; }
 /* STYLE ID label */
 .drawer-style-label{
   font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;
@@ -294,8 +290,8 @@ body::before{
   transition:none;caret-color:var(--s2s-red);min-width:0;
 }
 .drawer-omnibox::placeholder{
-  color:rgba(255,255,255,0.18);font-size:22px;letter-spacing:0.45em;
-  font-family:'Montserrat',sans-serif;font-weight:300;
+  color:rgba(255,255,255,0.2);font-size:14px;letter-spacing:0.02em;
+  font-family:'Montserrat',sans-serif;font-weight:400;
 }
 /* Divider */
 .drawer-slot-divider{
@@ -317,20 +313,18 @@ body::before{
 .drawer-room-label svg{display:none;}
 /* Frosted lens — inline right end */
 .drawer-submit{
-  width:32px;height:32px;border-radius:50%;flex-shrink:0;margin-right:8px;
-  background:rgba(255,255,255,0.04);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;margin-right:12px;
+  background:none;
+  border:none;
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:rgba(255,255,255,0.15);
-  transition:background 0.3s,box-shadow 0.3s,color 0.3s,border-color 0.3s;
-  flex-shrink:0;
+  cursor:pointer;color:rgba(255,255,255,0.3);
+  transition:color 0.3s;
+  padding:8px 0;
 }
 .drawer-submit.lit{
-  background:rgba(204,21,0,0.88);border-color:rgba(204,21,0,0.7);
-  color:white;box-shadow:0 0 18px rgba(204,21,0,0.55),inset 0 1px 0 rgba(255,255,255,0.15);
+  color:var(--s2s-red);
 }
-.drawer-submit:hover{background:var(--s2s-red);border-color:var(--s2s-red);color:white;box-shadow:0 0 26px rgba(204,21,0,0.65);}
+.drawer-submit:hover{color:white;}
 /* Footer: hidden in select phase */
 .drawer-footer-hidden{display:none!important;}
 /* Footer: shown in hero phase */
@@ -1723,16 +1717,10 @@ function createCard(restoreData, editorsChoice) {
           <div class="drawer-input-wrap">
             <div class="drawer-ref-id" style="display:none;"></div>
             <div class="drawer-slot-row">
-              <span class="drawer-anchor-icon">
-                <svg viewBox="0 0 32 32" width="13" height="13" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M5.87 3.205v25.59l10.129-7.464 10.13 7.464v-25.59h-20.259zM25.063 26.685l-9.064-6.678-9.063 6.678v-22.414h18.127v22.414z"/><path d="M10.668 9.602h10.663v1.066h-10.663v-1.066z"/><path d="M10.668 13.867h10.663v1.066h-10.663v-1.066z"/></svg>
-              </span>
               <span class="drawer-style-label">STYLE ID</span>
-              <input class="drawer-omnibox" type="text" placeholder="_ _ _ _">
-              <span class="drawer-slot-divider"></span>
-              <span class="drawer-status-icon"></span>
-              <span class="drawer-room-label"></span>
+              <input class="drawer-omnibox" type="text" placeholder="Enter Style ID or URL">
               <button class="drawer-submit" type="button">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                <svg width="28" height="16" viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="8" x2="24" y2="8"/><polyline points="18 2 24 8 18 14"/></svg>
               </button>
             </div>
             <!-- Hero info bar: STYLE ID 2222 · ROOM [APPROVE] -->
