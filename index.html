@@ -969,30 +969,42 @@ body::before{
 /* ── CARD ACTION ROW ── */
 .card-action-row{
   display:flex;gap:12px;justify-content:center;align-items:center;
-  width:100%;max-width:760px;margin:16px auto 8px;padding:0 16px;
+  width:100%;max-width:760px;margin:24px auto 8px;padding:0 16px;
   background:transparent;
   scroll-margin-top:110px;
 }
 .card-action-btn{
-  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.04em;
-  border:none;border-radius:50px;cursor:pointer;padding:11px 0;
-  transition:transform 0.18s,box-shadow 0.18s,opacity 0.18s;
-  white-space:nowrap;flex:1;max-width:220px;text-align:center;
+  font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.12em;
+  border:none;border-radius:0;cursor:pointer;padding:16px 0;
+  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+  white-space:nowrap;flex:1;max-width:280px;text-align:center;
+  text-transform:uppercase;position:relative;overflow:hidden;
 }
+/* ADD — dark, understated */
 .card-action-add{
-  background:transparent;color:rgba(255,255,255,0.7);
-  border:1.5px solid rgba(255,255,255,0.2);
-  box-shadow:none;
-  transition:background 0.3s cubic-bezier(0.4,0,0.2,1),border-color 0.3s cubic-bezier(0.4,0,0.2,1),color 0.3s cubic-bezier(0.4,0,0.2,1);
+  background:transparent;color:rgba(255,255,255,0.5);
+  border:1px solid rgba(255,255,255,0.15);
 }
-.card-action-add:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.4);color:white;}
+.card-action-add::after{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
+  background:rgba(255,255,255,0.08);
+  transition:width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.card-action-add:hover{color:white;border-color:rgba(255,255,255,0.4);}
+.card-action-add:hover::after{width:100%;}
+/* FINALIZE — red, dominant */
 .card-action-submit{
-  background:var(--s2s-red);color:white;font-weight:800;
-  box-shadow:0 4px 16px rgba(204,21,0,0.3);
-  transition:background 0.3s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s cubic-bezier(0.4,0,0.2,1),transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  background:var(--s2s-red);color:white;font-weight:700;
+  border:1px solid var(--s2s-red);
 }
-.card-action-submit:hover{background:var(--s2s-red-light);transform:translateY(-2px);box-shadow:0 6px 20px rgba(204,21,0,0.4);}
-.card-action-btn.locked-section{opacity:0.25;pointer-events:none;filter:none;}
+.card-action-submit::after{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
+  background:rgba(255,255,255,0.12);
+  transition:width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.card-action-submit:hover{background:var(--s2s-red-light);border-color:var(--s2s-red-light);}
+.card-action-submit:hover::after{width:100%;}
+.card-action-btn.locked-section{opacity:0.2;pointer-events:none;filter:none;}
 
 /* ══════════════════════════════════════
    STEP VIEW SYSTEM — simple show/hide
@@ -1370,8 +1382,8 @@ body::before{
       <div class="placeholder-container" id="placeholderContainer">
       </div>
       <div class="card-action-row" id="cardActionRow" style="display:none;">
-        <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">ADD ANOTHER ROOM +</button>
-        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">READY TO FINALIZE →</button>
+        <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ ADD ROOM</button>
+        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">FINALIZE →</button>
       </div>
     </div>
   </div>
