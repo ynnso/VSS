@@ -216,7 +216,7 @@ body::before{
 
 /* Grid wrapper needed for drawer injection */
 .room-tile-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
   overflow:visible;position:relative;
 }
 
@@ -438,10 +438,9 @@ body::before{
 /* Portrait obsidian tile */
 .room-tile{
   display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  gap:0;padding:0 0 14px;border-radius:14px;cursor:pointer;min-height:130px;
+  gap:0;padding:0 0 14px;border-radius:14px;cursor:pointer;min-height:150px;
   background:rgba(255,255,255,0.03);
   border:none;
-  /* Rim light: 0.5px inner stroke top+left glass-cut effect */
   box-shadow:inset 1px 1px 0 rgba(255,255,255,0.08),inset 0 0 0 1px rgba(255,255,255,0.04);
   overflow:hidden;position:relative;
   transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),
@@ -922,8 +921,8 @@ body::before{
   flex:1;height:1px;background:rgba(255,255,255,0.15);
 }
 .room-header-title{
-  font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;
-  color:rgba(255,255,255,0.5);letter-spacing:0.28em;text-transform:uppercase;white-space:nowrap;
+  font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;
+  color:white;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;
 }
 .room-header-step-tag{display:none;}
 
@@ -974,7 +973,7 @@ body::before{
   background:#0a0a0a;
   text-align:center;
   padding:24px 16px 16px;
-  border-bottom:1px solid rgba(255,255,255,0.06);
+  border-bottom:none;
 }
 .slide2-body {
   padding:24px 16px 120px;
