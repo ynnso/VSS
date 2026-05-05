@@ -87,16 +87,23 @@ body::before{
 .btn-catalog:hover{background:#2a2a2a;}
 /* Submit CTA — black, half-width, inner green glow */
 .btn-submit-compact{
-  width:auto;max-width:340px;padding:13px 28px;border-radius:50px;font-size:14px;font-weight:700;letter-spacing:0.05em;
+  width:auto;max-width:340px;padding:16px 28px;border-radius:0;font-size:13px;font-weight:700;letter-spacing:0.12em;
   background:var(--s2s-red) !important;color:white !important;
-  border:none;border-bottom:none;
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.25), 0 4px 18px rgba(204,21,0,0.35) !important;
-  transition:box-shadow 0.3s,background 0.3s;
+  border:1px solid var(--s2s-red) !important;
+  box-shadow:none !important;
+  transition:all 0.3s;position:relative;overflow:hidden;text-transform:uppercase;
+}
+.btn-submit-compact::after{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
+  background:rgba(255,255,255,0.12);
+  transition:width 0.4s cubic-bezier(0.4,0,0.2,1);
 }
 .btn-submit-compact:not(.locked-section):hover{
   background:var(--s2s-red-light) !important;
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.4), 0 6px 22px rgba(204,21,0,0.5) !important;
+  border-color:var(--s2s-red-light) !important;
+  box-shadow:none !important;
 }
+.btn-submit-compact:not(.locked-section):hover::after{width:100%;}
 /* Checkmark micro-action on submit */
 @keyframes checkPop{
   0%  {transform:scale(0.6);opacity:0;}
@@ -776,21 +783,39 @@ body::before{
 
 /* ── OPTION CARDS ── */
 .option-card{
-  background:white;padding:20px;border-radius:20px;margin-bottom:12px;
-  border:1.5px solid var(--border-soft);display:flex;align-items:flex-start;gap:16px;
-  cursor:pointer;width:100%;transition:0.18s;position:relative;
-  box-shadow:0 2px 8px rgba(20,20,20,0.04);
+  background:#1C1C1E;padding:20px;border-radius:0;margin-bottom:8px;
+  border:1px solid rgba(255,255,255,0.08);display:flex;align-items:flex-start;gap:16px;
+  cursor:pointer;width:100%;transition:all 0.25s;position:relative;
+  box-shadow:none;
 }
-.option-card input[type="radio"]{margin-top:5px;accent-color:#0a0a0a;transform:scale(1.2);}
-.option-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;color:#0a0a0a;display:flex;align-items:center;gap:8px;letter-spacing:-0.01em;flex-wrap:wrap;}
-.option-desc{font-family:'Montserrat',sans-serif;font-size:14px;color:#0a0a0a;line-height:1.5;margin-top:4px;opacity:0.72;}
+/* Custom radio — hide native, show styled circle */
+.option-card input[type="radio"]{
+  -webkit-appearance:none;appearance:none;
+  width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);
+  background:transparent;cursor:pointer;flex-shrink:0;margin-top:3px;
+  transition:border-color 0.2s,box-shadow 0.2s;position:relative;
+}
+.option-card input[type="radio"]:checked{
+  border-color:var(--s2s-red);
+  box-shadow:inset 0 0 0 5px var(--s2s-red);
+}
+.option-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;color:white;display:flex;align-items:center;gap:8px;letter-spacing:0;flex-wrap:wrap;}
+.option-title span[style*="color:#0a0a0a"] { color:white !important; }
+.option-title span[style*="color:var(--s2s-charcoal)"] { color:rgba(255,255,255,0.7) !important; }
+.option-desc{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;margin-top:4px;}
 .recommended-badge{
-  background:#0a0a0a;color:white;
-  font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;
-  padding:2px 8px;border-radius:20px;letter-spacing:0.06em;flex-shrink:0;
+  background:var(--s2s-red);color:white;
+  font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;
+  padding:3px 10px;border-radius:0;letter-spacing:0.08em;flex-shrink:0;
 }
-.option-card.option-recommended{border:1.5px solid var(--border-soft);background:white;}
-.option-card:has(input:checked){border-color:#0a0a0a !important;box-shadow:0 0 0 3px rgba(10,10,10,0.08),0 4px 16px rgba(20,20,20,0.08);}
+.option-card.option-recommended{border:1px solid rgba(255,255,255,0.08);background:#1C1C1E;}
+/* Selected state — red left accent bar */
+.option-card:has(input:checked){
+  border-color:rgba(204,21,0,0.5) !important;
+  box-shadow:inset 3px 0 0 var(--s2s-red) !important;
+  background:#1C1C1E;
+}
+.option-card:hover{border-color:rgba(255,255,255,0.2);}
 
 /* ── ADD CARD ── */
 .add-card-icon{
@@ -859,13 +884,25 @@ body::before{
 
 /* ── CONSENT ── */
 .final-consent-container{
-  margin-top:24px;padding:16px 20px;background:#FAFAF8;border-radius:16px;
-  border:1.5px solid var(--border-soft);
+  margin-top:16px;padding:16px 20px;background:#1C1C1E;border-radius:0;
+  border:1px solid rgba(255,255,255,0.08);
   display:none;align-items:center;gap:12px;width:100%;transition:0.3s;
 }
 .final-consent-container.visible{display:flex;}
-.final-consent-container input{width:20px;height:20px;accent-color:#0a0a0a;cursor:pointer;flex-shrink:0;}
-.final-consent-container label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#0a0a0a;cursor:pointer;line-height:1.5;opacity:0.8;}
+.final-consent-container input{
+  -webkit-appearance:none;appearance:none;
+  width:20px;height:20px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.25);
+  background:transparent;cursor:pointer;flex-shrink:0;position:relative;
+  transition:border-color 0.2s,background 0.2s;
+}
+.final-consent-container input:checked{
+  background:var(--s2s-red);border-color:var(--s2s-red);
+}
+.final-consent-container input:checked::after{
+  content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  color:white;font-size:12px;font-weight:800;
+}
+.final-consent-container label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.6);cursor:pointer;line-height:1.5;}
 
 /* APPLE #5: identity field focus glow */
 .identity-section{
@@ -1040,7 +1077,7 @@ body::before{
   min-height:calc(100vh - 64px);
   padding:32px 16px 120px;
 }
-#slide-3 > * { max-width:720px; width:100%; }
+#slide-3 > * { max-width:720px; width:100%; margin-left:auto; margin-right:auto; }
 
 /* ══════════════════════════════════════
    BOTTOM TAB BAR — WHITE CLEAN
@@ -1322,11 +1359,6 @@ body::before{
 
 /* Step 3 alignment */
 #slide-3 .slide-step-header { width:100%; }
-
-/* Step 3 option cards — compact */
-.option-card { padding:16px 18px !important; }
-.option-title { font-size:15px !important; }
-.option-desc  { font-size:12px !important; margin-top:2px !important; line-height:1.45 !important; }
 </style>
 </head>
 <body>
@@ -1395,8 +1427,8 @@ body::before{
 <div class="step-view" id="slide-3">
   <div class="slide-step-header">
     <div class="slide-step-num">3</div>
-    <div class="slide-step-title">ALMOST DONE.</div>
-    <div class="slide-step-sub" style="margin-bottom:28px;">Tell us how you'd like your photos handled — then we've got it.</div>
+    <div class="slide-step-title">CONFIRM & SUBMIT</div>
+    <div class="slide-step-sub" style="margin-bottom:28px;">Choose how you'd like your photos handled.</div>
   </div>
   <div id="section-3" style="width:100%;max-width:720px;margin:0 auto;">
       <label class="option-card option-recommended"><input type="radio" name="preference" value="A"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:#0a0a0a;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width:22px;height:22px;"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></svg></span> We'll pick the best shot<span class="recommended-badge">RECOMMENDED</span></div><div class="option-desc">We've staged 1,000+ rooms and know which angle sells. Our editors choose the strongest image from your gallery — zero follow-up needed from you.</div></div></label>
@@ -1404,10 +1436,10 @@ body::before{
 
   <div class="final-consent-container" id="consent-container">
     <input type="checkbox" id="tat-acknowledgement">
-    <label for="tat-acknowledgement">Got it — staging begins after my photos are delivered, not today. I'm locking in my style selections now.</label>
+    <label for="tat-acknowledgement">I understand staging begins after photo delivery.</label>
   </div>
 
-  <button class="action-button btn-green btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;display:block;margin-left:auto;margin-right:auto;max-width:340px;">SUBMIT MY ORDER →</button>
+  <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;display:block;margin-left:auto;margin-right:auto;max-width:340px;">SUBMIT ORDER →</button>
     </div>
     <div id="submit-success" style="display:none;width:100%;max-width:800px;margin-top:20px;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid var(--card-border);box-shadow:var(--card-shadow);padding:36px 28px;text-align:center;">
   <div style="width:52px;height:52px;background:linear-gradient(135deg,#44E872,#25B845);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(48,209,88,0.35);">
