@@ -263,11 +263,7 @@ body::before{
   z-index:2;font-family:'Montserrat',sans-serif;
 }
 /* REF ID — top-right of tray after validation */
-.drawer-ref-id{
-  position:absolute;top:10px;right:16px;
-  font-family:'Montserrat',sans-serif;font-size:10px;font-weight:500;
-  color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;
-}
+.drawer-ref-id { display:none !important; }
 /* Single milled slot row */
 .drawer-slot-row{
   display:flex;align-items:center;gap:0;
@@ -387,6 +383,8 @@ body::before{
 
 /* Hide submit arrow when drawer is in hero mode (image loaded) */
 .drawer-hero-mode .drawer-submit{display:none!important;}
+.drawer-hero-mode .drawer-slot-row{display:none!important;}
+.drawer-hero-mode .drawer-ref-id{display:none!important;}
 
 /* Hero tray: show footer row with +NOTE and lens */
 .drawer-hero-footer{
