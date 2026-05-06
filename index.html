@@ -206,7 +206,7 @@ body::before{
 .placeholder-card{
   background:#0a0a0a;
   border:none;
-  border-radius:32px;
+  border-radius:0;
   padding:0;position:relative;
   transition:box-shadow 0.4s cubic-bezier(0.4,0,0.2,1),transform 0.4s cubic-bezier(0.4,0,0.2,1);
   box-shadow:0 8px 24px rgba(0,0,0,0.4);
@@ -1044,7 +1044,7 @@ body::before{
   .main-section{padding-top:60px;scroll-margin-top:60px;margin-bottom:56px;}
   h1{margin-top:24px;margin-bottom:16px;}
   .placeholder-container{flex-direction:column;align-items:center;gap:16px;}
-  .placeholder-card{border-radius:24px;}
+  .placeholder-card{border-radius:0;}
   .add-card-icon{min-height:140px;border-radius:24px;}
   .add-card-icon span{font-size:48px;}
   .btn-red{font-size:16px;padding:18px 12px;}
@@ -1058,6 +1058,17 @@ body::before{
   .nav-btn{padding:16px 10px;font-size:13px;}
   .final-consent-container{padding:14px;}
   .action-button{font-size:15px;padding:18px;}
+
+  /* Pin card action CTAs to bottom on mobile */
+  .card-action-row{
+    position:fixed;bottom:64px;left:0;
+    width:100%;max-width:100%;
+    margin:0;padding:0 12px;
+    z-index:99;
+    background:linear-gradient(to top,rgba(10,10,10,0.95) 60%,transparent);
+    padding-top:20px;padding-bottom:10px;
+    box-sizing:border-box;
+  }
 }
 
 /* ── ROOM HEADER QUESTION ── */
@@ -1117,7 +1128,7 @@ body::before{
 }
 .card-action-submit:hover{background:var(--s2s-red-light);border-color:var(--s2s-red-light);}
 .card-action-submit:hover::after{width:100%;}
-.card-action-btn.locked-section{opacity:0.2;pointer-events:none;filter:none;}
+.card-action-btn.locked-section{opacity:0.35;pointer-events:none;filter:none;}
 
 /* ADD ROOM one-time pulse after first approval */
 @keyframes addRoomPulse{
