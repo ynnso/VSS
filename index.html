@@ -485,6 +485,7 @@ body::before{
   display:flex; align-items:center; gap:0;
   padding:10px 16px 8px;
   width:100%; box-sizing:border-box;
+  flex-wrap:wrap; row-gap:6px;
 }
 .hero-id-label {
   font-family:'Montserrat',sans-serif; font-size:20px; font-weight:700;
@@ -510,6 +511,16 @@ body::before{
 }
 .hero-info-bar-spacer { flex:1; min-width:8px; }
 .hero-info-bar .overlay-confirm { flex-shrink:0; }
+
+/* Mobile — scale info bar down so chip never bleeds */
+@media(max-width:480px){
+  .hero-id-label,
+  .hero-id-value { font-size:15px; }
+  .hero-room-name { font-size:15px; margin-left:4px; }
+  .hero-room-icon { margin-left:8px; width:18px; height:18px; }
+  .hero-room-icon svg { width:18px; height:18px; }
+  .hero-info-bar { padding:10px 12px 8px; flex-wrap:nowrap; }
+}
 .hero-notes-row { display:none; padding:0 16px 10px; }
 .hero-note-btn {
   background:none; border:none; cursor:pointer;
