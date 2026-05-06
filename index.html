@@ -1163,7 +1163,7 @@ body::before{
   border-bottom:1px solid rgba(255,255,255,0.06);
 }
 .slide2-header .slide-step-header {
-  max-width:760px; width:100%; margin:0 auto; padding:0 16px;
+  max-width:760px; width:100%; margin:0 auto; padding:0 16px; align-items:center;
 }
 .slide2-body {
   padding:24px 16px 120px;
@@ -1437,37 +1437,37 @@ body::before{
    ══════════════════════════════════════ */
 .slide-step-header {
   padding:0;
-  display:flex; flex-direction:column; align-items:flex-start;
+  display:flex; flex-direction:column; align-items:center;
 }
 /* Hide the number — context lives in the tab bar */
 .slide-step-num { display:none; }
 .slide-step-title {
-  font-family:'Montserrat',sans-serif; font-size:22px; font-weight:800;
+  font-family:'Montserrat',sans-serif; font-size:30px; font-weight:700;
   color:white; letter-spacing:-0.02em; text-transform:none;
-  display:block; text-align:left; line-height:1; position:relative;
+  display:block; text-align:center; line-height:1; position:relative;
   margin-bottom:10px;
 }
-/* Red underline mark — 32px wide, 2px tall, signature accent */
+/* Red underline mark — 32px wide, 2px tall, centered signature accent */
 .slide-step-title::after {
   content:''; display:block;
   width:32px; height:2px;
   background:var(--s2s-red);
-  margin-top:8px;
+  margin:8px auto 0;
 }
 .slide-step-sub {
   font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500;
   color:rgba(255,255,255,0.55); margin-top:0; line-height:1.5;
-  display:block; text-align:left;
+  display:block; text-align:center;
 }
 
 /* Slide 2 — scoped overrides cleared */
-#slide-2 .slide-step-header { flex-direction:column; align-items:flex-start; }
+#slide-2 .slide-step-header { flex-direction:column; align-items:center; }
 #slide-2 .slide-step-num { display:none; }
-#slide-2 .slide-step-title { font-size:22px; font-weight:800; letter-spacing:-0.02em; text-transform:none; }
+#slide-2 .slide-step-title { font-size:30px; font-weight:700; letter-spacing:-0.02em; text-transform:none; }
 #slide-2 .slide-step-sub { display:none; }
 
-/* Slide 3 — left-align to match */
-#slide-3 .slide-step-header { width:100%; align-items:flex-start; }
+/* Slide 3 — center to match */
+#slide-3 .slide-step-header { width:100%; align-items:center; }
 </style>
 </head>
 <body>
