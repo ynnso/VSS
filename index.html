@@ -1390,7 +1390,7 @@ body::before{
       <span class="hero-badge-text">742 Evergreen Terrace, Dallas TX 75201</span>
     </div>
 
-    <h1 class="hero-h1" id="hero-h1-text">CHOOSE YOUR<br><span class="hero-h1-line2">STYLE</span></h1>
+    <h1 class="hero-h1" id="hero-h1-text"><span id="hero-line1">CHOOSE YOUR</span><br><span class="hero-h1-line2" id="hero-line2">STYLE</span></h1>
 
     <p class="hero-sub">Pick the look for each room.<br>Our editors handle everything else.</p>
     <p class="hero-time-note">2 minute setup</p>
@@ -2344,7 +2344,23 @@ document.addEventListener('change', e => {
   updateProgress();
 })();
 
-
+/* ── HEADLINE WIDTH MATCH ── */
+function matchHeadlineWidths() {
+  const l1 = document.getElementById('hero-line1');
+  const l2 = document.getElementById('hero-line2');
+  if (!l1 || !l2) return;
+  l1.style.fontSize = '';
+  const w2 = l2.getBoundingClientRect().width;
+  const w1 = l1.getBoundingClientRect().width;
+  if (w1 === 0 || w2 === 0) return;
+  const currentFs = parseFloat(getComputedStyle(l1).fontSize);
+  l1.style.fontSize = (currentFs * (w2 / w1)) + 'px';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  matchHeadlineWidths();
+  window.addEventListener('resize', matchHeadlineWidths);
+});
+if (document.fonts) document.fonts.ready.then(matchHeadlineWidths);
 
 </script>
 </body>
