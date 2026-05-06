@@ -1457,7 +1457,7 @@ body::before{
 .slide-step-sub {
   font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500;
   color:rgba(255,255,255,0.55); margin-top:0; line-height:1.5;
-  display:block; text-align:center;
+  display:inline-block; text-align:center;
 }
 
 /* Slide 2 — scoped overrides */
@@ -1644,6 +1644,7 @@ function goToSlide(n) {
   });
   currentSlide = n;
   window.scrollTo(0, 0);
+  if (n === 3) setTimeout(matchSubtitleWidth, 50);
 }
 
 function updateBottomTabs(step1Done, step2Done, step3Active) {
