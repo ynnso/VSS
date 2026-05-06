@@ -422,7 +422,7 @@ body::before{
   transition:all 0.3s ease;display:none;
   align-items:center;justify-content:center;gap:5px;
   font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;
-  letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;
+  letter-spacing:0.06em;text-transform:none;white-space:nowrap;
 }
 .overlay-confirm.ready{
   display:flex;
@@ -504,7 +504,7 @@ body::before{
 .hero-room-icon svg { width:24px; height:24px; stroke:rgba(255,255,255,0.6); }
 .hero-room-name {
   font-family:'Montserrat',sans-serif; font-size:20px; font-weight:500;
-  color:rgba(255,255,255,0.4); letter-spacing:0;
+  color:rgba(255,255,255,0.55); letter-spacing:0;
   white-space:nowrap; margin-left:4px;
   flex-shrink:0;
 }
@@ -601,13 +601,13 @@ body::before{
   flex:1;display:flex;align-items:center;justify-content:center;
   position:relative;z-index:2;
 }
-.room-tile svg{width:56px;height:56px;display:block;color:rgba(255,255,255,0.6);
-  transition:color 0.35s,transform 0.35s cubic-bezier(0.4,0,0.2,1);stroke:rgba(255,255,255,0.6);}
+.room-tile svg{width:56px;height:56px;display:block;color:rgba(255,255,255,0.7);
+  transition:color 0.35s,transform 0.35s cubic-bezier(0.4,0,0.2,1);stroke:rgba(255,255,255,0.7);}
 .room-tile:hover svg{color:rgba(255,255,255,0.92);stroke:rgba(255,255,255,0.92);transform:scale(1.08);}
 .room-tile.selected svg{color:white;stroke:white;}
 .room-tile-label{
   font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;
-  color:rgba(255,255,255,0.45);text-align:center;letter-spacing:0.08em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);text-align:center;letter-spacing:0.08em;text-transform:none;
   line-height:1;transition:color 0.35s;position:relative;z-index:2;
   padding:0 6px 2px;
 }
@@ -1086,7 +1086,7 @@ body::before{
 
 /* ── CARD ACTION ROW ── */
 .card-action-row{
-  display:flex;gap:10px;justify-content:center;align-items:center;
+  display:flex;gap:28px;justify-content:center;align-items:center;
   width:100%;max-width:760px;margin:40px auto 8px;padding:0;
   background:transparent;
   scroll-margin-top:110px;
@@ -1096,12 +1096,12 @@ body::before{
   border:none;border-radius:0;cursor:pointer;padding:18px 0;
   transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
   white-space:nowrap;flex:1;text-align:center;
-  text-transform:uppercase;position:relative;overflow:hidden;
+  text-transform:none;position:relative;overflow:hidden;
 }
 /* ADD — dark, understated */
 .card-action-add{
-  background:transparent;color:rgba(255,255,255,0.5);
-  border:1px solid rgba(255,255,255,0.15);
+  background:transparent;color:rgba(255,255,255,0.6);
+  border:1px solid rgba(255,255,255,0.2);
 }
 .card-action-add::after{
   content:'';position:absolute;top:0;left:0;bottom:0;width:0;
@@ -1339,7 +1339,7 @@ body::before{
 .hero-sub {
   font-family:'Montserrat',sans-serif;
   font-size:15px; font-weight:300;
-  color:rgba(255,255,255,0.28);
+  color:rgba(255,255,255,0.50);
   line-height:1.7; margin:0 0 32px; max-width:460px;
   letter-spacing:0.05em;
 }
@@ -1452,7 +1452,7 @@ body::before{
 }
 .slide-step-sub {
   font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500;
-  color:rgba(255,255,255,0.4); margin-top:4px; line-height:1.5;
+  color:rgba(255,255,255,0.55); margin-top:4px; line-height:1.5;
   display:block; text-align:center;
 }
 
@@ -1476,7 +1476,7 @@ body::before{
   color:rgba(255,255,255,0.2);
 }
 #slide-2 .slide-step-title {
-  font-size:24px; font-weight:700; letter-spacing:-0.02em;
+  font-size:24px; font-weight:700; letter-spacing:-0.02em; text-transform:none;
 }
 #slide-2 .slide-step-sub {
   display:none;
@@ -1527,7 +1527,7 @@ body::before{
   <div class="slide2-header">
     <div class="slide-step-header">
       <div class="slide-step-num">2</div>
-      <span class="slide-step-title">STYLE YOUR ROOMS</span>
+      <span class="slide-step-title">Style Your Rooms</span>
       <span class="slide-step-sub">One style per room. Our editors take it from there.</span>
     </div>
   </div>
@@ -1536,8 +1536,8 @@ body::before{
       <div class="placeholder-container" id="placeholderContainer">
       </div>
       <div class="card-action-row" id="cardActionRow" style="display:none;">
-        <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ ADD ROOM</button>
-        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">FINALIZE <span class="finalize-arrow">→</span></button>
+        <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ Add Room</button>
+        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">Finalize <span class="finalize-arrow">→</span></button>
       </div>
     </div>
   </div>
@@ -1611,7 +1611,7 @@ const roomIconSVGs = {
   "Bedroom": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.91" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"><line x1="2.45" y1="23.45" x2="2.45" y2="20.59"/><rect x="1.5" y="15.82" width="21" height="4.77"/><path d="M6.52,11h11a4.07,4.07,0,0,1,4.07,4.07v.7H2.45v-.7A4.07,4.07,0,0,1,6.52,11Z"/><path d="M7.23,7.23H9.14A2.86,2.86,0,0,1,12,10.09v1H4.36v-1A2.86,2.86,0,0,1,7.23,7.23Z"/><path d="M14.86,7.23h1.91a2.86,2.86,0,0,1,2.86,2.86v1H12v-1A2.86,2.86,0,0,1,14.86,7.23Z"/><rect x="4.36" y="3.41" width="15.27" height="7.64"/><line x1="21.55" y1="23.45" x2="21.55" y2="20.59"/><line x1="4.36" y1="0.55" x2="4.36" y2="3.41"/><line x1="19.64" y1="0.55" x2="19.64" y2="3.41"/></svg>`,
   "Kitchen/Dining": `<svg viewBox="0 -1.05 48.095 48.095" fill="currentColor"><path d="M9 0A1 1 0 0 0 8 1L8 4.48L1.42 9.19A1 1 0 0 0 1 10L1 14A1 1 0 0 0 2 15L24 15A1 1 0 0 0 25 14L25 10A1 1 0 0 0 24.58 9.19L18 4.49L18 1A1 1 0 0 0 17 0L9 0zM10 2L16 2L16 5A1 1 0 0 0 16.42 5.81L23 10.51L23 13L3 13L3 10.51L9.58 5.81A1 1 0 0 0 10 5L10 2zM5.5 21C4.85 21 4.3 21.42 4.09 22L1 22A1 1 0 0 0 0 23L0 45A1 1 0 0 0 1 46L47.1 46A1 1 0 0 0 48.1 45L48.1 23A1 1 0 0 0 47.1 22L21.91 22C21.7 21.42 21.15 21 20.5 21L5.5 21zM2 24L5.5 24L20.5 24L24.1 24L24.1 44L2 44L2 24zM26.1 24L46.1 24L46.1 30L26.1 30L26.1 24zM5 26A1 1 0 0 0 4 27L4 41A1 1 0 0 0 5 42L21 42A1 1 0 0 0 22 41L22 27A1 1 0 0 0 21 26L5 26zM6 28L20 28L20 40L6 40L6 28zM26.1 32L46.1 32L46.1 44L26.1 44L26.1 32zM30 34.99A1 1 0 0 0 29 36L29 41A1 1 0 1 0 31 41L31 36A1 1 0 0 0 30 34.99z"/></svg>`,
   "Outdoor": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.91" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"><polygon points="20.61 7.24 3.39 7.24 3.39 6.28 12 1.5 20.61 6.28 20.61 7.24"/><line x1="12" y1="7.24" x2="12" y2="23.5"/><polyline points="15.83 23.5 15.83 19.67 20.61 19.67 20.61 23.5"/><line x1="20.61" y1="13.93" x2="20.61" y2="19.67"/><polyline points="8.17 23.5 8.17 19.67 3.39 19.67 3.39 23.5"/><line x1="3.39" y1="13.93" x2="3.39" y2="19.67"/><line x1="6.26" y1="15.85" x2="17.74" y2="15.85"/></svg>`,
-  "Study/Office": `<svg viewBox="0 0 512 512" fill="currentColor"><path d="M290.4,196.3h-0.1c-4.7,0-8.5,3.8-8.5,8.5c0,4.7,3.9,8.5,8.6,8.5s8.5-3.8,8.5-8.5C298.9,200.1,295.1,196.3,290.4,196.3z"/><path d="M110.9,256c4.7,0,8.5-3.8,8.5-8.5v-34.1c0-4.7,3.8-8.5,8.5-8.5s8.5,3.8,8.5,8.5v34.1c0,4.7,3.8,8.5,8.5,8.5c4.7,0,8.5-3.8,8.5-8.5v-34l8.5-169.9c1.5-12.8,10.1-26.6,25.7-26.6h136.5c15.5,0,24.2,13.8,25.6,26l8.5,170.2v34.1c0,4.7,3.8,8.5,8.5,8.5s8.5-3.8,8.5-8.5v-34.1c0-4.7,3.8-8.5,8.5-8.5s8.5,3.8,8.5,8.5v34.1c0,4.7,3.8,8.5,8.5,8.5c4.7,0,8.5-3.8,8.5-8.5v-34.1c0-14.1-11.5-25.6-25.6-25.6c-3.4,0-6.7,0.7-9.7,1.9l-7.4-148c-2.8-24.7-20.7-42.2-42.7-42.2H187.7c-21.9,0-39.9,17.5-42.7,42.2l-7.4,147.4c-3-1.2-6.3-1.9-9.7-1.9c-14.1,0-25.6,11.5-25.6,25.6v34.1C102.4,252.2,106.2,256,110.9,256z"/><path d="M503.5,273.1H8.5C3.8,273.1,0,276.9,0,281.6s3.8,8.5,8.5,8.5H17v42.7c0,4.7,3.8,8.5,8.5,8.5h25.6v162.1c0,4.7,3.8,8.5,8.5,8.5h34.1c4.7,0,8.5-3.8,8.5-8.5V366.9c0-4.7-3.8-8.5-8.5-8.5s-8.5,3.8-8.5,8.5v128H68.3V332.8c0-4.7-3.8-8.5-8.5-8.5H34.1V290h443.7v34.1h-25.6c-4.7,0-8.5,3.8-8.5,8.5s3.8,8.5,8.5,8.5h34.1c4.7,0,8.5-3.8,8.5-8.5v-42.7h8.5c4.7,0,8.5-3.8,8.5-8.5S508.2,273.1,503.5,273.1z"/><path d="M452.3,358.4c-4.7,0-8.5,3.8-8.5,8.5v128h-17.1V332.8c0-4.7-3.8-8.5-8.5-8.5H93.9c-4.7,0-8.5,3.8-8.5,8.5s3.8,8.5,8.5,8.5H409.6v162.1c0,4.7,3.8,8.5,8.5,8.5h34.1c4.7,0,8.5-3.8,8.5-8.5V366.9C460.8,362.2,457,358.4,452.3,358.4z"/><path d="M349.9,375.5c4.7,0,8.5-3.8,8.5-8.5s-3.8-8.5-8.5-8.5H162.1c-4.7,0-8.5,3.8-8.5,8.5s3.8,8.5,8.5,8.5h85.3v30.6l-57.3,57.3c-3.3-1.6-7-2.6-11-2.6c-14.1,0-25.6,11.5-25.6,25.6s11.5,25.6,25.6,25.6s25.6-11.5,25.6-25.6c0-3.9-1-7.6-2.6-11l45.2-45.2v32.2c-9.9,3.5-17.1,12.9-17.1,24c0,14.1,11.5,25.6,25.6,25.6s25.6-11.5,25.6-25.6c0-11.1-7.2-20.5-17.1-24v-32.2l45.2,45.2c-1.6,3.3-2.6,7-2.6,11c0,14.1,11.5,25.6,25.6,25.6c14.1,0,25.6-11.5,25.6-25.6s-11.5-25.6-25.6-25.6c-3.9,0-7.6,1-11,2.6l-57.3-57.3v-30.6H349.9z"/></svg>`,
+  "Study/Office": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="10" rx="1"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="7" y1="18" x2="17" y2="18"/><line x1="7" y1="18" x2="6" y2="21"/><line x1="17" y1="18" x2="18" y2="21"/></svg>`,
   "Entertainment": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.91" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"><circle cx="12.02" cy="12" r="10.52"/><circle cx="12.02" cy="6.26" r="1.91"/><circle cx="12.02" cy="17.74" r="1.91"/><circle cx="6.28" cy="12" r="1.91"/><circle cx="17.76" cy="12" r="1.91"/><line x1="23.5" y1="22.52" x2="12.02" y2="22.52"/><line x1="11.07" y1="12" x2="12.98" y2="12"/></svg>`
 };
 let step1Clicked = false;
@@ -2361,7 +2361,7 @@ function createCard(restoreData, editorsChoice) {
         const heroRoomName = drawer.querySelector('.hero-room-name');
         if (heroIdVal) heroIdVal.textContent = displayId;
         if (heroRoomIcon && roomIconSVGs[selectedRoom]) heroRoomIcon.innerHTML = roomIconSVGs[selectedRoom];
-        if (heroRoomName) heroRoomName.textContent = selectedRoom;
+        if (heroRoomName) heroRoomName.textContent = roomTileLabels[selectedRoom] || selectedRoom;
         /* Reveal info bar footer */
         const footer = drawer.querySelector('.drawer-footer,.drawer-footer-hidden');
         if (footer) { footer.className = 'drawer-footer'; }
@@ -2393,7 +2393,7 @@ function createCard(restoreData, editorsChoice) {
         /* Wire X btn to reset */
         if (xBtn) xBtn.addEventListener('click', e => { e.stopPropagation(); editBtn.click(); }, {once:true});
         overlayId.innerText = displayId;
-        overlayRoom.innerText = selectedRoom;
+        overlayRoom.innerText = roomTileLabels[selectedRoom] || selectedRoom;
         overlayIcon.innerHTML = roomIconSVGs[selectedRoom] || '';
         card.dataset.notesAcknowledge = 'true';
         cardFooter.classList.add('visible');
