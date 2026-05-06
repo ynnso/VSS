@@ -435,11 +435,26 @@ body::before{
 }
 .overlay-confirm.verified{
   display:flex;
-  background:rgba(8,8,8,0.92);
+  background:rgba(46,204,90,0.12);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.2);
-  color:white;animation:none;
-  box-shadow:0 2px 14px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);
+  border:1px solid rgba(46,204,90,0.4);
+  color:white;
+  box-shadow:0 2px 14px rgba(46,204,90,0.15),inset 0 1px 0 rgba(255,255,255,0.08);
+  animation:approvePopIn 0.35s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes approvePopIn{
+  0%  {transform:scale(1.12);opacity:0.7;}
+  60% {transform:scale(0.97);}
+  100%{transform:scale(1);opacity:1;}
+}
+/* Card green flash on approval */
+@keyframes cardApproveFlash{
+  0%  {box-shadow:0 0 0 0 rgba(46,204,90,0.5);}
+  40% {box-shadow:0 0 0 4px rgba(46,204,90,0.3);}
+  100%{box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+}
+.card-approve-flash{
+  animation:cardApproveFlash 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 .confirm-check{color:#2ECC5A;font-size:11px;font-weight:800;}
 
@@ -591,8 +606,8 @@ body::before{
 .room-tile:hover svg{color:rgba(255,255,255,0.92);stroke:rgba(255,255,255,0.92);transform:scale(1.08);}
 .room-tile.selected svg{color:white;stroke:white;}
 .room-tile-label{
-  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;
-  color:rgba(255,255,255,0.45);text-align:center;letter-spacing:0.16em;text-transform:uppercase;
+  font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;
+  color:rgba(255,255,255,0.45);text-align:center;letter-spacing:0.08em;text-transform:uppercase;
   line-height:1;transition:color 0.35s;position:relative;z-index:2;
   padding:0 6px 2px;
 }
@@ -1432,6 +1447,29 @@ body::before{
 
 /* Step 3 alignment */
 #slide-3 .slide-step-header { width:100%; }
+
+/* Slide 2 — inline architectural heading, no badge */
+#slide-2 .slide-step-header {
+  flex-direction:row; align-items:baseline; gap:0;
+  justify-content:center;
+}
+#slide-2 .slide-step-num {
+  width:auto; height:auto; border-radius:0;
+  background:none; border:none; box-shadow:none;
+  font-family:'Montserrat',sans-serif; font-size:24px; font-weight:300;
+  color:rgba(255,255,255,0.4); margin-bottom:0; margin-right:0;
+  letter-spacing:0.02em;
+}
+#slide-2 .slide-step-num::after {
+  content:'—'; margin:0 10px; font-weight:200;
+  color:rgba(255,255,255,0.2);
+}
+#slide-2 .slide-step-title {
+  font-size:24px; font-weight:700; letter-spacing:-0.02em;
+}
+#slide-2 .slide-step-sub {
+  display:none;
+}
 </style>
 </head>
 <body>
@@ -1554,6 +1592,7 @@ body::before{
 <script>
 const roomTypes = ["Living Room","Bedroom","Kitchen/Dining","Outdoor","Study/Office","Entertainment"];
 const roomSerials = {"Living Room":"RM-LR-01","Bedroom":"RM-BR-02","Kitchen/Dining":"RM-KD-03","Outdoor":"RM-OD-04","Study/Office":"RM-SO-05","Entertainment":"RM-EN-06"};
+const roomTileLabels = {"Living Room":"Living","Bedroom":"Bedroom","Kitchen/Dining":"Kitchen","Outdoor":"Outdoor","Study/Office":"Office","Entertainment":"Entertainment"};
 
 /* SVG icon strings per room type — injected into overlay-room-icon */
 const roomIconSVGs = {
@@ -1827,7 +1866,7 @@ function createCard(restoreData, editorsChoice) {
         ${roomTypes.map(r => `<button class="room-tile" data-room="${r}" type="button">
           <span class="room-tile-serial">${roomSerials[r]||''}</span>
           <span class="room-tile-icon-wrap"><span class="room-tile-icon"></span></span>
-          <span class="room-tile-label">${r}</span>
+          <span class="room-tile-label">${roomTileLabels[r]||r}</span>
         </button>`).join('')}
         <!-- Obsidian Drawer — spans full 3-col width -->
         <div class="studio-drawer">
@@ -2185,6 +2224,11 @@ function createCard(restoreData, editorsChoice) {
     nudge.classList.add('verified');
     nudge.querySelector('.confirm-check').style.display = 'inline';
     const _cl = nudge.querySelector('.confirm-label'); if(_cl) _cl.textContent = 'Approved';
+    /* Green flash on card */
+    card.classList.remove('card-approve-flash');
+    void card.offsetWidth;
+    card.classList.add('card-approve-flash');
+    card.addEventListener('animationend', () => card.classList.remove('card-approve-flash'), {once:true});
     
     updateProgress();
     /* Scroll action buttons into view so user sees ADD/FINALIZE */
