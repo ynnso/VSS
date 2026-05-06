@@ -404,11 +404,11 @@ body::before{
 /* +NOTE at 30% opacity */
 .drawer-add-note-btn{
   background:none;border:none;cursor:pointer;
-  font-family:'Montserrat',sans-serif;font-size:10px;font-weight:500;
-  color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;
+  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;
+  color:rgba(255,255,255,0.40);letter-spacing:0.04em;text-transform:none;
   padding:0;transition:color 0.25s;
 }
-.drawer-add-note-btn:hover{color:rgba(255,255,255,0.6);}
+.drawer-add-note-btn:hover{color:rgba(255,255,255,0.7);}
 
 /* Igniting Lens — replaces Approve chip, with slow pulse when ready */
 @keyframes lensReadyPulse{
@@ -499,10 +499,10 @@ body::before{
 .hero-note-btn {
   background:none; border:none; cursor:pointer;
   font-family:'Montserrat',sans-serif; font-size:11px; font-weight:500;
-  color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase;
+  color:rgba(255,255,255,0.40); letter-spacing:0.04em; text-transform:none;
   padding:0; transition:color 0.25s;
 }
-.hero-note-btn:hover { color:rgba(255,255,255,0.6); }
+.hero-note-btn:hover { color:rgba(255,255,255,0.7); }
 
 
 
@@ -1130,10 +1130,11 @@ body::before{
 }
 .slide2-header {
   position:sticky; top:0; z-index:10;
-  background:#0a0a0a;
+  background:rgba(10,10,10,0.85);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   text-align:center;
   padding:24px 16px 16px;
-  border-bottom:none;
+  border-bottom:1px solid rgba(255,255,255,0.06);
 }
 .slide2-body {
   padding:24px 16px 120px;
@@ -1870,11 +1871,11 @@ function createCard(restoreData, editorsChoice) {
                 <button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button>
               </div>
               <div class="drawer-footer-left" style="display:none;">
-                <button class="drawer-add-note-btn add-notes-btn" type="button">+ NOTE</button>
+                <button class="drawer-add-note-btn add-notes-btn" type="button">Any special requests?</button>
               </div>
             </div>
             <div class="hero-notes-row">
-              <button class="drawer-add-note-btn add-notes-btn hero-note-btn" type="button">+ NOTE</button>
+              <button class="drawer-add-note-btn add-notes-btn hero-note-btn" type="button">Any special requests?</button>
             </div>
             <div class="notes-content" style="display:none;padding:0 0 8px;">
               <textarea placeholder="Note for the editor..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);outline:none;resize:none;min-height:32px;"></textarea>
@@ -1904,7 +1905,7 @@ function createCard(restoreData, editorsChoice) {
         <div class="footer-row-2">
           <button class="add-note-btn add-notes-btn no-notes-btn" type="button">
             <span class="add-note-icon">+</span>
-            <span class="add-note-label">Add a note for the editor</span>
+            <span class="add-note-label">Any special requests for this room?</span>
           </button>
         </div>
         <div class="notes-content">
@@ -2121,7 +2122,7 @@ function createCard(restoreData, editorsChoice) {
       // Expand
       notesArea.classList.add('active');
       addNotes.classList.add('expanded');
-      addNotes.querySelector('.add-note-label').textContent = 'Note for the editor';
+      addNotes.querySelector('.add-note-label').textContent = 'Special requests';
       card.dataset.notesAcknowledge = 'true';
       nudge.classList.remove('verified');
       setTimeout(() => { autoResizeTa(); notesTa.focus(); }, 50);
@@ -2129,7 +2130,7 @@ function createCard(restoreData, editorsChoice) {
       // Collapse if empty
       notesArea.classList.remove('active');
       addNotes.classList.remove('expanded','has-content');
-      addNotes.querySelector('.add-note-label').textContent = 'Add a note for the editor';
+      addNotes.querySelector('.add-note-label').textContent = 'Any special requests for this room?';
       card.dataset.notesAcknowledge = 'true';
       nudge.classList.remove('verified');
     }
@@ -2156,7 +2157,7 @@ function createCard(restoreData, editorsChoice) {
       addNotes.querySelector('.add-note-label').textContent = 'Note added';
     } else {
       addNotes.classList.remove('has-content');
-      addNotes.querySelector('.add-note-label').textContent = 'Note for the editor';
+      addNotes.querySelector('.add-note-label').textContent = 'Special requests';
     }
     updateProgress();
   });
@@ -2315,10 +2316,21 @@ function createCard(restoreData, editorsChoice) {
         /* Show APPROVE in info bar */
         nudge.style.display = 'flex';
         nudge.classList.add('ready');
-        /* Hero mode — hide question bar and tiles, switch grid to block for full-width drawer */
+        /* Hero mode — fade tiles out, expand drawer smoothly */
         roomHdr.querySelector('.room-header-question').style.display = 'none';
-        tiles.forEach(t => t.style.display = 'none');
-        tileGrid.style.display = 'block';
+        tiles.forEach(t => {
+          t.style.transition = 'opacity 0.3s ease, max-height 0.4s ease';
+          t.style.opacity = '0';
+          t.style.maxHeight = '0';
+          t.style.overflow = 'hidden';
+          t.style.padding = '0';
+          t.style.margin = '0';
+          t.style.border = 'none';
+        });
+        setTimeout(() => {
+          tiles.forEach(t => t.style.display = 'none');
+          tileGrid.style.display = 'block';
+        }, 350);
         roomHdr.style.padding = '0';
         drawer.style.cssText = 'display:block;border:none;border-radius:0;opacity:1;max-height:none;width:100%;overflow:visible;';
         drawer.classList.add('drawer-hero-mode');
@@ -2374,7 +2386,7 @@ function createCard(restoreData, editorsChoice) {
     nudge.classList.remove('ready','verified','pulse-trigger');
     card.dataset.notesAcknowledge = 'true';
     addNotes.classList.remove('active','expanded','has-content');
-    if (addNotes.querySelector('.add-note-label')) addNotes.querySelector('.add-note-label').textContent = 'Add a note for the editor';
+    if (addNotes.querySelector('.add-note-label')) addNotes.querySelector('.add-note-label').textContent = 'Any special requests for this room?';
     notesArea.classList.remove('active');
     notesTa.value = ''; notesTa.style.height = '34px';
     input.value = '';
@@ -2392,7 +2404,16 @@ function createCard(restoreData, editorsChoice) {
     /* Reset to tile selection */
     selectedRoom = '';
     tiles.forEach(t => t.classList.remove('selected'));
-    tiles.forEach(t => t.style.display = ''); /* restore tiles */
+    tiles.forEach(t => {
+      t.style.display = '';
+      t.style.opacity = '';
+      t.style.maxHeight = '';
+      t.style.overflow = '';
+      t.style.padding = '';
+      t.style.margin = '';
+      t.style.border = '';
+      t.style.transition = '';
+    });
     tileGrid.style.display = '';       /* restore grid layout */
     tileGrid.style.position = '';
     roomHdr.style.padding = '';
