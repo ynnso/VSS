@@ -281,23 +281,23 @@ body::before{
 }
 /* REF ID — top-right of tray after validation */
 .drawer-ref-id { display:none !important; }
-/* Single milled slot row */
+/* Single milled slot row — all on one line */
 .drawer-slot-row{
   display:flex;align-items:center;gap:0;
   background:transparent;
   border:none;
   box-shadow:none;
   position:relative;
-  padding:12px 16px 0;
+  padding:16px 16px 14px;
 }
 /* Left: id-tag icon */
 .drawer-anchor-icon{ display:none; }
-/* STYLE ID label */
+/* STYLE ID label — static left position in row */
 .drawer-style-label{
-  font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;
-  color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;
-  white-space:nowrap;padding-right:0;flex-shrink:0;border-right:none;
-  position:absolute;top:-2px;left:16px;
+  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;
+  color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;
+  white-space:nowrap;flex-shrink:0;border-right:none;
+  position:static;margin-right:14px;
   transition:color 0.3s;
 }
 .drawer-slot-row:focus-within .drawer-style-label{
@@ -311,7 +311,7 @@ body::before{
   font-family:'Montserrat',sans-serif;font-weight:700;font-size:22px;
   color:white;outline:none;letter-spacing:0.04em;
   transition:border-color 0.3s;caret-color:var(--s2s-red);min-width:0;
-  margin-top:14px;
+  margin-top:0;
 }
 .drawer-omnibox:focus{
   border-bottom-color:var(--s2s-red);
@@ -322,32 +322,43 @@ body::before{
 }
 /* ── STRUCTURED 4-BOX STYLE ID ── */
 .style-id-boxes{
-  display:flex;align-items:center;gap:8px;
-  flex:1;margin-top:14px;justify-content:center;padding:4px 0 6px;
+  display:flex;align-items:center;gap:6px;
+  flex:1;margin:0;justify-content:flex-start;padding:0;
 }
 .style-id-digit{
-  width:48px;height:56px;border:none;
-  border-bottom:2px solid rgba(255,255,255,0.15);
-  background:transparent;
-  font-family:'Montserrat',sans-serif;font-weight:800;font-size:28px;
+  width:44px;height:48px;
+  border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:6px;
+  background:rgba(255,255,255,0.03);
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:22px;
   color:white;text-align:center;outline:none;
   caret-color:var(--s2s-red);
-  transition:border-color 0.3s;
+  transition:border-color 0.3s,background 0.3s;
   letter-spacing:0;padding:0;
 }
 .style-id-digit:focus{
-  border-bottom-color:var(--s2s-red);
+  border-color:var(--s2s-red);
+  background:rgba(204,21,0,0.06);
+  animation:digitPulse 1.2s ease-in-out infinite;
+}
+.style-id-digit:not(:placeholder-shown):focus,
+.style-id-digit:not([value=""]):focus{
+  animation:none;
+}
+@keyframes digitPulse{
+  0%,100%{border-color:var(--s2s-red);box-shadow:0 0 0 0 rgba(204,21,0,0);}
+  50%    {border-color:var(--s2s-red);box-shadow:0 0 8px 1px rgba(204,21,0,0.25);}
 }
 .style-id-digit::placeholder{
   color:rgba(255,255,255,0.08);
 }
 /* Extra digit slots (5th, 6th) — hidden until needed */
 .style-id-digit-extra{
-  width:48px;display:none;
+  width:44px;display:none;
 }
 .style-id-extra-sep{
   color:rgba(255,255,255,0.12);font-size:18px;font-weight:300;
-  display:none;margin:14px 2px 0;
+  display:none;margin:0 2px;
 }
 /* Divider */
 .drawer-slot-divider{
@@ -1048,16 +1059,16 @@ body::before{
 
 /* ── CARD ACTION ROW ── */
 .card-action-row{
-  display:flex;gap:12px;justify-content:center;align-items:center;
-  width:100%;max-width:760px;margin:24px auto 8px;padding:0 16px;
+  display:flex;gap:0;justify-content:center;align-items:center;
+  width:100%;max-width:760px;margin:40px auto 8px;padding:0;
   background:transparent;
   scroll-margin-top:110px;
 }
 .card-action-btn{
   font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.12em;
-  border:none;border-radius:0;cursor:pointer;padding:16px 0;
+  border:none;border-radius:0;cursor:pointer;padding:18px 0;
   transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
-  white-space:nowrap;flex:1;max-width:280px;text-align:center;
+  white-space:nowrap;flex:1;text-align:center;
   text-transform:uppercase;position:relative;overflow:hidden;
 }
 /* ADD — dark, understated */
@@ -2049,8 +2060,8 @@ function createCard(restoreData, editorsChoice) {
     tileGrid.classList.add('drawer-open');
     drawer.classList.add('open');
 
-    /* Focus input after animation */
-    setTimeout(() => { input.focus(); }, 400);
+    /* Focus first digit box after drawer animation */
+    setTimeout(() => { if (digitBoxes[0]) digitBoxes[0].focus(); }, 400);
     updateProgress();
   }
 
