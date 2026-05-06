@@ -85,25 +85,34 @@ body::before{
   transition:background 0.18s;
 }
 .btn-catalog:hover{background:#2a2a2a;}
-/* Submit CTA — black, half-width, inner green glow */
+/* Submit CTA — matches ENTER GALLERY hero style */
 .btn-submit-compact{
-  width:auto;max-width:340px;padding:16px 28px;border-radius:0;font-size:13px;font-weight:700;letter-spacing:0.12em;
-  background:var(--s2s-red) !important;color:white !important;
-  border:1px solid var(--s2s-red) !important;
+  width:100%;max-width:100%;padding:0;height:72px;border-radius:0;
+  font-size:16px;font-weight:400;letter-spacing:0.18em;
+  background:transparent !important;color:rgba(255,255,255,0.95) !important;
+  border:1.5px solid rgba(255,255,255,0.7) !important;
   box-shadow:none !important;
-  transition:all 0.3s;position:relative;overflow:hidden;text-transform:uppercase;
+  transition:border-color 0.3s ease !important;
+  position:relative;overflow:hidden;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:14px;
 }
+/* Red pulse radial from bottom — same as hero CTA */
+.btn-submit-compact::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 120%, rgba(204,21,0,0.35) 0%, transparent 70%);
+  animation:ctaRedPulse 2.8s ease-in-out infinite;
+  pointer-events:none;z-index:0;
+}
+/* Fill left-to-right on hover */
 .btn-submit-compact::after{
   content:'';position:absolute;top:0;left:0;bottom:0;width:0;
-  background:rgba(255,255,255,0.12);
-  transition:width 0.4s cubic-bezier(0.4,0,0.2,1);
-}
-.btn-submit-compact:not(.locked-section):hover{
-  background:var(--s2s-red-light) !important;
-  border-color:var(--s2s-red-light) !important;
-  box-shadow:none !important;
+  background:var(--s2s-red);
+  transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+  pointer-events:none;z-index:0;
 }
 .btn-submit-compact:not(.locked-section):hover::after{width:100%;}
+.btn-submit-compact:not(.locked-section):hover{border-color:var(--s2s-red) !important;}
+.btn-submit-compact > *{position:relative;z-index:1;}
 /* Checkmark micro-action on submit */
 @keyframes checkPop{
   0%  {transform:scale(0.6);opacity:0;}
@@ -783,8 +792,8 @@ body::before{
 
 /* ── OPTION CARDS ── */
 .option-card{
-  background:#1C1C1E;padding:20px;border-radius:0;margin-bottom:8px;
-  border:1px solid rgba(255,255,255,0.08);display:flex;align-items:flex-start;gap:16px;
+  background:transparent;padding:20px;border-radius:0;margin-bottom:8px;
+  border:1px solid rgba(255,255,255,0.18);display:flex;align-items:flex-start;gap:16px;
   cursor:pointer;width:100%;transition:all 0.25s;position:relative;
   box-shadow:none;
 }
@@ -808,14 +817,14 @@ body::before{
   font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;
   padding:3px 10px;border-radius:0;letter-spacing:0.08em;flex-shrink:0;
 }
-.option-card.option-recommended{border:1px solid rgba(255,255,255,0.08);background:#1C1C1E;}
+.option-card.option-recommended{border:1px solid rgba(204,21,0,0.55);background:transparent;}
 /* Selected state — red left accent bar */
 .option-card:has(input:checked){
-  border-color:rgba(204,21,0,0.5) !important;
+  border-color:rgba(204,21,0,0.75) !important;
   box-shadow:inset 3px 0 0 var(--s2s-red) !important;
-  background:#1C1C1E;
+  background:transparent;
 }
-.option-card:hover{border-color:rgba(255,255,255,0.2);}
+.option-card:hover{border-color:rgba(255,255,255,0.35);}
 
 /* ── ADD CARD ── */
 .add-card-icon{
@@ -884,14 +893,14 @@ body::before{
 
 /* ── CONSENT ── */
 .final-consent-container{
-  margin-top:16px;padding:16px 20px;background:#1C1C1E;border-radius:0;
-  border:1px solid rgba(255,255,255,0.08);
+  margin-top:16px;padding:16px 0;background:transparent;border-radius:0;
+  border:none;
   display:none;align-items:center;gap:12px;width:100%;transition:0.3s;
 }
 .final-consent-container.visible{display:flex;}
 .final-consent-container input{
   -webkit-appearance:none;appearance:none;
-  width:20px;height:20px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.25);
+  width:20px;height:20px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.35);
   background:transparent;cursor:pointer;flex-shrink:0;position:relative;
   transition:border-color 0.2s,background 0.2s;
 }
@@ -902,7 +911,7 @@ body::before{
   content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   color:white;font-size:12px;font-weight:800;
 }
-.final-consent-container label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.6);cursor:pointer;line-height:1.5;}
+.final-consent-container label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:white;cursor:pointer;line-height:1.5;letter-spacing:0.06em;text-transform:uppercase;}
 
 /* APPLE #5: identity field focus glow */
 .identity-section{
@@ -1439,7 +1448,7 @@ body::before{
     <label for="tat-acknowledgement">I understand staging begins after photo delivery.</label>
   </div>
 
-  <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;display:block;margin-left:auto;margin-right:auto;max-width:340px;">SUBMIT ORDER →</button>
+  <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;"><span style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;">SUBMIT ORDER <svg width="39" height="22" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="12" x2="44" y2="12"/><polyline points="37 5 44 12 37 19"/></svg></span></button>
     </div>
     <div id="submit-success" style="display:none;width:100%;max-width:800px;margin-top:20px;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid var(--card-border);box-shadow:var(--card-shadow);padding:36px 28px;text-align:center;">
   <div style="width:52px;height:52px;background:linear-gradient(135deg,#44E872,#25B845);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(48,209,88,0.35);">
@@ -1700,7 +1709,7 @@ document.getElementById('final-submit').addEventListener('click', async () => {
   }));
   const payload = { name, address, preference: pref, rooms, submittedAt: new Date().toISOString() };
   const btn = document.getElementById('final-submit');
-  const orig = btn.innerText;
+  const orig = btn.innerHTML;
   /* Checkmark micro-action */
   btn.innerHTML = '<span class="submit-check-anim">✓</span>';
   btn.disabled = true;
