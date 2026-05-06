@@ -1198,7 +1198,7 @@ body::before{
 /* Watermark wordmark — integrated, not a sticker */
 .hero-wordmark {
   display:inline-flex; align-items:center; gap:12px;
-  margin-bottom:48px; opacity:0.35;
+  margin-bottom:48px; opacity:0.7;
   mix-blend-mode:screen;
 }
 .wm-mono {
@@ -1210,12 +1210,12 @@ body::before{
 }
 .wm-sep {
   width:1px; height:16px;
-  background:rgba(255,255,255,0.4);
+  background:rgba(255,255,255,0.7);
 }
 .wm-name {
   font-family:'Montserrat',sans-serif;
   font-size:11px; font-weight:400;
-  letter-spacing:0.14em; text-transform:uppercase;
+  letter-spacing:0.10em; text-transform:uppercase;
   color:rgba(255,255,255,0.9);
 }
 /* Property badge */
@@ -1242,12 +1242,12 @@ body::before{
   font-weight:200;
   font-size:clamp(2.2rem,5.5vw,4.2rem);
   color:rgba(255,255,255,0.92); letter-spacing:0.01em;
-  line-height:0.9; margin:0 0 28px;
+  line-height:0.7; margin:0 0 28px;
   text-transform:uppercase;
   word-break:keep-all; overflow-wrap:normal;
 }
-/* Second line — flush width match to "CHOOSE YOUR" */
-.hero-h1-line2 { font-weight:900; font-size:2.9em; letter-spacing:-0.02em; margin-right:0.02em; display:block; line-height:0.95; }
+/* Second line — locked unit, margin-top pulls it tight */
+.hero-h1-line2 { font-weight:900; font-size:2.9em; letter-spacing:-0.02em; margin-right:0.02em; display:block; line-height:0.95; margin-top:-5px; }
 .hero-sub {
   font-family:'Montserrat',sans-serif;
   font-size:15px; font-weight:300;
@@ -1296,10 +1296,11 @@ body::before{
 
 .hero-micro {
   font-family:'Montserrat',sans-serif;
-  font-size:12px; font-weight:300;
-  color:rgba(255,255,255,0.22);
-  margin-top:20px; line-height:1.7;
-  letter-spacing:0.05em;
+  font-size:10px; font-weight:400;
+  color:rgba(255,255,255,0.35);
+  margin-top:16px; line-height:1;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
 }
 
 @media(max-width:680px) {
@@ -1401,7 +1402,7 @@ body::before{
         <span style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;">ENTER GALLERY
         <svg width="39" height="22" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="12" x2="44" y2="12"/><polyline points="37 5 44 12 37 19"/></svg></span>
       </a>
-      <p class="hero-micro">Open the catalog, find a style you like, and copy the Style ID.<br>Paste it into each room card below — that's all we need from you.</p>
+      <p class="hero-micro">Find a style &rarr;&nbsp; Copy the ID &rarr;&nbsp; Come back</p>
       <span class="editors-choice-link" id="editors-choice-link"></span>
     </div>
 
