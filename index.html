@@ -317,8 +317,37 @@ body::before{
   border-bottom-color:var(--s2s-red);
 }
 .drawer-omnibox::placeholder{
-  color:rgba(255,255,255,0.18);font-size:15px;letter-spacing:0.01em;
+  color:rgba(255,255,255,0.30);font-size:15px;letter-spacing:0.12em;
   font-family:'Montserrat',sans-serif;font-weight:400;
+}
+/* ── STRUCTURED 4-BOX STYLE ID ── */
+.style-id-boxes{
+  display:flex;align-items:center;gap:8px;
+  flex:1;margin-top:14px;justify-content:center;padding:4px 0 6px;
+}
+.style-id-digit{
+  width:48px;height:56px;border:none;
+  border-bottom:2px solid rgba(255,255,255,0.15);
+  background:transparent;
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:28px;
+  color:white;text-align:center;outline:none;
+  caret-color:var(--s2s-red);
+  transition:border-color 0.3s;
+  letter-spacing:0;padding:0;
+}
+.style-id-digit:focus{
+  border-bottom-color:var(--s2s-red);
+}
+.style-id-digit::placeholder{
+  color:rgba(255,255,255,0.08);
+}
+/* Extra digit slots (5th, 6th) — hidden until needed */
+.style-id-digit-extra{
+  width:48px;display:none;
+}
+.style-id-extra-sep{
+  color:rgba(255,255,255,0.12);font-size:18px;font-weight:300;
+  display:none;margin:14px 2px 0;
 }
 /* Divider */
 .drawer-slot-divider{
@@ -477,11 +506,16 @@ body::before{
 }
 .drawer-staged-img.revealed{filter:grayscale(0) brightness(1);}
 .drawer-img-wrap{position:relative;overflow:hidden;}
-/* 20px vignette bleed bottom of image into tray */
+/* 4-edge vignette — subtle blend into dark UI */
+.drawer-img-wrap::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
+  box-shadow:inset 0 0 60px 20px rgba(10,10,10,0.7);
+}
+/* Bottom gradient bleed into tray — stronger */
 .drawer-img-fade{
-  position:absolute;bottom:0;left:0;right:0;height:20px;
-  background:linear-gradient(to bottom,transparent,rgba(6,6,6,0.98));
-  pointer-events:none;z-index:2;
+  position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:linear-gradient(to bottom,transparent,rgba(10,10,10,0.95));
+  pointer-events:none;z-index:3;
 }
 /* X — high contrast frosted, inlaid top-right of image */
 .drawer-x-btn{ display:none !important; }
@@ -1001,8 +1035,7 @@ body::before{
 
 /* ── ROOM HEADER QUESTION ── */
 .room-header-question{
-  display:flex;align-items:center;gap:14px;
-  margin:0 0 12px;padding:0;
+  display:none;
 }
 .room-header-line{
   flex:1;height:1px;background:rgba(255,255,255,0.15);
@@ -1039,10 +1072,16 @@ body::before{
 }
 .card-action-add:hover{color:white;border-color:rgba(255,255,255,0.4);}
 .card-action-add:hover::after{width:100%;}
-/* FINALIZE — red, dominant */
+/* FINALIZE — red, dominant, arrow slides on hover */
 .card-action-submit{
   background:var(--s2s-red);color:white;font-weight:700;
   border:1px solid var(--s2s-red);
+}
+.card-action-submit .finalize-arrow{
+  display:inline-block;transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.card-action-submit:hover .finalize-arrow{
+  transform:translateX(4px);
 }
 .card-action-submit::after{
   content:'';position:absolute;top:0;left:0;bottom:0;width:0;
@@ -1052,6 +1091,16 @@ body::before{
 .card-action-submit:hover{background:var(--s2s-red-light);border-color:var(--s2s-red-light);}
 .card-action-submit:hover::after{width:100%;}
 .card-action-btn.locked-section{opacity:0.2;pointer-events:none;filter:none;}
+
+/* ADD ROOM one-time pulse after first approval */
+@keyframes addRoomPulse{
+  0%  {box-shadow:0 0 0 0 rgba(255,255,255,0.4);}
+  50% {box-shadow:0 0 0 10px rgba(255,255,255,0);}
+  100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}
+}
+.card-action-add.pulse-once{
+  animation:addRoomPulse 0.8s cubic-bezier(0.22,1,0.36,1) 1;
+}
 
 /* ══════════════════════════════════════
    STEP VIEW SYSTEM — simple show/hide
@@ -1426,7 +1475,7 @@ body::before{
       </div>
       <div class="card-action-row" id="cardActionRow" style="display:none;">
         <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ ADD ROOM</button>
-        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">FINALIZE →</button>
+        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">FINALIZE <span class="finalize-arrow">→</span></button>
       </div>
     </div>
   </div>
@@ -1783,7 +1832,16 @@ function createCard(restoreData, editorsChoice) {
             <div class="drawer-ref-id" style="display:none;"></div>
             <div class="drawer-slot-row">
               <span class="drawer-style-label">STYLE ID</span>
-              <input class="drawer-omnibox" type="text" placeholder="Enter Style ID or URL">
+              <div class="style-id-boxes">
+                <input class="style-id-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-idx="0" autocomplete="off">
+                <input class="style-id-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-idx="1" autocomplete="off">
+                <input class="style-id-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-idx="2" autocomplete="off">
+                <input class="style-id-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-idx="3" autocomplete="off">
+                <span class="style-id-extra-sep">—</span>
+                <input class="style-id-digit style-id-digit-extra" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-idx="4" autocomplete="off" placeholder="">
+                <input class="style-id-digit style-id-digit-extra" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-idx="5" autocomplete="off" placeholder="">
+              </div>
+              <input class="drawer-omnibox" type="hidden" placeholder="Enter Style ID">
               <button class="drawer-submit" type="button">
                 <svg width="28" height="16" viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="8" x2="24" y2="8"/><polyline points="18 2 24 8 18 14"/></svg>
               </button>
@@ -1876,7 +1934,84 @@ function createCard(restoreData, editorsChoice) {
   card._nudge     = nudge;
   card._drawerImg = drawerImg;
 
-  /* ── PASTE AUTO-TRIGGER — longer delay for URLs ── */
+  /* ── 4-BOX STYLE ID WIRING ── */
+  const digitBoxes = Array.from(card.querySelectorAll('.style-id-digit'));
+  const extraSep = card.querySelector('.style-id-extra-sep');
+  const extraBoxes = Array.from(card.querySelectorAll('.style-id-digit-extra'));
+
+  function syncDigitsToInput() {
+    const val = digitBoxes.map(d => d.value).join('');
+    input.value = val;
+    /* Show extra boxes if first 4 are filled */
+    const first4 = val.length >= 4;
+    extraBoxes.forEach(b => b.style.display = first4 ? 'block' : 'none');
+    if (extraSep) extraSep.style.display = first4 ? 'inline' : 'none';
+    /* Light up submit arrow at 4+ digits */
+    if (val.length >= 4) stageBtn.classList.add('lit');
+    else stageBtn.classList.remove('lit');
+    const e = card.querySelector('.img-error-msg'); if (e) e.remove();
+    if (drawerBlade) drawerBlade.classList.toggle('active', val.length > 0);
+  }
+
+  digitBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      /* Allow only digits */
+      box.value = box.value.replace(/[^0-9]/g, '');
+      if (box.value && i < digitBoxes.length - 1) {
+        syncDigitsToInput();
+        /* Auto-advance: find next visible box */
+        for (let n = i + 1; n < digitBoxes.length; n++) {
+          if (digitBoxes[n].offsetParent !== null) { digitBoxes[n].focus(); break; }
+        }
+      } else {
+        syncDigitsToInput();
+      }
+      /* Auto-submit when 4th digit entered */
+      const fullVal = digitBoxes.map(d => d.value).join('');
+      if (fullVal.length === 4) {
+        setTimeout(() => performStaging(), 200);
+      }
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        /* Go back to previous box */
+        for (let n = i - 1; n >= 0; n--) {
+          if (digitBoxes[n].offsetParent !== null) { digitBoxes[n].focus(); break; }
+        }
+      }
+      if (e.key === 'Enter') performStaging();
+    });
+    /* Handle paste into first box — distribute digits across boxes */
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').trim();
+      /* If it's a URL, put it directly in hidden input and trigger */
+      if (pasted.startsWith('http')) {
+        input.value = pasted;
+        setTimeout(() => performStaging(), 150);
+        return;
+      }
+      const digits = pasted.replace(/[^0-9]/g, '').split('');
+      /* Show extra boxes if pasting 5+ digit ID */
+      if (digits.length > 4) {
+        extraBoxes.forEach(b => b.style.display = 'block');
+        if (extraSep) extraSep.style.display = 'inline';
+      }
+      digitBoxes.forEach((d, idx) => {
+        if (d.offsetParent !== null || idx < 4) {
+          d.value = digits[idx] || '';
+        }
+      });
+      syncDigitsToInput();
+      /* Focus last filled box or next empty */
+      const filled = Math.min(digits.length, digitBoxes.length);
+      if (filled > 0 && filled < digitBoxes.length) digitBoxes[filled].focus();
+      /* Auto-submit on paste of 4+ digits */
+      if (digits.length >= 4) setTimeout(() => performStaging(), 200);
+    });
+  });
+
+  /* ── PASTE AUTO-TRIGGER — longer delay for URLs (on hidden input fallback) ── */
   input.addEventListener('paste', (e) => {
     const pasted = (e.clipboardData || window.clipboardData).getData('text').trim();
     const isUrl = pasted.startsWith('http');
@@ -2044,6 +2179,15 @@ function createCard(restoreData, editorsChoice) {
     if (actionRow && actionRow.style.display !== 'none') {
       setTimeout(() => actionRow.scrollIntoView({ behavior:'smooth', block:'nearest' }), 300);
     }
+    /* One-time pulse on ADD ROOM after first ever approval */
+    const addBtn = document.getElementById('addCardButton');
+    if (addBtn && !addBtn.dataset.pulsed) {
+      addBtn.dataset.pulsed = 'true';
+      addBtn.classList.remove('pulse-once');
+      void addBtn.offsetWidth;
+      addBtn.classList.add('pulse-once');
+      addBtn.addEventListener('animationend', () => addBtn.classList.remove('pulse-once'), {once:true});
+    }
   });
 
   card.querySelector('.delete-card').addEventListener('click', e => {
@@ -2085,16 +2229,7 @@ function createCard(restoreData, editorsChoice) {
     updateProgress();
   });
 
-  input.addEventListener('input', () => {
-    const val = input.value.trim();
-    if (val.length >= 4) {
-      stageBtn.classList.add('lit');
-    } else {
-      stageBtn.classList.remove('lit');
-    }
-    const e = card.querySelector('.img-error-msg'); if (e) e.remove();
-    if (drawerBlade) drawerBlade.classList.toggle('active', val.length > 0);
-  });
+  /* input sync handled by 4-box digit wiring above */
 
   const performStaging = () => {
     const val = input.value.trim(); if (!val) return;
@@ -2232,6 +2367,9 @@ function createCard(restoreData, editorsChoice) {
     notesTa.value = ''; notesTa.style.height = '34px';
     input.value = '';
     input.style.pointerEvents = '';
+    digitBoxes.forEach(d => d.value = '');
+    extraBoxes.forEach(b => b.style.display = 'none');
+    if (extraSep) extraSep.style.display = 'none';
     stageBtn.classList.remove('lit');
     /* Re-hide footer row for next selection */
     const _df = drawer.querySelector('.drawer-footer,.drawer-footer-hidden');
