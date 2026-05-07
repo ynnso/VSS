@@ -1370,7 +1370,7 @@ body::before{
   background:transparent !important;
   color:rgba(255,255,255,0.95) !important;
   border:1.5px solid rgba(255,255,255,0.7) !important;
-  box-shadow:inset 0 0 0 0 var(--s2s-red) !important;
+  box-shadow:none !important;
   font-family:'Montserrat',sans-serif !important;
   font-size:19.5px !important; font-weight:400 !important;
   letter-spacing:0.18em !important;
@@ -1378,32 +1378,55 @@ body::before{
   position:relative; overflow:hidden;
   transition:border-color 0.3s ease !important;
 }
-/* Subtle red pulse via pseudo-element */
+/* Layer 1 — always-running red radial pulse from below (unchanged) */
 .hero-cta-area .btn-catalog::before {
   content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 120%, rgba(204,21,0,0.35) 0%, transparent 70%);
+  background:radial-gradient(ellipse at 50% 120%, rgba(204,21,0,0.4) 0%, transparent 70%);
   animation:ctaRedPulse 2.8s ease-in-out infinite;
+  transform-origin:center bottom;
   pointer-events:none;z-index:0;
 }
-/* Fill left-to-right on hover — deep burgundy */
+/* Layer 2 — shimmer sweep pseudo — fires on hover */
 .hero-cta-area .btn-catalog::after {
-  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
-  background:#6B1010;
-  transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
-  pointer-events:none;z-index:0;
+  content:'';position:absolute;
+  top:0;left:-100%;bottom:0;width:60%;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.07) 40%,
+    rgba(255,255,255,0.13) 50%,
+    rgba(255,255,255,0.07) 60%,
+    transparent 100%);
+  transform:skewX(-15deg);
+  pointer-events:none;z-index:1;
+  transition:none;
 }
-.hero-cta-area .btn-catalog:hover::after { width:100%; }
-.hero-cta-area .btn-catalog:hover { border-color:#6B1010 !important; }
-.hero-cta-area .btn-catalog > * { position:relative;z-index:1; }
-/* Arrow slides right on hover */
-.hero-cta-area .btn-catalog .cta-arrow {
-  display:inline-block;
-  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+/* On hover: shimmer sweeps once left→right, border brightens */
+@media(hover:hover){
+  .hero-cta-area .btn-catalog:hover {
+    border-color:rgba(255,255,255,0.95) !important;
+  }
+  .hero-cta-area .btn-catalog:hover::after {
+    animation:shimmerSweep 1.3s cubic-bezier(0.25,0.1,0.25,1) forwards;
+  }
+  /* Layer 3 — arrow slides right */
+  .hero-cta-area .btn-catalog:hover .cta-arrow {
+    transform:translateX(6px);
+  }
 }
-.hero-cta-area .btn-catalog:hover .cta-arrow { transform:translateX(5px); }
+@keyframes shimmerSweep {
+  0%   { left:-100%; }
+  100% { left:160%; }
+}
+/* Red radial pulse — opacity + width breathe together */
 @keyframes ctaRedPulse {
-  0%,100%{ opacity:0.5; }
-  50%    { opacity:1;   }
+  0%,100%{ opacity:0.45; transform:scaleX(0.85); }
+  50%    { opacity:1;    transform:scaleX(1.1);  }
+}
+.hero-cta-area .btn-catalog > * { position:relative;z-index:2; }
+/* Arrow transition */
+.hero-cta-area .btn-catalog .cta-arrow {
+  display:inline-flex; align-items:center;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
 }
 
 .hero-micro {
@@ -1515,7 +1538,7 @@ body::before{
       <a href="https://virtualstaginglibrary.com/" id="browse-link" target="_blank"
          class="action-button btn-catalog btn-catalog-pulse">
         <span style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;">Enter Gallery
-        <span class="cta-arrow"><svg width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></span>
+        <span class="cta-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></span>
       </a>
       <p class="hero-micro">Find a style &rarr;&nbsp; Copy the ID &rarr;&nbsp; Come back</p>
       <span class="editors-choice-link" id="editors-choice-link"></span>
