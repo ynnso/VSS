@@ -94,26 +94,42 @@ body::before{
   border:1.5px solid rgba(255,255,255,0.7) !important;
   box-shadow:none !important;
   transition:border-color 0.3s ease !important;
-  position:relative;overflow:hidden;text-transform:uppercase;
+  position:relative;overflow:hidden;text-transform:none;
   display:flex;align-items:center;justify-content:center;gap:14px;
 }
-/* Red pulse radial from bottom — same as hero CTA */
+/* Layer 1 — red radial pulse (same as Enter Gallery) */
 .btn-submit-compact::before{
   content:'';position:absolute;inset:0;
   background:radial-gradient(ellipse at 50% 120%, rgba(204,21,0,0.35) 0%, transparent 70%);
   animation:ctaRedPulse 2.8s ease-in-out infinite;
+  transform-origin:center bottom;
   pointer-events:none;z-index:0;
 }
-/* Fill left-to-right on hover */
+/* Layer 2 — shimmer sweep on hover */
 .btn-submit-compact::after{
-  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
-  background:var(--s2s-red);
-  transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
-  pointer-events:none;z-index:0;
+  content:'';position:absolute;
+  top:0;left:-100%;bottom:0;width:60%;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.07) 40%,
+    rgba(255,255,255,0.13) 50%,
+    rgba(255,255,255,0.07) 60%,
+    transparent 100%);
+  transform:skewX(-15deg);
+  pointer-events:none;z-index:1;
+  transition:none;
 }
-.btn-submit-compact:not(.locked-section):hover::after{width:100%;}
-.btn-submit-compact:not(.locked-section):hover{border-color:var(--s2s-red) !important;}
-.btn-submit-compact > *{position:relative;z-index:1;}
+.btn-submit-compact:not(.locked-section):hover::after{
+  animation:shimmerSweep 1.3s cubic-bezier(0.25,0.1,0.25,1) forwards;
+}
+.btn-submit-compact:not(.locked-section):hover{border-color:rgba(255,255,255,0.95) !important;}
+.btn-submit-compact:not(.locked-section):hover .submit-arrow{transform:translateX(6px);}
+.btn-submit-compact > *{position:relative;z-index:2;}
+/* Arrow transition */
+.submit-arrow{
+  display:inline-flex;align-items:center;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
 /* Checkmark micro-action on submit */
 @keyframes checkPop{
   0%  {transform:scale(0.6);opacity:0;}
@@ -370,7 +386,7 @@ body::before{
   width:22px;height:22px;opacity:0.45;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;margin-right:6px;
 }
-.drawer-status-icon svg{width:22px;height:22px;stroke:rgba(255,255,255,0.5);color:rgba(255,255,255,0.5);}
+.drawer-status-icon svg{width:22px;height:22px;stroke:rgba(255,255,255,0.9);color:rgba(255,255,255,0.9);}
 /* Room label: grey, right-justified */
 .drawer-room-label{
   font-family:'Montserrat',sans-serif;
@@ -404,11 +420,12 @@ body::before{
 /* +NOTE at 30% opacity */
 .drawer-add-note-btn{
   background:none;border:none;cursor:pointer;
-  font-family:'Montserrat',sans-serif;font-size:12px;font-weight:500;
-  color:rgba(255,255,255,0.60);letter-spacing:0.04em;text-transform:none;
+  font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,0.70);letter-spacing:0.04em;text-transform:none;
   padding:0;transition:color 0.25s;
+  display:inline-flex;align-items:center;gap:6px;
 }
-.drawer-add-note-btn:hover{color:rgba(255,255,255,0.7);}
+.drawer-add-note-btn:hover{color:white;}
 
 /* Igniting Lens — replaces Approve chip, with slow pulse when ready */
 @keyframes lensReadyPulse{
@@ -499,13 +516,13 @@ body::before{
 .hero-room-sep { display:none; }
 .hero-room-icon {
   display:flex; align-items:center; flex-shrink:0;
-  width:24px; height:24px; opacity:0.45;
+  width:24px; height:24px;
   margin-left:14px;
 }
-.hero-room-icon svg { width:24px; height:24px; stroke:rgba(255,255,255,0.6); }
+.hero-room-icon svg { width:24px; height:24px; stroke:rgba(255,255,255,0.9); }
 .hero-room-name {
   font-family:'Montserrat',sans-serif; font-size:20px; font-weight:500;
-  color:rgba(255,255,255,0.55); letter-spacing:0;
+  color:rgba(255,255,255,0.9); letter-spacing:0;
   white-space:nowrap; margin-left:4px;
   flex-shrink:0;
 }
@@ -518,17 +535,18 @@ body::before{
   .hero-id-value { font-size:15px; }
   .hero-room-name { font-size:15px; margin-left:4px; }
   .hero-room-icon { margin-left:8px; width:18px; height:18px; }
-  .hero-room-icon svg { width:18px; height:18px; }
+  .hero-room-icon svg { width:18px; height:18px; stroke:rgba(255,255,255,0.9); }
   .hero-info-bar { padding:10px 12px 8px; flex-wrap:nowrap; }
 }
 .hero-notes-row { display:none; padding:0 16px 10px; }
 .hero-note-btn {
   background:none; border:none; cursor:pointer;
-  font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500;
-  color:rgba(255,255,255,0.60); letter-spacing:0.04em; text-transform:none;
+  font-family:'Montserrat',sans-serif; font-size:13px; font-weight:500;
+  color:rgba(255,255,255,0.70); letter-spacing:0.04em; text-transform:none;
   padding:0; transition:color 0.25s;
+  display:inline-flex; align-items:center; gap:6px;
 }
-.hero-note-btn:hover { color:rgba(255,255,255,0.7); }
+.hero-note-btn:hover { color:white; }
 
 
 
@@ -612,18 +630,18 @@ body::before{
   flex:1;display:flex;align-items:center;justify-content:center;
   position:relative;z-index:2;
 }
-.room-tile svg{width:56px;height:56px;display:block;color:rgba(255,255,255,0.7);
-  transition:color 0.35s,transform 0.35s cubic-bezier(0.4,0,0.2,1);stroke:rgba(255,255,255,0.7);}
+.room-tile svg{width:56px;height:56px;display:block;color:rgba(255,255,255,0.9);
+  transition:color 0.35s,transform 0.35s cubic-bezier(0.4,0,0.2,1);stroke:rgba(255,255,255,0.9);}
 .room-tile:hover svg{color:rgba(255,255,255,0.92);stroke:rgba(255,255,255,0.92);transform:scale(1.08);}
 .room-tile.selected svg{color:white;stroke:white;}
 .room-tile-label{
   font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;
-  color:rgba(255,255,255,0.55);text-align:center;letter-spacing:0.08em;text-transform:none;
+  color:rgba(255,255,255,0.90);text-align:center;letter-spacing:0.08em;text-transform:none;
   line-height:1;transition:color 0.35s;position:relative;z-index:2;
   padding:0 6px 2px;
 }
-.room-tile:hover .room-tile-label{color:rgba(255,255,255,0.85);}
-.room-tile.selected .room-tile-label{color:rgba(255,255,255,0.8);}
+.room-tile:hover .room-tile-label{color:white;}
+.room-tile.selected .room-tile-label{color:white;}
 /* Delete/Cancel button in header */
 .room-header .delete-card{position:absolute;right:10px;top:10px;}
 
@@ -755,9 +773,9 @@ body::before{
   padding:10px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.06);
 }
 .footer-room-group{display:flex;align-items:center;gap:7px;}
-.footer-room-icon{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);}
-.footer-room-icon svg{width:18px;height:18px;display:block;stroke:rgba(255,255,255,0.5);}
-.footer-room-label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.6);letter-spacing:0;}
+.footer-room-icon{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.9);}
+.footer-room-icon svg{width:18px;height:18px;display:block;stroke:rgba(255,255,255,0.9);}
+.footer-room-label{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.9);letter-spacing:0;}
 .footer-id-group{display:flex;align-items:center;gap:6px;}
 .footer-id-icon{display:flex;align-items:center;color:rgba(255,255,255,0.4);flex-shrink:0;}
 .footer-id-icon svg{width:16px;height:16px;display:block;stroke:rgba(255,255,255,0.4);}
@@ -1107,43 +1125,81 @@ body::before{
   scroll-margin-top:110px;
 }
 .card-action-btn{
-  font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.12em;
-  border:none;border-radius:0;cursor:pointer;padding:18px 0;
-  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+  font-family:'Montserrat',sans-serif;font-size:15px;font-weight:400;letter-spacing:0.18em;
+  border:none;border-radius:0;cursor:pointer;
+  height:56px;padding:0;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:border-color 0.3s ease;
   white-space:nowrap;flex:1;text-align:center;
   text-transform:none;position:relative;overflow:hidden;
 }
-/* ADD — dark, understated */
+
+/* ADD ROOM — transparent, strong white border, shimmer on hover */
 .card-action-add{
-  background:transparent;color:rgba(255,255,255,0.6);
-  border:1px solid rgba(255,255,255,0.2);
+  background:transparent;color:rgba(255,255,255,0.95);
+  border:1.5px solid rgba(255,255,255,0.7);
 }
-.card-action-add::after{
-  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
-  background:rgba(255,255,255,0.08);
-  transition:width 0.4s cubic-bezier(0.4,0,0.2,1);
+/* Shimmer sweep — fires once on hover */
+.card-action-add::before{
+  content:'';position:absolute;
+  top:0;left:-100%;bottom:0;width:60%;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.06) 40%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.06) 60%,
+    transparent 100%);
+  transform:skewX(-15deg);
+  pointer-events:none;z-index:0;
+  transition:none;
 }
-.card-action-add:hover{color:white;border-color:rgba(255,255,255,0.4);}
-.card-action-add:hover::after{width:100%;}
-/* FINALIZE — red, dominant, arrow slides on hover */
+@media(hover:hover){
+  .card-action-add:hover{ border-color:rgba(255,255,255,0.95); }
+  .card-action-add:hover::before{
+    animation:shimmerSweep 1.3s cubic-bezier(0.25,0.1,0.25,1) forwards;
+  }
+}
+.card-action-add > *{ position:relative;z-index:1; }
+
+/* FINALIZE — white fill, black text, inverted */
 .card-action-submit{
-  background:var(--s2s-red);color:white;font-weight:700;
-  border:1px solid var(--s2s-red);
+  background:white;color:#0a0a0a;
+  border:1.5px solid white;
+  position:relative;
 }
-.card-action-submit .finalize-arrow{
-  display:inline-block;transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);
-}
-.card-action-submit:hover .finalize-arrow{
-  transform:translateX(4px);
-}
+/* No idle pulse — white button is already the loudest element */
+.card-action-submit::before{ display:none; }
+/* Shimmer on hover — dark streak through white */
 .card-action-submit::after{
-  content:'';position:absolute;top:0;left:0;bottom:0;width:0;
-  background:rgba(255,255,255,0.12);
-  transition:width 0.4s cubic-bezier(0.4,0,0.2,1);
+  content:'';position:absolute;
+  top:0;left:-100%;bottom:0;width:60%;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,0,0,0.04) 40%,
+    rgba(0,0,0,0.08) 50%,
+    rgba(0,0,0,0.04) 60%,
+    transparent 100%);
+  transform:skewX(-15deg);
+  pointer-events:none;z-index:1;
+  transition:none;
 }
-.card-action-submit:hover{background:var(--s2s-red-light);border-color:var(--s2s-red-light);}
-.card-action-submit:hover::after{width:100%;}
-.card-action-btn.locked-section{opacity:0.35;pointer-events:none;filter:none;}
+@media(hover:hover){
+  .card-action-submit:hover{
+    background:rgba(255,255,255,0.88);
+    border-color:rgba(255,255,255,0.6);
+  }
+  .card-action-submit:hover::after{
+    animation:shimmerSweep 1.3s cubic-bezier(0.25,0.1,0.25,1) forwards;
+  }
+  .card-action-submit:hover .finalize-arrow{ transform:translateX(5px); }
+}
+.card-action-submit > *{ position:relative;z-index:2; }
+.card-action-submit .finalize-arrow{
+  display:inline-flex;align-items:center;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+.card-action-btn.locked-section{opacity:0.3;pointer-events:none;filter:none;}
 
 /* ADD ROOM one-time pulse after first approval */
 @keyframes addRoomPulse{
@@ -1304,7 +1360,7 @@ body::before{
 /* Watermark wordmark — integrated, not a sticker */
 .hero-wordmark {
   display:inline-flex; align-items:center; gap:12px;
-  margin-bottom:48px; opacity:0.7;
+  margin-bottom:48px; opacity:1.0;
   mix-blend-mode:screen;
 }
 .wm-mono {
@@ -1316,7 +1372,7 @@ body::before{
 }
 .wm-sep {
   width:1px; height:16px;
-  background:rgba(255,255,255,0.7);
+  background:white;
 }
 .wm-name {
   font-family:'Montserrat',sans-serif;
@@ -1347,7 +1403,7 @@ body::before{
   font-family:'Montserrat',sans-serif;
   font-weight:200;
   font-size:clamp(2.2rem,5.5vw,4.2rem);
-  color:rgba(255,255,255,0.92); letter-spacing:0.01em;
+  color:rgba(255,255,255,1.0); letter-spacing:0.01em;
   line-height:0.7; margin:0 0 28px;
   text-transform:uppercase;
   word-break:keep-all; overflow-wrap:normal;
@@ -1357,7 +1413,7 @@ body::before{
 .hero-sub {
   font-family:'Montserrat',sans-serif;
   font-size:15px; font-weight:300;
-  color:rgba(255,255,255,0.50);
+  color:rgba(255,255,255,0.90);
   line-height:1.7; margin:0 0 32px; max-width:460px;
   letter-spacing:0.05em;
 }
@@ -1432,7 +1488,7 @@ body::before{
 .hero-micro {
   font-family:'Montserrat',sans-serif;
   font-size:10px; font-weight:400;
-  color:rgba(255,255,255,0.35);
+  color:rgba(255,255,255,0.75);
   margin-top:16px; line-height:1;
   letter-spacing:0.12em;
   text-transform:uppercase;
@@ -1500,7 +1556,7 @@ body::before{
 }
 .slide-step-sub {
   font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500;
-  color:rgba(255,255,255,0.55); margin-top:0; line-height:1.5;
+  color:rgba(255,255,255,0.90); margin-top:0; line-height:1.5;
   display:inline-block; text-align:center;
 }
 
@@ -1562,7 +1618,7 @@ body::before{
       </div>
       <div class="card-action-row" id="cardActionRow" style="display:none;">
         <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ Add Room</button>
-        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">Finalize <span class="finalize-arrow">→</span></button>
+        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">Finalize <span class="finalize-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></button>
       </div>
     </div>
   </div>
@@ -1574,18 +1630,18 @@ body::before{
 <div class="step-view" id="slide-3">
   <div class="slide-step-header">
     <div class="slide-step-title" id="s3-title">Confirm & Submit</div>
-    <div class="slide-step-sub" id="s3-sub" style="margin-bottom:32px;">Choose how you'd like your photos handled.</div>
+    <div class="slide-step-sub" id="s3-sub" style="margin-bottom:96px;">Choose how you'd like your photos handled.</div>
   </div>
   <div id="section-3" style="width:100%;max-width:720px;margin:0 auto;">
-      <label class="option-card option-recommended"><input type="radio" name="preference" value="A"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:#0a0a0a;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width:22px;height:22px;"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></svg></span> We'll pick the best shot<span class="recommended-badge">RECOMMENDED</span></div><div class="option-desc">We've staged 1,000+ rooms and know which angle sells. Our editors choose the strongest image from your gallery — zero follow-up needed from you.</div></div></label>
-  <label class="option-card"><input type="radio" name="preference" value="B"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:var(--s2s-charcoal);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width:22px;height:22px;"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></svg></span> I'll choose after my shoot</div><div class="option-desc">Once your photos are delivered, we'll send you a link to select your preferred image. Respond within 48 hours — if we don't hear back, our editors will step in so there's no delay.</div></div></label>
+      <label class="option-card option-recommended"><input type="radio" name="preference" value="A"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:white;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><circle cx="12" cy="12" r="10"/><polyline points="7 12 10.5 15.5 17 9"/></svg></span> We'll pick the best shot<span class="recommended-badge">RECOMMENDED</span></div><div class="option-desc">We've staged 1,000+ rooms and know which angle sells. Our editors choose the strongest image from your gallery — zero follow-up needed from you.</div></div></label>
+  <label class="option-card"><input type="radio" name="preference" value="B"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:white;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><path d="M4 4l7.07 17 2.51-7.39L21 11.07z"/></svg></span> I'll choose after my shoot</div><div class="option-desc">Once your photos are delivered, we'll send you a link to select your preferred image. Respond within 48 hours — if we don't hear back, our editors will step in so there's no delay.</div></div></label>
 
   <div class="final-consent-container" id="consent-container">
     <input type="checkbox" id="tat-acknowledgement">
     <label for="tat-acknowledgement">I understand staging begins after photo delivery.</label>
   </div>
 
-  <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;"><span style="position:relative;z-index:1;display:flex;align-items:center;gap:18px;">SUBMIT ORDER <svg width="38" height="14" viewBox="0 0 38 14" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="7" x2="34" y2="7"/><polyline points="27 1 34 7 27 13"/></svg></span></button>
+  <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;"><span style="position:relative;z-index:2;display:flex;align-items:center;gap:14px;">Submit Order <span class="submit-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></span></button>
     </div>
     <div id="submit-success" style="display:none;width:100%;max-width:800px;margin-top:20px;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid var(--card-border);box-shadow:var(--card-shadow);padding:36px 28px;text-align:center;">
   <div style="width:52px;height:52px;background:linear-gradient(135deg,#44E872,#25B845);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(48,209,88,0.35);">
@@ -1946,11 +2002,11 @@ function createCard(restoreData, editorsChoice) {
                 <button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button>
               </div>
               <div class="drawer-footer-left" style="display:none;">
-                <button class="drawer-add-note-btn add-notes-btn" type="button">Any special requests?</button>
+                <button class="drawer-add-note-btn add-notes-btn" type="button"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Any special requests?</button>
               </div>
             </div>
             <div class="hero-notes-row">
-              <button class="drawer-add-note-btn add-notes-btn hero-note-btn" type="button">Any special requests?</button>
+              <button class="drawer-add-note-btn add-notes-btn hero-note-btn" type="button"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Any special requests?</button>
             </div>
             <div class="notes-content" style="display:none;padding:0 0 8px;">
               <textarea placeholder="Note for the editor..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);outline:none;resize:none;min-height:32px;"></textarea>
