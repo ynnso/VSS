@@ -2619,27 +2619,14 @@ function createCard(restoreData, editorsChoice) {
 }
 
 document.getElementById('addCardButton').addEventListener('click', () => {
-  /* Check if any card has an image loaded */
-  const cardsWithImages = Array.from(document.querySelectorAll('.placeholder-card')).filter(c => {
-    const img = c._drawerImg || c.querySelector('.drawer-staged-img');
-    return img && img.style.display === 'block';
-  });
-
+  /* Check if there's a ready card waiting for approval */
   if (document.querySelectorAll('.overlay-confirm.ready:not(.verified)').length) {
     /* There's a ready card waiting for approval — pulse it */
     triggerCheckPulse();
-  } else if (cardsWithImages.length === 0) {
-    /* No images loaded yet — send user back to catalog to pick styles for the new room */
-    window.open('https://virtualstaginglibrary.com/', '_blank');
   } else {
-    /* At least one image is loaded — safe to add new card */
-    const c = createCard();
-    if (c) {
-      
-      cardObserver.observe(c);
-      setTimeout(() => c.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
-    }
-    updateProgress();
+    /* Always send to catalog to pick style for new room first */
+    window.open('https://virtualstaginglibrary.com/', '_blank');
+    /* User returns with style ID, then we create the card */
   }
 });
 
