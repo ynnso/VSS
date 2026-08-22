@@ -1627,26 +1627,82 @@ body::before{
 <div class="step-view" id="slide-3">
   <div class="slide-step-header">
     <div class="slide-step-title" id="s3-title">Confirm & Submit</div>
-    <div class="slide-step-sub" id="s3-sub" style="margin-bottom:96px;">Choose how you'd like your photos handled.</div>
   </div>
   <div id="section-3" style="width:100%;max-width:720px;margin:0 auto;">
-      <label class="option-card option-recommended"><input type="radio" name="preference" value="A"><div class="option-content"><div class="option-title"><span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:white;"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-linejoin:round;stroke-width:32px;"><path d="M480,208H308L256,48,204,208H32l140,96L118,464,256,364,394,464,340,304Z"/></svg></span> We'll pick the best shot<span class="recommended-badge">RECOMMENDED</span></div><div class="option-desc">We've staged 1,000+ rooms and know which angle sells. Our editors choose the strongest image from your gallery — zero follow-up needed from you.</div></div></label>
-  <label class="option-card"><input type="radio" name="preference" value="B"><div class="option-content"><div class="option-title"><span style="width:0;height:22px;display:inline-flex;align-items:center;flex-shrink:0;"></span> I'll choose after my shoot</div><div class="option-desc">Once your photos are delivered, we'll send you a link to select your preferred image. Respond within 48 hours — if we don't hear back, our editors will step in so there's no delay.</div></div></label>
-
-  <div class="final-consent-container" id="consent-container">
-    <input type="checkbox" id="tat-acknowledgement">
-    <label for="tat-acknowledgement">I understand staging begins after photo delivery.</label>
-  </div>
-
-  <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-top:20px;"><span style="position:relative;z-index:2;display:flex;align-items:center;gap:14px;">Submit Order <span class="submit-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></span></button>
+    
+    <!-- Name & Address Fields -->
+    <div style="margin-bottom:32px;">
+      <div style="margin-bottom:16px;">
+        <label style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);display:block;margin-bottom:8px;letter-spacing:0.04em;">Name</label>
+        <input type="text" id="client-name" placeholder="Your name" style="width:100%;padding:12px 16px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.04);font-family:'Montserrat',sans-serif;font-size:14px;color:white;outline:none;transition:border-color 0.3s;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);display:block;margin-bottom:8px;letter-spacing:0.04em;">Property Address</label>
+        <input type="text" id="property-address" placeholder="Property address" style="width:100%;padding:12px 16px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.04);font-family:'Montserrat',sans-serif;font-size:14px;color:white;outline:none;transition:border-color 0.3s;box-sizing:border-box;">
+      </div>
     </div>
-    <div id="submit-success" style="display:none;width:100%;max-width:800px;margin-top:20px;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid var(--card-border);box-shadow:var(--card-shadow);padding:36px 28px;text-align:center;">
-  <div style="width:52px;height:52px;background:linear-gradient(135deg,#44E872,#25B845);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(48,209,88,0.35);">
-    <span style="font-size:22px;color:white;">✓</span>
+
+    <!-- Section Header -->
+    <div style="margin-bottom:24px;text-align:center;">
+      <h3 style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:600;color:white;margin:0 0 8px;letter-spacing:0.02em;">Choose Done for You for the fastest, hassle-free delivery at no extra cost.</h3>
+    </div>
+
+    <!-- Option A: Done for You -->
+    <label class="option-card option-recommended" style="margin-bottom:16px;">
+      <input type="radio" name="preference" value="A">
+      <div class="option-content">
+        <div class="option-title">
+          <span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:white;">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Done for You
+          <span class="recommended-badge">RECOMMENDED</span>
+        </div>
+        <div class="option-desc">Let our expert editors select the best shots. With 1,000+ rooms staged, our team knows exactly which angles capture buyers' attention. Based on your selected room and style ID, we'll pick the absolute strongest photo from your gallery. Get market-ready visuals in half the time: no dashboard logins, no mulling which property image, no file matching, zero extra cost. Enjoy a seamless, stress-free delivery during a hectic time.</div>
+      </div>
+    </label>
+
+    <!-- Option B: Choose Later -->
+    <label class="option-card" style="margin-bottom:24px;">
+      <input type="radio" name="preference" value="B">
+      <div class="option-content">
+        <div class="option-title">
+          <span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;"></span>
+          I'll wait until and choose my own photos later
+        </div>
+        <div class="option-desc">Select room type, style ID, and specific photo file numbers manually after your property gallery is delivered, we'll email you a link to complete your selections. (Note: Production cannot begin until your selections are submitted.)</div>
+      </div>
+    </label>
+
+    <!-- Consent Checkbox -->
+    <div class="final-consent-container" id="consent-container" style="margin-bottom:24px;">
+      <input type="checkbox" id="tat-acknowledgement">
+      <label for="tat-acknowledgement">I understand production turnaround is 1–2 business days starting after virtual staging selections are finalized and approved.</label>
+    </div>
+
+    <!-- Submit Button -->
+    <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-bottom:40px;">
+      <span style="position:relative;z-index:2;display:flex;align-items:center;gap:14px;">
+        Submit Order
+        <span class="submit-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+            <line x1="0" y1="12" x2="20" y2="12"/>
+            <polyline points="13 5 20 12 13 19"/>
+          </svg>
+        </span>
+      </span>
+    </button>
+    
   </div>
-  <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;color:#0a0a0a;margin-bottom:10px;letter-spacing:-0.03em;">You're all set.</div>
-  <div style="font-family:'Montserrat',sans-serif;font-size:15px;color:#0a0a0a;opacity:0.72;line-height:1.65;max-width:420px;margin:0 auto 24px;">Your style selections are locked in. Once your shoot is delivered, our editors get to work — staged images land in your gallery within 1–2 business days. No follow-up needed from you.</div>
-  <div><button class="action-button btn-red" style="max-width:300px;margin:0 auto;font-size:14px;padding:16px;" onclick="resetForm()">Stage rooms for another listing ↗</button></div>
+
+  <!-- Success State -->
+  <div id="submit-success" style="display:none;width:100%;max-width:800px;margin-top:20px;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid var(--card-border);box-shadow:var(--card-shadow);padding:36px 28px;text-align:center;margin-left:auto;margin-right:auto;">
+    <div style="width:52px;height:52px;background:linear-gradient(135deg,#44E872,#25B845);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(48,209,88,0.35);">
+      <span style="font-size:22px;color:white;">✓</span>
+    </div>
+    <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;color:#0a0a0a;margin-bottom:10px;letter-spacing:-0.03em;">You're all set.</div>
+    <div style="font-family:'Montserrat',sans-serif;font-size:15px;color:#0a0a0a;opacity:0.72;line-height:1.65;max-width:420px;margin:0 auto 24px;">Your style selections are locked in. Once your shoot is delivered, our editors get to work — staged images land in your gallery within 1–2 business days. No follow-up needed from you.</div>
+    <div><button class="action-button btn-red" style="max-width:300px;margin:0 auto;font-size:14px;padding:16px;" onclick="resetForm()">Stage rooms for another listing ↗</button></div>
   </div>
   
 </div>
