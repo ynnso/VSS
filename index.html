@@ -1585,10 +1585,9 @@ body::before{
     </div>
 
 
-    <h1 class="hero-h1" id="hero-h1-text"><span id="hero-line1">CHOOSE YOUR</span><br><span class="hero-h1-line2" id="hero-line2">STYLE</span></h1>
+    <h1 class="hero-h1" id="hero-h1-text"><span id="hero-line1">Choose Your</span><br><span class="hero-h1-line2" id="hero-line2">Style</span></h1>
 
     <p class="hero-sub">Pick the look for each room.<br>Our editors handle everything else.</p>
-    <p class="hero-time-note">2 minute setup</p>
 
     <div class="hero-cta-area" id="section-1">
       <a href="https://virtualstaginglibrary.com/" id="browse-link" target="_blank"
@@ -1596,7 +1595,7 @@ body::before{
         <span style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;">Enter Gallery
         <span class="cta-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></span>
       </a>
-      <p class="hero-micro">Find a style &rarr;&nbsp; Copy the ID &rarr;&nbsp; Come back</p>
+      <p class="hero-micro">Find a style → Copy the ID → Come back</p>
       <span class="editors-choice-link" id="editors-choice-link"></span>
     </div>
 
@@ -2086,10 +2085,9 @@ function createCard(restoreData, editorsChoice) {
   function syncDigitsToInput() {
     const val = digitBoxes.map(d => d.value).join('');
     input.value = val;
-    /* Show extra boxes if first 4 are filled */
-    const first4 = val.length >= 4;
-    extraBoxes.forEach(b => b.style.display = first4 ? 'block' : 'none');
-    if (extraSep) extraSep.style.display = first4 ? 'inline' : 'none';
+    /* Keep extra boxes hidden — 4-digit IDs only */
+    extraBoxes.forEach(b => b.style.display = 'none');
+    if (extraSep) extraSep.style.display = 'none';
     /* Light up submit arrow at 4+ digits */
     if (val.length >= 4) stageBtn.classList.add('lit');
     else stageBtn.classList.remove('lit');
@@ -2136,11 +2134,7 @@ function createCard(restoreData, editorsChoice) {
         return;
       }
       const digits = pasted.replace(/[^0-9]/g, '').split('');
-      /* Show extra boxes if pasting 5+ digit ID */
-      if (digits.length > 4) {
-        extraBoxes.forEach(b => b.style.display = 'block');
-        if (extraSep) extraSep.style.display = 'inline';
-      }
+      /* Keep extra boxes hidden — 4-digit IDs only */
       digitBoxes.forEach((d, idx) => {
         if (d.offsetParent !== null || idx < 4) {
           d.value = digits[idx] || '';
@@ -2391,10 +2385,18 @@ function createCard(restoreData, editorsChoice) {
       const ex = card.querySelector('.img-error-msg'); if (ex) ex.remove();
       const err = document.createElement('p');
       err.className = 'img-error-msg';
-      err.style.cssText = "color:var(--s2s-red);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;text-align:center;padding:8px 0;letter-spacing:0.08em;";
-      err.innerText = 'ID NOT FOUND — CHECK AND RETRY';
+      err.style.cssText = "color:var(--s2s-red);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;text-align:center;padding:10px 12px;letter-spacing:0.06em;background:rgba(204,21,0,0.08);border:1px solid rgba(204,21,0,0.25);border-radius:8px;margin-bottom:10px;";
+      err.innerText = 'ID Not Found — Check And Retry';
       drawer.querySelector('.drawer-input-wrap').prepend(err);
+      /* Clear input boxes on error */
+      digitBoxes.forEach(d => d.value = '');
+      extraBoxes.forEach(b => { b.style.display = 'none'; b.value = ''; });
+      if (extraSep) extraSep.style.display = 'none';
+      input.value = '';
+      stageBtn.classList.remove('lit');
       nudge.classList.remove('ready','verified','pulse-trigger');
+      /* Focus first digit box for retry */
+      if (digitBoxes[0]) digitBoxes[0].focus();
       updateProgress();
     };
 
@@ -2619,9 +2621,20 @@ function createCard(restoreData, editorsChoice) {
 }
 
 document.getElementById('addCardButton').addEventListener('click', () => {
+  /* Check if any card has an image loaded */
+  const cardsWithImages = Array.from(document.querySelectorAll('.placeholder-card')).filter(c => {
+    const img = c._drawerImg || c.querySelector('.drawer-staged-img');
+    return img && img.style.display === 'block';
+  });
+
   if (document.querySelectorAll('.overlay-confirm.ready:not(.verified)').length) {
+    /* There's a ready card waiting for approval — pulse it */
     triggerCheckPulse();
+  } else if (cardsWithImages.length === 0) {
+    /* No images loaded yet — send user back to catalog to pick styles for the new room */
+    window.open('https://virtualstaginglibrary.com/', '_blank');
   } else {
+    /* At least one image is loaded — safe to add new card */
     const c = createCard();
     if (c) {
       
