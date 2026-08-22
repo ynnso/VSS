@@ -2624,9 +2624,17 @@ document.getElementById('addCardButton').addEventListener('click', () => {
     /* There's a ready card waiting for approval — pulse it */
     triggerCheckPulse();
   } else {
-    /* Always send to catalog to pick style for new room first */
-    window.open('https://virtualstaginglibrary.com/', '_blank');
-    /* User returns with style ID, then we create the card */
+    /* Create a new blank card first */
+    const c = createCard();
+    if (c) {
+      cardObserver.observe(c);
+      setTimeout(() => c.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
+    }
+    updateProgress();
+    /* Then send user to catalog to pick style for this new room */
+    setTimeout(() => {
+      window.open('https://virtualstaginglibrary.com/', '_blank');
+    }, 400);
   }
 });
 
