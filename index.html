@@ -1691,7 +1691,7 @@ body::before{
     <!-- Submit Button -->
     <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-bottom:40px;">
       <span style="position:relative;z-index:2;display:flex;align-items:center;gap:14px;">
-        Submit Order
+        Submit
         <span class="submit-arrow">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
             <line x1="0" y1="12" x2="20" y2="12"/>
@@ -1911,9 +1911,9 @@ function updateOrderSummary() {
       <div style="flex-shrink:0;width:160px;height:100px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
         ${hasImage ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;" alt="Room preview">` : '<span style="font-size:48px;color:rgba(255,255,255,0.15);">📷</span>'}
       </div>
-      <div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px;">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;color:white;">Style ID <span style="color:var(--s2s-red);font-size:18px;">${styleId}</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding-top:4px;">
+        <div style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;color:white;">Style ID <span style="color:#CC1500;font-size:18px;">${styleId}</span></div>
+        <div style="display:flex;align-items:center;gap:10px;">
           <div style="flex-shrink:0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.85);">
             <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;">
               ${roomType === 'Bedroom' ? '<line x1="2.45" y1="23.45" x2="2.45" y2="20.59"/><rect x="1.5" y="15.82" width="21" height="4.77"/><path d="M6.52,11h11a4.07,4.07,0,0,1,4.07,4.07v.7H2.45v-.7A4.07,4.07,0,0,1,6.52,11Z"/><path d="M7.23,7.23H9.14A2.86,2.86,0,0,1,12,10.09v1H4.36v-1A2.86,2.86,0,0,1,7.23,7.23Z"/><path d="M14.86,7.23h1.91a2.86,2.86,0,0,1,2.86,2.86v1H12v-1A2.86,2.86,0,0,1,14.86,7.23Z"/><rect x="4.36" y="3.41" width="15.27" height="7.64"/><line x1="21.55" y1="23.45" x2="21.55" y2="20.59"/><line x1="4.36" y1="0.55" x2="4.36" y2="3.41"/><line x1="19.64" y1="0.55" x2="19.64" y2="3.41"/>' : 
@@ -2052,6 +2052,14 @@ document.getElementById('final-submit').addEventListener('click', async () => {
   const name    = (document.getElementById('client-name') || {value:''}).value.trim();
   const address = (document.getElementById('property-address') || {value:''}).value.trim();
   const pref    = document.querySelector('input[name="preference"]:checked')?.value;
+  const consent = document.getElementById('tat-acknowledgement').checked;
+  
+  /* Validate all required fields */
+  if (!name) { alert('Please enter your name'); return; }
+  if (!address) { alert('Please enter property address'); return; }
+  if (!pref) { alert('Please select an option (A or B)'); return; }
+  if (!consent) { alert('Please acknowledge the turnaround time'); return; }
+  
   const rooms   = Array.from(document.querySelectorAll('.placeholder-card')).map(c => ({
     roomType: (c.querySelector('.room-tile.selected') || {}).dataset?.room || '',
     styleId:  c.querySelector('.footer-id-number').innerText,
