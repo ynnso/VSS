@@ -2071,13 +2071,11 @@ document.getElementById('final-submit').addEventListener('click', async () => {
   btn.disabled = true;
   await new Promise(r => setTimeout(r, 420));
   btn.innerHTML = 'Submitting…'; btn.style.opacity = '0.7';
+  
   try {
-    /* REPLACE URL with your actual endpoint */
-    const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
-      method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error('Server error');
+    /* For testing: skip actual submission, just show success states */
+    /* In production, replace with: const res = await fetch('YOUR_ENDPOINT', {...}) */
+    
     clearSavedState();
     document.getElementById('section-3').style.display = 'none';
     
@@ -2102,17 +2100,16 @@ document.getElementById('final-submit').addEventListener('click', async () => {
       /* For testing: show mock email preview with clickable link */
       const emailPreview = document.createElement('div');
       emailPreview.style.cssText = 'margin-top:32px;padding:24px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;';
-      const redColor = 'var(--s2s-red)';
       emailPreview.innerHTML = `
         <div style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em;">📧 Email Preview (Testing)</div>
         <div style="background:white;border-radius:8px;padding:20px;color:#0a0a0a;font-family:'Montserrat',sans-serif;">
           <div style="font-size:14px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,0.1);">Your Virtual Staging Order</div>
           <div style="font-size:13px;line-height:1.6;margin-bottom:16px;">
             <p style="margin:0 0 8px;">Hi ${name},</p>
-            <p style="margin:0 0 8px;">Your photos have arrived! Now it's time to select which images you'd like us to stage.</p>
+            <p style="margin:0 0 8px;">Your photos have arrived! Now it\'s time to select which images you\'d like us to stage.</p>
             <p style="margin:0 0 12px;"><strong>Order ID:</strong> ${orderId}</p>
             <p style="margin:0 0 16px;"><a href="https://ynnso.github.io/VSS/?mode=image-select&id=${orderId}" style="display:inline-block;background:#CC1500;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Select Images Now →</a></p>
-            <p style="margin:0;font-size:12px;color:rgba(0,0,0,0.6);">Production begins once you submit your selections. You'll have finished images within 1–2 business days.</p>
+            <p style="margin:0;font-size:12px;color:rgba(0,0,0,0.6);">Production begins once you submit your selections. You\'ll have finished images within 1–2 business days.</p>
           </div>
         </div>
         <div style="margin-top:16px;text-align:center;">
