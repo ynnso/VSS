@@ -2029,11 +2029,13 @@ function updateProgress() {
 
 }
 
-document.getElementById('browse-link').addEventListener('click', () => {
+document.getElementById('browse-link').addEventListener('click', (e) => {
+  e.preventDefault();
   step1Clicked = true;
   catalogClickTime = Date.now();
   updateProgress();
-  /* Transition to slide 2 happens inside updateProgress on step1Clicked */
+  /* Open catalog in new tab */
+  window.open('https://virtualstaginglibrary.com/', '_blank');
 });
 
 function handleCatalogReturn() {
