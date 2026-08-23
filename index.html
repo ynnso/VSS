@@ -2140,7 +2140,9 @@ document.getElementById('editors-choice-link').addEventListener('click', () => {
   step1Clicked = true; catalogClickTime = 0; updateProgress();
   setTimeout(() => {
     const c = createCard(null, true);
-    if (c) {  }
+    if (c) {
+      cardObserver.observe(c);
+    }
     updateProgress();
     document.getElementById('section-2').scrollIntoView({ behavior:'smooth' });
   }, 200);
@@ -2559,7 +2561,9 @@ function createCard(restoreData, editorsChoice) {
     const remaining = document.querySelectorAll('.placeholder-card');
     if (!remaining.length) {
       const c = createCard();
-      if (c) {  }
+      if (c) {
+        cardObserver.observe(c);
+      }
     }
     updateProgress();
   });
@@ -2571,7 +2575,9 @@ function createCard(restoreData, editorsChoice) {
     const remaining = document.querySelectorAll('.placeholder-card');
     if (!remaining.length) {
       const c = createCard();
-      if (c) {  }
+      if (c) {
+        cardObserver.observe(c);
+      }
     }
     updateProgress();
   });
