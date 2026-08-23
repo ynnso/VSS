@@ -2096,6 +2096,27 @@ document.getElementById('final-submit').addEventListener('click', async () => {
       messageEl.innerText = 'Check your email — we'll send you a link to select images once your photo delivery arrives.';
       orderIdSection.style.display = 'block';
       orderIdDisplay.innerText = orderId;
+      
+      /* For testing: show mock email preview with clickable link */
+      const emailPreview = document.createElement('div');
+      emailPreview.style.cssText = 'margin-top:32px;padding:24px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;';
+      emailPreview.innerHTML = `
+        <div style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em;">📧 Email Preview (Testing)</div>
+        <div style="background:white;border-radius:8px;padding:20px;color:#0a0a0a;font-family:'Montserrat',sans-serif;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,0.1);">Your Virtual Staging Order</div>
+          <div style="font-size:13px;line-height:1.6;margin-bottom:16px;">
+            <p style="margin:0 0 8px;">Hi ${name},</p>
+            <p style="margin:0 0 8px;">Your photos have arrived! Now it's time to select which images you'd like us to stage.</p>
+            <p style="margin:0 0 12px;"><strong>Order ID:</strong> ${orderId}</p>
+            <p style="margin:0 0 16px;"><a href="https://ynnso.github.io/VSS/?mode=image-select&id=${orderId}" style="display:inline-block;background:var(--s2s-red);color:white;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Select Images Now →</a></p>
+            <p style="margin:0;font-size:12px;color:rgba(0,0,0,0.6);">Production begins once you submit your selections. You'll have finished images within 1–2 business days.</p>
+          </div>
+        </div>
+        <div style="margin-top:16px;text-align:center;">
+          <a href="https://ynnso.github.io/VSS/?mode=image-select&id=${orderId}" style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:white;text-decoration:none;padding:10px 24px;background:var(--s2s-red);border-radius:6px;display:inline-block;transition:background 0.3s;">Click to Complete Order (Slide 4)</a>
+        </div>
+      `;
+      orderIdSection.parentNode.insertBefore(emailPreview, orderIdSection.nextSibling);
     }
     
     document.getElementById('submit-success').style.display = 'block';
