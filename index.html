@@ -1742,7 +1742,7 @@ body::before{
   <div class="slide-step-header">
     <div class="slide-step-title">Select Your Images</div>
   </div>
-  <div id="section-4" style="width:100%;max-width:720px;margin:0 auto;padding:32px 16px 0;">
+  <div id="section-4" style="width:100%;max-width:720px;margin:0 auto;padding:56px 16px 0;">
     
     <!-- Order ID Input (if not in URL) -->
     <div id="order-id-input-container" style="margin-bottom:32px;display:none;">
@@ -3202,14 +3202,16 @@ async function loadOrderData(orderId) {
           </div>
         </div>
       </div>
-      <div style="flex:1 1 180px;border:2px dashed rgba(255,255,255,0.2);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;" class="drag-drop-zone" data-room-idx="${idx}">
+      <div style="flex:1 1 180px;position:relative;width:100%;aspect-ratio:4/3;border-radius:8px;border:2px dashed rgba(255,255,255,0.2);cursor:pointer;overflow:hidden;transition:border-color 0.3s,background 0.3s;" class="drag-drop-zone" data-room-idx="${idx}">
         <input type="file" accept="image/*" style="display:none;" class="room-image-input" data-room-idx="${idx}">
-        <div style="font-size:28px;margin-bottom:6px;">📷</div>
-        <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:4px;">Drag image here or click to browse</div>
-        <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">.jpg, .png, .webp up to 10MB</div>
-        <div class="image-preview" data-room-idx="${idx}" style="margin-top:10px;display:none;width:100%;">
-          <img style="max-width:100%;max-height:160px;border-radius:6px;margin-bottom:8px;" class="preview-img">
-          <button type="button" class="remove-image-btn" data-room-idx="${idx}" style="background:transparent;border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Remove</button>
+        <div class="dropzone-prompt" data-room-idx="${idx}" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px;">
+          <div style="font-size:28px;margin-bottom:6px;">📷</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:4px;">Drag image here or click to browse</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">.jpg, .png, .webp up to 10MB</div>
+        </div>
+        <div class="image-preview" data-room-idx="${idx}" style="position:absolute;inset:0;display:none;">
+          <img style="width:100%;height:100%;object-fit:cover;" class="preview-img">
+          <button type="button" class="remove-image-btn" data-room-idx="${idx}" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Remove</button>
         </div>
       </div>
     `;
@@ -3272,6 +3274,9 @@ function wireUpImageUploads(orderData) {
       const fileInput = document.querySelector(`.room-image-input[data-room-idx="${idx}"]`);
       fileInput.value = '';
       document.querySelector(`.image-preview[data-room-idx="${idx}"]`).style.display = 'none';
+      const prompt = document.querySelector(`.dropzone-prompt[data-room-idx="${idx}"]`);
+      if (prompt) prompt.style.display = 'flex';
+      if (window.currentOrderData?.roomImages) delete window.currentOrderData.roomImages[idx];
     });
   });
 }
@@ -3282,6 +3287,10 @@ function handleImageSelect(roomIdx, file) {
     const preview = document.querySelector(`.image-preview[data-room-idx="${roomIdx}"]`);
     preview.querySelector('.preview-img').src = e.target.result;
     preview.style.display = 'block';
+    /* Photo fills the same fixed box as the style thumbnail — hide the
+       prompt text instead of letting the box grow taller to fit it. */
+    const prompt = document.querySelector(`.dropzone-prompt[data-room-idx="${roomIdx}"]`);
+    if (prompt) prompt.style.display = 'none';
     /* Store base64 on order data */
     if (!window.currentOrderData.roomImages) window.currentOrderData.roomImages = {};
     window.currentOrderData.roomImages[roomIdx] = e.target.result;
@@ -3294,6 +3303,15 @@ const submitSpinnerHtml = '<span style="display:inline-block;width:16px;height:1
 document.getElementById('submit-images-btn')?.addEventListener('click', async () => {
   if (!window.currentOrderData) {
     alert('No order data loaded.');
+    return;
+  }
+
+  /* Block submission if any room is still missing its photo — every room
+     needs an image before this order can go to staging. */
+  const roomImages = window.currentOrderData.roomImages || {};
+  const missingCount = window.currentOrderData.rooms.filter((r, idx) => !roomImages[idx]).length;
+  if (missingCount > 0) {
+    alert(`Please upload a photo for every room before submitting — ${missingCount} still missing.`);
     return;
   }
 
