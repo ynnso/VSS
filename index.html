@@ -1014,6 +1014,7 @@ body::before{
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .room-error{background:#F5F5F5 !important;animation:shake 0.3s ease-in-out;}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── CONSENT ── */
 .final-consent-container{
@@ -2091,6 +2092,21 @@ function syncCardActionRowSpacing() {
   });
 }
 
+/* Belt-and-suspenders on top of the calls above: watch the pinned bar's
+   real size continuously, so any timing gap that leaves the padding
+   stale (hint text changing, animation mid-flight, anything) self-heals
+   on the very next frame instead of staying stuck. */
+(function watchCardActionRowSize() {
+  const row = document.getElementById('cardActionRow');
+  const body = document.querySelector('.slide2-body');
+  if (!row || !body || typeof ResizeObserver === 'undefined') return;
+  const observer = new ResizeObserver(() => {
+    const h = row.offsetHeight;
+    body.style.paddingBottom = (h > 0 ? h + 40 : 24) + 'px';
+  });
+  observer.observe(row);
+})();
+
 document.getElementById('browse-link').addEventListener('click', (e) => {
   e.preventDefault();
   step1Clicked = true;
@@ -3126,47 +3142,57 @@ async function loadOrderData(orderId) {
   document.getElementById('order-summary-section').style.display = 'block';
   document.getElementById('submit-images-btn').style.display = 'block';
   
-  /* Order-level summary — just ID + property, rooms live with their own upload card now */
+  /* Order-level summary — ID, Name, Email, Property all shown separately */
   const summaryEl = document.getElementById('image-select-order-summary');
   summaryEl.innerHTML = `
-    <div style="margin-bottom:12px;">
-      <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Order ID</div>
-      <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;">${orderId}</div>
-    </div>
-    <div>
-      <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Property</div>
-      <div style="font-family:'Montserrat',sans-serif;font-size:14px;color:rgba(255,255,255,0.9);">${orderData.name}, ${orderData.address}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+      <div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Order ID</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;">${orderId}</div>
+      </div>
+      <div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Name</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:14px;color:rgba(255,255,255,0.9);">${orderData.name || '—'}</div>
+      </div>
+      <div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Email</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:14px;color:rgba(255,255,255,0.9);word-break:break-all;">${orderData.email || '—'}</div>
+      </div>
+      <div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Property</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:14px;color:rgba(255,255,255,0.9);">${orderData.address || '—'}</div>
+      </div>
     </div>
   `;
 
-  /* One card per room: staged-style thumbnail + room/style info + its own
-     upload dropzone together, instead of a separate duplicate list. */
+  /* One card per room, laid out as two even columns: room info on the
+     left, its own upload dropzone on the right — stacks on narrow phones. */
   const uploadsEl = document.getElementById('image-uploads-container');
   uploadsEl.innerHTML = '';
 
   orderData.rooms.forEach((room, idx) => {
     const uploadSection = document.createElement('div');
-    uploadSection.style.cssText = 'padding:16px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.04);';
+    uploadSection.style.cssText = 'padding:16px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.04);display:flex;flex-wrap:wrap;gap:16px;';
     uploadSection.innerHTML = `
-      <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;">
-        <div style="flex-shrink:0;width:72px;height:56px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-          ${room.imageUrl ? `<img src="${room.imageUrl}" style="width:100%;height:100%;object-fit:cover;" alt="Style preview">` : '<span style="font-size:22px;color:rgba(255,255,255,0.15);">📷</span>'}
+      <div style="flex:1 1 180px;display:flex;flex-direction:column;gap:10px;">
+        <div style="width:100%;aspect-ratio:4/3;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          ${room.imageUrl ? `<img src="${room.imageUrl}" style="width:100%;height:100%;object-fit:cover;" alt="Style preview">` : '<span style="font-size:28px;color:rgba(255,255,255,0.15);">📷</span>'}
         </div>
-        <div style="flex:1;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;margin-bottom:2px;">Style ID <span style="color:var(--s2s-red);">${room.styleId}</span></div>
+        <div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;margin-bottom:4px;">Style ID <span style="color:var(--s2s-red);">${room.styleId}</span></div>
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="width:16px;height:16px;flex-shrink:0;display:flex;color:rgba(255,255,255,0.75);">${roomIconSVGs[room.roomType] || ''}</span>
             <span style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.75);">${room.roomType}</span>
           </div>
         </div>
       </div>
-      <div style="border:2px dashed rgba(255,255,255,0.2);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;" class="drag-drop-zone" data-room-idx="${idx}">
+      <div style="flex:1 1 180px;border:2px dashed rgba(255,255,255,0.2);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;display:flex;flex-direction:column;align-items:center;justify-content:center;" class="drag-drop-zone" data-room-idx="${idx}">
         <input type="file" accept="image/*" style="display:none;" class="room-image-input" data-room-idx="${idx}">
         <div style="font-size:28px;margin-bottom:6px;">📷</div>
         <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:4px;">Drag image here or click to browse</div>
         <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">.jpg, .png, .webp up to 10MB</div>
-        <div class="image-preview" data-room-idx="${idx}" style="margin-top:10px;display:none;">
-          <img style="max-width:100%;max-height:200px;border-radius:6px;margin-bottom:8px;" class="preview-img">
+        <div class="image-preview" data-room-idx="${idx}" style="margin-top:10px;display:none;width:100%;">
+          <img style="max-width:100%;max-height:160px;border-radius:6px;margin-bottom:8px;" class="preview-img">
           <button type="button" class="remove-image-btn" data-room-idx="${idx}" style="background:transparent;border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Remove</button>
         </div>
       </div>
@@ -3248,17 +3274,18 @@ function handleImageSelect(roomIdx, file) {
 }
 
 /* Submit images */
+const submitSpinnerHtml = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(10,10,10,0.25);border-top-color:#0a0a0a;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:8px;vertical-align:-3px;"></span>';
 document.getElementById('submit-images-btn')?.addEventListener('click', async () => {
   if (!window.currentOrderData) {
     alert('No order data loaded.');
     return;
   }
-  
+
   const btn = document.getElementById('submit-images-btn');
   const orig = btn.innerHTML;
-  btn.innerHTML = 'Submitting…';
   btn.disabled = true;
-  
+  btn.innerHTML = submitSpinnerHtml + 'Uploading photos…';
+
   try {
     /* Upload each real photo to Cloudinary first — turns a huge base64
        string into a short, real, hosted URL that fits in a Sheets cell. */
@@ -3275,6 +3302,7 @@ document.getElementById('submit-images-btn')?.addEventListener('click', async ()
       images: hostedImages
     };
 
+    btn.innerHTML = submitSpinnerHtml + 'Saving order…';
     const res = await fetch(ORDERS_API_URL, {
       method:'POST',
       headers:{'Content-Type':'text/plain'},
@@ -3285,6 +3313,7 @@ document.getElementById('submit-images-btn')?.addEventListener('click', async ()
 
     /* Real "images received" confirmation email */
     if (window.emailjs) {
+      btn.innerHTML = submitSpinnerHtml + 'Sending confirmation…';
       try {
         await emailjs.send('service_a2c7o9h', 'template_k4d03do', {
           to_name: window.currentOrderData.name || '',
