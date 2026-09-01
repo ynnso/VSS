@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Virtual Staging Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 /* ── TOKENS ── */
 :root {
@@ -1673,7 +1674,7 @@ body::before{
           Done for You
           <span class="recommended-badge">RECOMMENDED</span>
         </div>
-        <div class="option-desc">Let our expert editors select the best shots. With 1,000+ rooms staged, our team knows exactly which angles capture buyers' attention. Based on your selected room and style ID, we'll pick the absolute strongest photo from your gallery. Get market-ready visuals in half the time: no dashboard logins, no mulling which property image, no file matching, zero extra cost. Enjoy a seamless, stress-free delivery during a hectic time.</div>
+        <div class="option-desc">Our editors pick the strongest shot per room for your style ID — no logins, no file matching, zero extra cost. Fastest option, nothing further needed from you.</div>
       </div>
     </label>
 
@@ -1685,7 +1686,7 @@ body::before{
           <span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;"></span>
           I'll wait until and choose my own photos later
         </div>
-        <div class="option-desc">Select room type, style ID, and specific photo file numbers manually after your property gallery is delivered, we'll email you a link to complete your selections. (Note: Production cannot begin until your selections are submitted.)</div>
+        <div class="option-desc">We'll email you a link to pick your own photos once your gallery is delivered. Production waits until you submit those selections.</div>
       </div>
     </label>
 
@@ -1740,7 +1741,7 @@ body::before{
   <div class="slide-step-header">
     <div class="slide-step-title">Select Your Images</div>
   </div>
-  <div id="section-4" style="width:100%;max-width:720px;margin:0 auto;padding:0 16px;">
+  <div id="section-4" style="width:100%;max-width:720px;margin:0 auto;padding:32px 16px 0;">
     
     <!-- Order ID Input (if not in URL) -->
     <div id="order-id-input-container" style="margin-bottom:32px;display:none;">
@@ -1777,6 +1778,14 @@ body::before{
   </div>
 </div>
 <script>
+/* EmailJS — sends the real branded "Select Images Now" email for Option B */
+if (window.emailjs) emailjs.init('32z_NIDdnBT660UG-');
+
+/* Real order backend — Google Sheets via Apps Script Web App.
+   Gives every order a real home that Slide 4 can look up by ID from any
+   device, any time later — sessionStorage alone can never do that. */
+const ORDERS_API_URL = 'https://script.google.com/macros/s/AKfycbx6ZT4c_yNl8jGSkkNXoo1s9-DXB33uchvjdSGN7E48q2kuovOkX64KX5OSOSAn88qXiQ/exec';
+
 const roomTypes = ["Living Room","Bedroom","Kitchen/Dining","Outdoor","Study/Office","Other"];
 const roomSerials = {"Living Room":"RM-LR-01","Bedroom":"RM-BR-02","Kitchen/Dining":"RM-KD-03","Outdoor":"RM-OD-04","Study/Office":"RM-SO-05","Other":"RM-OT-06"};
 const roomTileLabels = {"Living Room":"Living Room","Bedroom":"Bedroom","Kitchen/Dining":"Kitchen/Dining","Outdoor":"Outdoor","Study/Office":"Study/Office","Other":"Other"};
@@ -2085,7 +2094,8 @@ document.getElementById('final-submit').addEventListener('click', async () => {
   const rooms   = Array.from(document.querySelectorAll('.placeholder-card')).map(c => ({
     roomType: (c.querySelector('.room-tile.selected') || {}).dataset?.room || '',
     styleId:  c.querySelector('.footer-id-number').innerText,
-    notes:    c.querySelector('textarea').value.trim()
+    notes:    c.querySelector('textarea').value.trim(),
+    imageUrl: (c._drawerImg || c.querySelector('.drawer-staged-img'))?.src || ''
   }));
   
   /* Generate Order ID: timestamp + random string */
@@ -2103,16 +2113,48 @@ document.getElementById('final-submit').addEventListener('click', async () => {
   btn.innerHTML = 'Submitting…'; btn.style.opacity = '0.7';
   
   try {
-    /* For testing: skip actual submission, just show success states */
-    /* In production, replace with: const res = await fetch('YOUR_ENDPOINT', {...}) */
-    
+    /* Real branded confirmation email — the actual thing a real client
+       receives, sent via EmailJS. Option A gets the "you're all set"
+       confirmation (no link, no further step). Option B gets the
+       "select your images" email with a real working link to Slide 4. */
+    if (window.emailjs) {
+      const roomsListText = rooms.map(r => `${r.roomType} — Style ID ${r.styleId}`).join('\n');
+      try {
+        if (pref === 'A') {
+          await emailjs.send('service_a2c7o9h', 'template_k4d03do', {
+            to_name: name,
+            to_email: email,
+            order_id: orderId,
+            address: address,
+            rooms_list: roomsListText
+          });
+        } else {
+          const selectLink = window.location.origin + window.location.pathname + `?mode=image-select&id=${orderId}`;
+          await emailjs.send('service_a2c7o9h', 'template_mxbnmbh', {
+            to_name: name,
+            to_email: email,
+            order_id: orderId,
+            address: address,
+            rooms_list: roomsListText,
+            select_link: selectLink
+          });
+        }
+      } catch (emailErr) { /* email hiccup shouldn't block the UI flow */ }
+    }
+
     clearSavedState();
 
-    /* Persist order for records + the Slide 4 (image-select) hand-off —
-       local/same-browser testing only. Real cross-device delivery/records
-       need the production backend (Open Priority #2 in the brief); this
-       just proves the flow end-to-end. */
+    /* Persist order — sessionStorage as a fast same-tab fallback, plus the
+       real backend (Google Sheets) so Slide 4 can find it from any device,
+       any time later. */
     try { sessionStorage.setItem('order_' + orderId, JSON.stringify(payload)); } catch(e) {}
+    try {
+      await fetch(ORDERS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
+    } catch (backendErr) { /* network hiccup shouldn't block the UI flow */ }
 
     document.getElementById('section-3').style.display = 'none';
 
@@ -3021,16 +3063,25 @@ function initSlide4() {
   }
 }
 
-function loadOrderData(orderId) {
-  /* In real implementation, fetch order from backend by orderId */
-  /* For now, retrieve from localStorage or sessionStorage if available */
+async function loadOrderData(orderId) {
+  /* Check the real backend first (works from any device, any time later),
+     fall back to sessionStorage for same-tab testing if the backend
+     doesn't have it yet. */
   let orderData = null;
-  
+
   try {
-    const stored = sessionStorage.getItem('order_' + orderId);
-    if (stored) orderData = JSON.parse(stored);
-  } catch (e) {}
-  
+    const res = await fetch(`${ORDERS_API_URL}?orderId=${encodeURIComponent(orderId)}`);
+    const json = await res.json();
+    if (!json.error) orderData = json;
+  } catch (e) { /* backend unreachable — fall through to sessionStorage */ }
+
+  if (!orderData) {
+    try {
+      const stored = sessionStorage.getItem('order_' + orderId);
+      if (stored) orderData = JSON.parse(stored);
+    } catch (e) {}
+  }
+
   if (!orderData) {
     alert('Order not found. Please check your Order ID from the email.');
     return;
@@ -3054,10 +3105,19 @@ function loadOrderData(orderId) {
     </div>
     <div>
       <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:8px;">Rooms to stage</div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${orderData.rooms.map((r, i) => `
-          <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.8);">
-            ${r.roomType} — Style ID <span style="color:var(--s2s-red);font-weight:700;">${r.styleId}</span>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${orderData.rooms.map(r => `
+          <div style="display:flex;gap:14px;padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.12);align-items:center;">
+            <div style="flex-shrink:0;width:100px;height:72px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+              ${r.imageUrl ? `<img src="${r.imageUrl}" style="width:100%;height:100%;object-fit:cover;" alt="Room preview">` : '<span style="font-size:28px;color:rgba(255,255,255,0.15);">📷</span>'}
+            </div>
+            <div style="flex:1;">
+              <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;margin-bottom:4px;">Style ID <span style="color:var(--s2s-red);">${r.styleId}</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="width:18px;height:18px;flex-shrink:0;display:flex;color:rgba(255,255,255,0.8);">${roomIconSVGs[r.roomType] || ''}</span>
+                <span style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.85);">${r.roomType}</span>
+              </div>
+            </div>
           </div>
         `).join('')}
       </div>
@@ -3176,20 +3236,34 @@ document.getElementById('submit-images-btn')?.addEventListener('click', async ()
   btn.disabled = true;
   
   try {
-    /* Send images + order ID to backend */
+    /* Send images + order ID to the real backend (updates the existing
+       Sheets row for this order rather than creating a new one). */
     const payload = {
       orderId: window.currentOrderData.orderId,
       images: window.currentOrderData.roomImages || {}
     };
-    
-    const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+
+    const res = await fetch(ORDERS_API_URL, {
       method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      headers:{'Content-Type':'text/plain'},
       body: JSON.stringify(payload)
     });
-    
+
     if (!res.ok) throw new Error('Server error');
-    
+
+    /* Real "images received" confirmation email */
+    if (window.emailjs) {
+      try {
+        await emailjs.send('service_a2c7o9h', 'template_k4d03do', {
+          to_name: window.currentOrderData.name || '',
+          to_email: window.currentOrderData.email || '',
+          order_id: window.currentOrderData.orderId,
+          address: window.currentOrderData.address || '',
+          rooms_list: 'Images received — staging begins now.'
+        });
+      } catch (emailErr) { /* email hiccup shouldn't block the UI flow */ }
+    }
+
     /* Show success */
     document.getElementById('image-uploads-container').style.display = 'none';
     document.getElementById('section-4').innerHTML = `
