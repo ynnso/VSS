@@ -17,6 +17,7 @@
   --field-bg:rgba(20,20,20,0.04); --s2s-green:#30D158; --s2s-green-dark:#28C24A;
   --border-soft:rgba(20,20,20,0.09); --border-medium:rgba(20,20,20,0.14);
   --soft-red:#FFECEA; --section-accent:rgba(200,20,0,0.08);
+  --topbar-h:56px;
 }
 
 /* ── BASE ── */
@@ -24,7 +25,7 @@
 html{scroll-behavior:smooth;}
 body{
   background:#0a0a0a;
-  min-height:100vh;margin:0;padding:0 0 64px;
+  min-height:100vh;margin:0;padding:var(--topbar-h) 0 24px;
   font-family:'Montserrat',sans-serif;font-weight:500;position:relative;
   color:#0a0a0a;
 }
@@ -38,35 +39,50 @@ body::before{
 }
 @keyframes grainShift{0%,100%{transform:translate(0,0)}25%{transform:translate(-1px,1px)}75%{transform:translate(1px,-1px)}}
 
-/* ── PROGRESS BAR ── */
+/* ── PROGRESS BAR — dark, dot stepper with short labels ── */
 #top-progress-container{
-  position:fixed;top:0;left:0;width:100%;
-  background:rgba(250,250,250,0.88);
+  position:fixed;top:0;left:0;width:100%;height:var(--topbar-h);box-sizing:border-box;
+  background:rgba(10,10,10,0.85);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1.5px solid var(--border-soft);
-  z-index:9999;padding:6px 0;display:flex;justify-content:center;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  z-index:9999;padding:9px 0 8px;display:flex;justify-content:center;
 }
-.stepper-wrapper{display:flex;align-items:center;width:100%;max-width:800px;padding:0 12px;}
-.step-item{display:flex;flex-direction:column;align-items:center;position:relative;flex:1;}
+.stepper-wrapper{display:flex;align-items:flex-start;width:100%;max-width:420px;padding:0 32px;}
+.step-item{
+  display:flex;flex-direction:column;align-items:center;position:relative;flex:1;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.step-item[data-state="locked"]{cursor:not-allowed;}
 .step-dot{
-  width:27px;height:27px;border:1.5px solid var(--border-medium);border-radius:50%;
+  width:22px;height:22px;border:1.5px solid rgba(255,255,255,0.25);border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:13px;background:white;z-index:2;
-  color:var(--apple-black);transition:background 0.4s,border-color 0.4s,box-shadow 0.4s,color 0.4s;
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;background:transparent;
+  color:rgba(255,255,255,0.45);z-index:2;
+  transition:background 0.4s,border-color 0.4s,box-shadow 0.4s,color 0.4s;
 }
-/* Completed: black fill, bright green halo, white checkmark */
-.step-dot.completed{
+.step-item[data-state="active"] .step-dot{
+  border-color:var(--s2s-red);color:white;background:rgba(204,21,0,0.15);
+  box-shadow:0 0 10px rgba(204,21,0,0.35);
+}
+/* Completed: black fill, green halo, white checkmark */
+.step-item[data-state="complete"] .step-dot{
   background:#0a0a0a;border-color:#0a0a0a;color:white;
-  box-shadow:0 0 0 3px rgba(48,209,88,0.9),0 0 0 6px rgba(48,209,88,0.18);
+  box-shadow:0 0 0 2px rgba(48,209,88,0.85),0 0 0 4px rgba(48,209,88,0.16);
 }
-/* Step label: full black opacity when step is completed */
-.step-text{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;color:var(--apple-black);opacity:0.55;transition:opacity 0.4s,font-weight 0.4s;}
-.step-item:has(.step-dot.completed) .step-text{opacity:1;font-weight:700;}
+.step-text{
+  font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-top:5px;color:rgba(255,255,255,0.35);white-space:nowrap;
+  transition:color 0.4s,font-weight 0.4s;
+}
+.step-item[data-state="active"] .step-text{color:white;font-weight:700;}
+.step-item[data-state="complete"] .step-text{color:rgba(255,255,255,0.55);}
 .step-line{
-  position:absolute;height:1px;background:var(--border-soft);top:13.5px;left:50%;width:100%;z-index:1;
+  position:absolute;height:1px;background:rgba(255,255,255,0.12);top:10px;left:-50%;width:100%;z-index:1;
   transition:background 0.4s;
 }
-.step-item:has(.step-dot.completed) .step-line{background:#0a0a0a;}
+.step-item:first-child .step-line{display:none;}
+.step-item[data-state="active"] .step-line,
+.step-item[data-state="complete"] .step-line{background:rgba(255,255,255,0.4);}
 
 /* CTA pulse — slow green glow on black button */
 @keyframes catalogPulse {
@@ -427,6 +443,20 @@ body::before{
 }
 .drawer-add-note-btn:hover{color:white;}
 
+/* Reopen-catalog escape hatch — visible whenever the ID input row is showing */
+.drawer-catalog-link-row{
+  display:flex;justify-content:center;padding:2px 4px 10px;
+}
+.drawer-catalog-link{
+  background:none;border:none;cursor:pointer;
+  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;
+  color:rgba(255,255,255,0.35);letter-spacing:0.02em;text-transform:none;
+  padding:0;transition:color 0.25s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.drawer-catalog-link:hover{color:var(--s2s-red-light);}
+.drawer-hero-mode .drawer-catalog-link-row{display:none!important;}
+
 /* Igniting Lens — replaces Approve chip, with slow pulse when ready */
 @keyframes lensReadyPulse{
   0%,100%{box-shadow:0 0 6px rgba(204,21,0,0.4),0 0 0 1px rgba(204,21,0,0.25);}
@@ -636,9 +666,11 @@ body::before{
 .room-tile.selected svg{color:white;stroke:white;}
 .room-tile-label{
   font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;
-  color:rgba(255,255,255,0.90);text-align:center;letter-spacing:0.08em;text-transform:none;
-  line-height:1;transition:color 0.35s;position:relative;z-index:2;
-  padding:0 6px 2px;
+  color:rgba(255,255,255,0.90);text-align:center;letter-spacing:0.03em;text-transform:none;
+  line-height:1.2;transition:color 0.35s;position:relative;z-index:2;
+  padding:0 3px 2px;width:100%;box-sizing:border-box;
+  overflow-wrap:break-word;word-break:break-word;
+  min-height:32px;display:flex;align-items:center;justify-content:center;
 }
 .room-tile:hover .room-tile-label{color:white;}
 .room-tile.selected .room-tile-label{color:white;}
@@ -1070,7 +1102,7 @@ body::before{
 
 /* ── MOBILE ── */
 @media(max-width:480px){
-  body{padding:0 12px 96px;}
+  body{padding:var(--topbar-h) 12px 96px;}
   .step-text{font-size:9px;}
   .step-dot{width:24px;height:24px;font-size:12px;}
   .step-line{top:12px;}
@@ -1092,16 +1124,22 @@ body::before{
   .final-consent-container{padding:14px;}
   .action-button{font-size:15px;padding:18px;}
 
-  /* Pin card action CTAs to bottom on mobile */
-  .card-action-row{
-    position:fixed;bottom:60px;left:0;
-    width:100%;max-width:100%;
-    margin:0;padding:0 12px;
-    z-index:99;
-    background:linear-gradient(to top,rgba(10,10,10,0.95) 60%,transparent);
-    padding-top:20px;padding-bottom:10px;
-    box-sizing:border-box;
-  }
+  /* Tighten Style ID row so label+boxes+arrow fit without clipping */
+  .drawer-slot-row{padding:10px 8px;}
+  .drawer-style-label{font-size:13px;margin-right:8px;}
+  .style-id-boxes{gap:4px;}
+  .style-id-digit{width:32px;height:38px;font-size:17px;}
+  .style-id-digit-extra{width:32px;}
+  .drawer-submit{margin-left:6px;}
+
+  /* Tighten hero info bar so Approve chip doesn't spill past the card edge */
+  .hero-info-bar{padding:10px 10px 8px;}
+  .hero-id-label,
+  .hero-id-value{font-size:13px;}
+  .hero-room-icon{margin-left:6px;width:16px;height:16px;}
+  .hero-room-icon svg{width:16px;height:16px;}
+  .hero-room-name{font-size:12px;margin-left:3px;}
+  .overlay-confirm{padding:0 10px;font-size:11px;}
 }
 
 /* ── ROOM HEADER QUESTION ── */
@@ -1117,13 +1155,26 @@ body::before{
 }
 .room-header-step-tag{display:none;}
 
-/* ── CARD ACTION ROW ── */
+/* ── CARD ACTION ROW — pinned to the bottom so it's never scrolled out
+   of view, no matter how many room cards are in the list ── */
 .card-action-row{
-  display:flex;gap:28px;justify-content:center;align-items:center;
-  width:100%;max-width:760px;margin:40px auto 8px;padding:0;
-  background:transparent;
+  position:fixed;left:0;bottom:0;z-index:99;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  width:100%;box-sizing:border-box;
+  padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top,rgba(10,10,10,0.97) 55%,transparent);
   scroll-margin-top:110px;
 }
+.card-action-buttons{
+  display:flex;gap:28px;justify-content:center;align-items:center;
+  width:100%;max-width:760px;margin:0 auto;
+}
+.progress-hint{
+  font-family:'Montserrat',sans-serif;font-size:12px;font-weight:500;
+  color:rgba(255,255,255,0.5);text-align:center;letter-spacing:0.02em;
+  margin:10px auto 0;max-width:760px;
+}
+#finalizeHint{margin:0;}
 .card-action-btn{
   font-family:'Montserrat',sans-serif;font-size:15px;font-weight:400;letter-spacing:0.18em;
   border:none;border-radius:0;cursor:pointer;
@@ -1226,7 +1277,7 @@ body::before{
   background:#0a0a0a;
 }
 .slide2-header {
-  position:sticky; top:0; z-index:10;
+  position:sticky; top:var(--topbar-h); z-index:10;
   background:rgba(10,10,10,0.85);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   text-align:left;
@@ -1237,7 +1288,7 @@ body::before{
   max-width:760px; width:100%; margin:0 auto; padding:0 16px; align-items:center;
 }
 .slide2-body {
-  padding:24px 16px 120px;
+  padding:24px 16px 170px;
 }
 .slide2-body > * { position:relative;z-index:1; }
 .slide2-body > * { max-width:760px; width:100%; margin-left:auto; margin-right:auto; }
@@ -1246,87 +1297,10 @@ body::before{
 /* ── SLIDE 3 ── */
 #slide-3 {
   background:#0a0a0a;
-  min-height:calc(100vh - 64px);
+  min-height:calc(100vh - var(--topbar-h));
   padding:32px 16px 120px;
 }
 #slide-3 > * { max-width:720px; width:100%; margin-left:auto; margin-right:auto; }
-
-/* ══════════════════════════════════════
-   BOTTOM TAB BAR — WHITE CLEAN
-   ══════════════════════════════════════ */
-#bottom-tab-bar {
-  position:fixed; bottom:0; left:0;
-  width:100%; height:64px; z-index:9999;
-  background:white;
-  border-top:2px solid rgba(0,0,0,0.08);
-  display:flex; align-items:stretch;
-  box-shadow:0 -2px 20px rgba(0,0,0,0.07);
-}
-.btab {
-  flex:1; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:3px;
-  cursor:pointer; border:none; background:transparent;
-  padding:0 8px; position:relative; overflow:visible;
-  height:64px;
-  transition:background 0.18s;
-  -webkit-tap-highlight-color:transparent;
-}
-/* Tab dividers via span injected in HTML */
-.btab-divider {
-  position:absolute;
-  left:0; top:50%;
-  transform:translateY(-50%);
-  width:1.5px; height:44px;
-  background:#000;
-  opacity:0.4;
-  pointer-events:none;
-}
-/* Tab number */
-.btab-num {
-  font-family:'Montserrat',sans-serif;
-  font-size:11px; font-weight:400; letter-spacing:0.04em;
-  transition:font-size 0.2s, font-weight 0.2s, color 0.2s;
-  line-height:1;
-}
-/* Tab label */
-.btab-label {
-  font-family:'Montserrat',sans-serif;
-  font-size:8px; font-weight:600;
-  letter-spacing:0.1em; text-transform:uppercase;
-  transition:color 0.2s; white-space:nowrap;
-}
-/* Red top indicator */
-.btab::after {
-  content:''; position:absolute;
-  top:0; left:0; right:0; height:2px;
-  background:var(--s2s-red);
-  transform:scaleX(0);
-  transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
-  transform-origin:left;
-  /* Red underglow — light bouncing off surface below */
-  box-shadow:0 2px 8px rgba(204,21,0,0.5),0 4px 18px rgba(204,21,0,0.18);
-}
-/* ── LOCKED ── */
-.btab[data-state="locked"] { cursor:not-allowed; pointer-events:none; }
-.btab[data-state="locked"] .btab-num   { color:rgba(0,0,0,0.4); font-weight:500; font-size:11px; }
-.btab[data-state="locked"] .btab-label { color:rgba(0,0,0,0.4); }
-/* ── ACTIVE — larger, bold, solid black ── */
-.btab[data-state="active"]::after { transform:scaleX(1); }
-.btab[data-state="active"] .btab-num {
-  color:#0a0a0a; font-weight:900; font-size:18px; letter-spacing:-0.03em;
-}
-.btab[data-state="active"] .btab-label { color:#0a0a0a; font-weight:800; font-size:9px; }
-/* ── COMPLETE ── */
-.btab[data-state="complete"] .btab-num   { color:var(--s2s-red); font-weight:700; font-size:12px; }
-.btab[data-state="complete"] .btab-label { color:rgba(0,0,0,0.45); font-weight:600; }
-.btab[data-state="complete"]::after { transform:scaleX(1); background:var(--s2s-red); }
-
-@keyframes tabActivate {
-  0%  {background:rgba(204,21,0,0.03);}
-  50% {background:rgba(204,21,0,0.07);}
-  100%{background:transparent;}
-}
-.btab.tab-just-activated { animation:tabActivate 0.55s ease forwards; }
 
 /* ══════════════════════════════════════
    HERO — ARCHITECTURAL REFINEMENT
@@ -1335,7 +1309,7 @@ body::before{
   background:#050505;
   display:flex; align-items:center; justify-content:center;
   overflow:hidden; position:relative;
-  min-height:calc(100vh - 64px);
+  min-height:calc(100vh - var(--topbar-h));
 }
 /* Micro-grain texture */
 #slide-1::before{
@@ -1502,11 +1476,6 @@ body::before{
   .hero-h1   { font-size:clamp(1.8rem,10vw,3rem); letter-spacing:0.08em; }
 }
 
-@media(max-width:480px) {
-  #bottom-tab-bar { height:60px; }
-  .btab-num  { font-size:12px; }
-  .btab-label{ font-size:8px; }
-}
 
 
 
@@ -1534,9 +1503,19 @@ body::before{
    STEP HEADERS — TITLE + RED UNDERLINE
    ══════════════════════════════════════ */
 .slide-step-header {
-  padding:0;
+  padding:0;position:relative;
   display:flex; flex-direction:column; align-items:center;
 }
+.back-chevron{
+  position:absolute;left:0;top:0;z-index:5;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:none;color:rgba(255,255,255,0.8);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background 0.2s,color 0.2s;
+}
+.back-chevron:hover{background:rgba(204,21,0,0.25);color:white;}
+.back-chevron svg{width:18px;height:18px;display:block;}
 /* Hide the number — context lives in the tab bar */
 .slide-step-num { display:none; }
 .slide-step-title {
@@ -1569,6 +1548,29 @@ body::before{
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════
+     TOP PROGRESS STEPPER
+     ═══════════════════════════════════════ -->
+<div id="top-progress-container">
+  <div class="stepper-wrapper">
+    <div class="step-item" id="step-item-1" data-state="active" onclick="stepClick(1)">
+      <div class="step-line"></div>
+      <div class="step-dot" id="step-dot-1">1</div>
+      <div class="step-text">Browse</div>
+    </div>
+    <div class="step-item" id="step-item-2" data-state="locked" onclick="stepClick(2)">
+      <div class="step-line"></div>
+      <div class="step-dot" id="step-dot-2">2</div>
+      <div class="step-text">Style</div>
+    </div>
+    <div class="step-item" id="step-item-3" data-state="locked" onclick="stepClick(3)">
+      <div class="step-line"></div>
+      <div class="step-dot" id="step-dot-3">3</div>
+      <div class="step-text">Confirm</div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════
      SLIDE 1: HERO + STEP 1 (Browse Styles)
@@ -1606,6 +1608,9 @@ body::before{
 <div class="step-view" id="slide-2">
   <div class="slide2-header">
     <div class="slide-step-header">
+      <button class="back-chevron" type="button" onclick="goBack()" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
       <span class="slide-step-title">Style Your Rooms</span>
     </div>
   </div>
@@ -1614,8 +1619,11 @@ body::before{
       <div class="placeholder-container" id="placeholderContainer">
       </div>
       <div class="card-action-row" id="cardActionRow" style="display:none;">
-        <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ Add Room</button>
-        <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">Finalize <span class="finalize-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></button>
+        <p class="progress-hint" id="finalizeHint" style="display:none;"></p>
+        <div class="card-action-buttons">
+          <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ Add Room</button>
+          <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">Finalize <span class="finalize-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></button>
+        </div>
       </div>
     </div>
   </div>
@@ -1626,6 +1634,9 @@ body::before{
      ═══════════════════════════════════════ -->
 <div class="step-view" id="slide-3">
   <div class="slide-step-header">
+    <button class="back-chevron" type="button" onclick="goBack()" aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
     <div class="slide-step-title" id="s3-title">Confirm & Submit</div>
   </div>
   <div id="section-3" style="width:100%;max-width:720px;margin:0 auto;">
@@ -1635,6 +1646,10 @@ body::before{
       <div style="margin-bottom:16px;">
         <label style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);display:block;margin-bottom:8px;letter-spacing:0.04em;">Name</label>
         <input type="text" id="client-name" placeholder="Your name" style="width:100%;padding:12px 16px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.04);font-family:'Montserrat',sans-serif;font-size:14px;color:white;outline:none;transition:border-color 0.3s;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);display:block;margin-bottom:8px;letter-spacing:0.04em;">Email</label>
+        <input type="email" id="client-email" placeholder="you@email.com" style="width:100%;padding:12px 16px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.04);font-family:'Montserrat',sans-serif;font-size:14px;color:white;outline:none;transition:border-color 0.3s;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);display:block;margin-bottom:8px;letter-spacing:0.04em;">Property Address</label>
@@ -1687,6 +1702,8 @@ body::before{
       <input type="checkbox" id="tat-acknowledgement">
       <label for="tat-acknowledgement">I understand production turnaround is 1–2 business days starting after virtual staging selections are finalized and approved.</label>
     </div>
+
+    <p class="progress-hint" id="submitHint" style="display:none;"></p>
 
     <!-- Submit Button -->
     <button class="action-button btn-submit-compact locked-section" id="final-submit" style="margin-bottom:40px;">
@@ -1749,27 +1766,6 @@ body::before{
     <button type="button" id="submit-images-btn" style="width:100%;padding:14px;border-radius:0;background:white;color:#0a0a0a;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:600;border:none;cursor:pointer;transition:background 0.3s;display:none;">Submit Images</button>
 
   </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     BOTTOM TAB BAR (Extended to 4 tabs)
-     ═══════════════════════════════════════ -->
-
-<div id="bottom-tab-bar">
-  <button class="btab" id="btab-1" data-state="active" onclick="btabClick(1)">
-    <span class="btab-num" id="btab-num-1">01</span>
-    <span class="btab-label">Browse Styles</span>
-  </button>
-  <button class="btab" id="btab-2" data-state="locked" onclick="btabClick(2)">
-    <span class="btab-divider"></span>
-    <span class="btab-num" id="btab-num-2">02</span>
-    <span class="btab-label">Style Rooms</span>
-  </button>
-  <button class="btab" id="btab-3" data-state="locked" onclick="btabClick(3)">
-    <span class="btab-divider"></span>
-    <span class="btab-num" id="btab-num-3">03</span>
-    <span class="btab-label">Confirm &amp; Submit</span>
-  </button>
 </div>
 
 <!-- Restore banner (outside slide-root, hidden) -->
@@ -1843,37 +1839,34 @@ function goToSlide(n) {
   if (n === 3) setTimeout(matchSubtitleWidth, 50);
 }
 
-function updateBottomTabs(step1Done, step2Done, step3Active) {
+/* Back chevron — always allowed; going back never skips a requirement */
+function goBack() {
+  if (currentSlide > 1) goToSlide(currentSlide - 1);
+}
+
+function updateStepper(step1Done, step2Done, step3Active) {
+  /* 'locked' means truly unreachable (not clickable). Once step 3 is
+     reachable it must never show 'locked' styling again, even before its
+     own fields are filled in — otherwise the dot looks disabled while
+     still being navigable, which is exactly the confusion we're fixing. */
   const states = {
     1: step1Done ? 'complete' : 'active',
     2: !step1Done ? 'locked' : (step2Done ? 'complete' : 'active'),
-    3: !step2Done ? 'locked' : (step3Active ? 'active' : 'locked'),
+    3: !step2Done ? 'locked' : (step3Active ? 'complete' : 'active'),
   };
   [1,2,3].forEach(i => {
-    const tab = document.getElementById('btab-' + i);
-    const num = document.getElementById('btab-num-' + i);
-    if (!tab || !num) return;
-    const prev = tab.dataset.state;
+    const item = document.getElementById('step-item-' + i);
+    const dot  = document.getElementById('step-dot-' + i);
+    if (!item || !dot) return;
     const next = states[i];
-    tab.dataset.state = next;
-    if (next === 'complete') {
-      num.innerHTML = '<span style="color:var(--s2s-red);font-size:11px;vertical-align:middle;margin-right:4px;">✓</span>0' + i;
-    } else {
-      num.textContent = '0' + i;
-    }
-    tab.style.pointerEvents = next === 'locked' ? 'none' : 'auto';
-    if (prev !== 'active' && next === 'active') {
-      tab.classList.remove('tab-just-activated');
-      void tab.offsetWidth;
-      tab.classList.add('tab-just-activated');
-      tab.addEventListener('animationend', () => tab.classList.remove('tab-just-activated'), {once:true});
-    }
+    item.dataset.state = next;
+    dot.textContent = next === 'complete' ? '✓' : String(i);
   });
 }
 
-function btabClick(n) {
-  const tab = document.getElementById('btab-' + n);
-  if (!tab || tab.dataset.state === 'locked') return;
+function stepClick(n) {
+  const item = document.getElementById('step-item-' + n);
+  if (!item || item.dataset.state === 'locked') return;
   goToSlide(n);
 }
 
@@ -1985,6 +1978,7 @@ function updateProgress() {
   });
 
   const anyVerified = Array.from(cards).some(c => (c._nudge || c.querySelector('.overlay-confirm'))?.classList.contains('verified'));
+  const verifiedCount = Array.from(cards).filter(c => (c._nudge || c.querySelector('.overlay-confirm'))?.classList.contains('verified')).length;
 
   if (cards.length > 0 && allVerified) {
     _s2done = true;
@@ -1999,6 +1993,17 @@ function updateProgress() {
     }
     if (goSubmitBtn) goSubmitBtn.classList.add('locked-section');
     if (cardActionRow) cardActionRow.style.display = cards.length > 0 ? 'flex' : 'none';
+  }
+
+  /* Finalize hint — say what's missing instead of a silent dead tap */
+  const finalizeHint = document.getElementById('finalizeHint');
+  if (finalizeHint) {
+    if (cards.length > 0 && !allVerified) {
+      finalizeHint.textContent = `Approve all rooms to continue (${verifiedCount} of ${cards.length} approved)`;
+      finalizeHint.style.display = 'block';
+    } else {
+      finalizeHint.style.display = 'none';
+    }
   }
 
   /* Step 3 */
@@ -2022,9 +2027,23 @@ function updateProgress() {
       consent.classList.remove('visible');
       if (finalBtn) finalBtn.classList.add('locked-section');
     }
+
+    /* Submit hint — say what's missing instead of a silent dead tap */
+    const submitHint = document.getElementById('submitHint');
+    if (submitHint) {
+      if (!radioSel) {
+        submitHint.textContent = 'Select a delivery option to continue';
+        submitHint.style.display = 'block';
+      } else if (!(tat && tat.checked)) {
+        submitHint.textContent = 'Confirm the turnaround acknowledgment to continue';
+        submitHint.style.display = 'block';
+      } else {
+        submitHint.style.display = 'none';
+      }
+    }
   }
 
-  updateBottomTabs(_s1done, _s2done, _s3active);
+  updateStepper(_s1done, _s2done, _s3active);
   updateOrderSummary();
 
 }
@@ -2050,12 +2069,15 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 
 document.getElementById('final-submit').addEventListener('click', async () => {
   const name    = (document.getElementById('client-name') || {value:''}).value.trim();
+  const email   = (document.getElementById('client-email') || {value:''}).value.trim();
   const address = (document.getElementById('property-address') || {value:''}).value.trim();
   const pref    = document.querySelector('input[name="preference"]:checked')?.value;
   const consent = document.getElementById('tat-acknowledgement').checked;
-  
+
   /* Validate all required fields */
   if (!name) { alert('Please enter your name'); return; }
+  if (!email) { alert('Please enter your email'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email'); return; }
   if (!address) { alert('Please enter property address'); return; }
   if (!pref) { alert('Please select an option (A or B)'); return; }
   if (!consent) { alert('Please acknowledge the turnaround time'); return; }
@@ -2071,7 +2093,7 @@ document.getElementById('final-submit').addEventListener('click', async () => {
   const random = Math.random().toString(36).substring(2, 8).toUpperCase();
   const orderId = `VSS_${timestamp}_${random}`;
   
-  const payload = { orderId, name, address, preference: pref, rooms, submittedAt: new Date().toISOString() };
+  const payload = { orderId, name, email, address, preference: pref, rooms, submittedAt: new Date().toISOString() };
   const btn = document.getElementById('final-submit');
   const orig = btn.innerHTML;
   /* Checkmark micro-action */
@@ -2085,19 +2107,48 @@ document.getElementById('final-submit').addEventListener('click', async () => {
     /* In production, replace with: const res = await fetch('YOUR_ENDPOINT', {...}) */
     
     clearSavedState();
+
+    /* Persist order for records + the Slide 4 (image-select) hand-off —
+       local/same-browser testing only. Real cross-device delivery/records
+       need the production backend (Open Priority #2 in the brief); this
+       just proves the flow end-to-end. */
+    try { sessionStorage.setItem('order_' + orderId, JSON.stringify(payload)); } catch(e) {}
+
     document.getElementById('section-3').style.display = 'none';
-    
+
     /* Update success message based on preference A vs B */
     const titleEl = document.getElementById('success-title');
     const messageEl = document.getElementById('success-message');
     const orderIdSection = document.getElementById('success-order-id');
     const orderIdDisplay = document.getElementById('order-id-display');
-    
+    const roomsListHtml = rooms.map(r => `
+            <div style="font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.6;">${r.roomType} — Style ID <strong>${r.styleId}</strong></div>`).join('');
+
     if (pref === 'A') {
       /* Done for You */
       titleEl.innerText = 'You\'re all set.';
       messageEl.innerText = 'We\'ll select the best images and deliver market-ready visuals within 1–2 business days. No follow-up needed from you.';
-      orderIdSection.style.display = 'none';
+      orderIdSection.style.display = 'block';
+      orderIdDisplay.innerText = orderId;
+
+      /* For testing: show mock order-confirmation email — record for the
+         client's reference, no Slide 4 link (Editor's Pick has no image-select step) */
+      const emailPreview = document.createElement('div');
+      emailPreview.style.cssText = 'margin-top:32px;padding:24px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;';
+      emailPreview.innerHTML = `
+        <div style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em;">📧 Email Preview (Testing)</div>
+        <div style="background:white;border-radius:8px;padding:20px;color:#0a0a0a;font-family:'Montserrat',sans-serif;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,0.1);">Your Virtual Staging Order</div>
+          <div style="font-size:13px;line-height:1.6;margin-bottom:16px;">
+            <p style="margin:0 0 8px;">Hi ${name},</p>
+            <p style="margin:0 0 8px;">Your style selections for ${address} are locked in — here's your order for your records:</p>
+            <p style="margin:0 0 12px;"><strong>Order ID:</strong> ${orderId}</p>
+            <div style="margin:0 0 16px;padding:12px 14px;background:rgba(0,0,0,0.04);border-radius:6px;">${roomsListHtml}</div>
+            <p style="margin:0;font-size:12px;color:rgba(0,0,0,0.6);">Our editors pick the strongest shot per room. You'll have finished images within 1–2 business days — no further action needed.</p>
+          </div>
+        </div>
+      `;
+      orderIdSection.parentNode.insertBefore(emailPreview, orderIdSection.nextSibling);
     } else {
       /* Wait for Images */
       titleEl.innerText = 'Order confirmed.';
@@ -2116,12 +2167,12 @@ document.getElementById('final-submit').addEventListener('click', async () => {
             <p style="margin:0 0 8px;">Hi ${name},</p>
             <p style="margin:0 0 8px;">Your photos have arrived! Now it\'s time to select which images you\'d like us to stage.</p>
             <p style="margin:0 0 12px;"><strong>Order ID:</strong> ${orderId}</p>
-            <p style="margin:0 0 16px;"><a href="https://ynnso.github.io/VSS/?mode=image-select&id=${orderId}" style="display:inline-block;background:#CC1500;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Select Images Now →</a></p>
+            <p style="margin:0 0 16px;"><a href="?mode=image-select&id=${orderId}" style="display:inline-block;background:#CC1500;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Select Images Now →</a></p>
             <p style="margin:0;font-size:12px;color:rgba(0,0,0,0.6);">Production begins once you submit your selections. You\'ll have finished images within 1–2 business days.</p>
           </div>
         </div>
         <div style="margin-top:16px;text-align:center;">
-          <a href="https://ynnso.github.io/VSS/?mode=image-select&id=${orderId}" style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:white;text-decoration:none;padding:10px 24px;background:#CC1500;border-radius:6px;display:inline-block;transition:background 0.3s;">Click to Complete Order (Slide 4)</a>
+          <a href="?mode=image-select&id=${orderId}" style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:white;text-decoration:none;padding:10px 24px;background:#CC1500;border-radius:6px;display:inline-block;transition:background 0.3s;">Click to Complete Order (Slide 4)</a>
         </div>
       `;
       orderIdSection.parentNode.insertBefore(emailPreview, orderIdSection.nextSibling);
@@ -2168,7 +2219,7 @@ function createCard(restoreData, editorsChoice) {
         ${roomTypes.map(r => `<button class="room-tile" data-room="${r}" type="button">
           <span class="room-tile-serial">${roomSerials[r]||''}</span>
           <span class="room-tile-icon-wrap"><span class="room-tile-icon"></span></span>
-          <span class="room-tile-label">${roomTileLabels[r]||r}</span>
+          <span class="room-tile-label">${(roomTileLabels[r]||r).replace(/\//g,'/<wbr>')}</span>
         </button>`).join('')}
         <!-- Obsidian Drawer — spans full 3-col width -->
         <div class="studio-drawer">
@@ -2198,6 +2249,12 @@ function createCard(restoreData, editorsChoice) {
               <input class="drawer-omnibox" type="hidden" placeholder="Enter Style ID">
               <button class="drawer-submit" type="button">
                 <svg width="28" height="16" viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="8" x2="24" y2="8"/><polyline points="18 2 24 8 18 14"/></svg>
+              </button>
+            </div>
+            <div class="drawer-catalog-link-row">
+              <button class="drawer-catalog-link" type="button">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Lost your ID? Reopen catalog
               </button>
             </div>
             <!-- Hero info bar: STYLE ID 2222 · ROOM [APPROVE] -->
@@ -2283,6 +2340,14 @@ function createCard(restoreData, editorsChoice) {
   const editBtn     = card.querySelector('.edit-trigger-btn');
   const stagedImg   = drawerImg; /* alias for shared performStaging logic */
   const cardFooter  = card.querySelector('.card-footer');
+  const catalogLinkBtn = card.querySelector('.drawer-catalog-link');
+
+  /* Escape hatch: reopen the catalog without creating a new card or losing state */
+  if (catalogLinkBtn) {
+    catalogLinkBtn.addEventListener('click', () => {
+      window.open('https://virtualstaginglibrary.com/', '_blank');
+    });
+  }
 
   /* Store refs on card element — survives DOM reparenting */
   card._nudge     = nudge;
@@ -2929,14 +2994,20 @@ function initSlide4() {
   const orderId = params.get('id');
   
   if (mode === 'image-select') {
-    /* Hide Slides 1-3 */
-    document.getElementById('slide-1').style.display = 'none';
-    document.getElementById('slide-2').style.display = 'none';
-    document.getElementById('slide-3').style.display = 'none';
-    
+    /* Hide Slides 1-3 — must strip .active, not just set inline display:none;
+       .step-view.active{display:block!important} in CSS beats an inline style. */
+    document.getElementById('slide-1').classList.remove('active');
+    document.getElementById('slide-2').classList.remove('active');
+    document.getElementById('slide-3').classList.remove('active');
+
     /* Show Slide 4 */
     document.getElementById('slide-4').classList.add('active');
-    
+
+    /* Standalone deferred-upload flow reached via email link — not part of the 3-step journey */
+    const stepper = document.getElementById('top-progress-container');
+    if (stepper) stepper.style.display = 'none';
+    document.body.style.paddingTop = '0';
+
     /* If order ID in URL, load it; otherwise show input */
     if (orderId) {
       loadOrderData(orderId);
