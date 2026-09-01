@@ -1786,6 +1786,25 @@ if (window.emailjs) emailjs.init('32z_NIDdnBT660UG-');
    device, any time later — sessionStorage alone can never do that. */
 const ORDERS_API_URL = 'https://script.google.com/macros/s/AKfycbx6ZT4c_yNl8jGSkkNXoo1s9-DXB33uchvjdSGN7E48q2kuovOkX64KX5OSOSAn88qXiQ/exec';
 
+/* Real image hosting — Cloudinary unsigned upload. No Google permissions
+   involved; uploads real photos and hands back a short URL that fits
+   comfortably in a Sheets cell (unlike raw base64, which blows the 50k
+   character-per-cell limit instantly). */
+const CLOUDINARY_CLOUD_NAME = 'ly5dk0or';
+const CLOUDINARY_UPLOAD_PRESET = 'trvnl80m';
+async function uploadToCloudinary(dataUrl) {
+  const form = new FormData();
+  form.append('file', dataUrl);
+  form.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    method: 'POST',
+    body: form
+  });
+  const json = await res.json();
+  if (!json.secure_url) throw new Error('Cloudinary upload failed');
+  return json.secure_url;
+}
+
 const roomTypes = ["Living Room","Bedroom","Kitchen/Dining","Outdoor","Study/Office","Other"];
 const roomSerials = {"Living Room":"RM-LR-01","Bedroom":"RM-BR-02","Kitchen/Dining":"RM-KD-03","Outdoor":"RM-OD-04","Study/Office":"RM-SO-05","Other":"RM-OT-06"};
 const roomTileLabels = {"Living Room":"Living Room","Bedroom":"Bedroom","Kitchen/Dining":"Kitchen/Dining","Outdoor":"Outdoor","Study/Office":"Study/Office","Other":"Other"};
@@ -2054,7 +2073,22 @@ function updateProgress() {
 
   updateStepper(_s1done, _s2done, _s3active);
   updateOrderSummary();
+  syncCardActionRowSpacing();
 
+}
+
+/* The pinned Add Room/Finalize bar's real height varies (hint text can
+   wrap to 2 lines, single vs multi-line labels, etc). A fixed guessed
+   padding number will eventually be wrong and let content sit behind the
+   bar — measure it for real instead. */
+function syncCardActionRowSpacing() {
+  const row = document.getElementById('cardActionRow');
+  const body = document.querySelector('.slide2-body');
+  if (!row || !body) return;
+  requestAnimationFrame(() => {
+    const h = row.offsetHeight;
+    body.style.paddingBottom = (h > 0 ? h + 40 : 24) + 'px';
+  });
 }
 
 document.getElementById('browse-link').addEventListener('click', (e) => {
@@ -3092,62 +3126,52 @@ async function loadOrderData(orderId) {
   document.getElementById('order-summary-section').style.display = 'block';
   document.getElementById('submit-images-btn').style.display = 'block';
   
-  /* Populate order summary */
+  /* Order-level summary — just ID + property, rooms live with their own upload card now */
   const summaryEl = document.getElementById('image-select-order-summary');
   summaryEl.innerHTML = `
     <div style="margin-bottom:12px;">
       <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Order ID</div>
       <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;">${orderId}</div>
     </div>
-    <div style="margin-bottom:12px;">
+    <div>
       <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Property</div>
       <div style="font-family:'Montserrat',sans-serif;font-size:14px;color:rgba(255,255,255,0.9);">${orderData.name}, ${orderData.address}</div>
     </div>
-    <div>
-      <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:8px;">Rooms to stage</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        ${orderData.rooms.map(r => `
-          <div style="display:flex;gap:14px;padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.12);align-items:center;">
-            <div style="flex-shrink:0;width:100px;height:72px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-              ${r.imageUrl ? `<img src="${r.imageUrl}" style="width:100%;height:100%;object-fit:cover;" alt="Room preview">` : '<span style="font-size:28px;color:rgba(255,255,255,0.15);">📷</span>'}
-            </div>
-            <div style="flex:1;">
-              <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;margin-bottom:4px;">Style ID <span style="color:var(--s2s-red);">${r.styleId}</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="width:18px;height:18px;flex-shrink:0;display:flex;color:rgba(255,255,255,0.8);">${roomIconSVGs[r.roomType] || ''}</span>
-                <span style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.85);">${r.roomType}</span>
-              </div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
   `;
-  
-  /* Generate upload sections per room */
+
+  /* One card per room: staged-style thumbnail + room/style info + its own
+     upload dropzone together, instead of a separate duplicate list. */
   const uploadsEl = document.getElementById('image-uploads-container');
   uploadsEl.innerHTML = '';
-  
+
   orderData.rooms.forEach((room, idx) => {
     const uploadSection = document.createElement('div');
-    uploadSection.style.cssText = 'padding:20px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.04);';
+    uploadSection.style.cssText = 'padding:16px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.04);';
     uploadSection.innerHTML = `
-      <div style="margin-bottom:16px;">
-        <h5 style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;color:white;margin:0 0 4px;">Style ID ${room.styleId} — ${room.roomType}</h5>
-        <p style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);margin:0;">Upload the image for this room</p>
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;">
+        <div style="flex-shrink:0;width:72px;height:56px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          ${room.imageUrl ? `<img src="${room.imageUrl}" style="width:100%;height:100%;object-fit:cover;" alt="Style preview">` : '<span style="font-size:22px;color:rgba(255,255,255,0.15);">📷</span>'}
+        </div>
+        <div style="flex:1;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:white;margin-bottom:2px;">Style ID <span style="color:var(--s2s-red);">${room.styleId}</span></div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="width:16px;height:16px;flex-shrink:0;display:flex;color:rgba(255,255,255,0.75);">${roomIconSVGs[room.roomType] || ''}</span>
+            <span style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.75);">${room.roomType}</span>
+          </div>
+        </div>
       </div>
-      <div style="border:2px dashed rgba(255,255,255,0.2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;" class="drag-drop-zone" data-room-idx="${idx}">
+      <div style="border:2px dashed rgba(255,255,255,0.2);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;" class="drag-drop-zone" data-room-idx="${idx}">
         <input type="file" accept="image/*" style="display:none;" class="room-image-input" data-room-idx="${idx}">
-        <div style="font-size:32px;margin-bottom:8px;">📷</div>
-        <div style="font-family:'Montserrat',sans-serif;font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:4px;">Drag image here or click to browse</div>
-        <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);">.jpg, .png, .webp up to 10MB</div>
-        <div class="image-preview" data-room-idx="${idx}" style="margin-top:12px;display:none;">
+        <div style="font-size:28px;margin-bottom:6px;">📷</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:4px;">Drag image here or click to browse</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">.jpg, .png, .webp up to 10MB</div>
+        <div class="image-preview" data-room-idx="${idx}" style="margin-top:10px;display:none;">
           <img style="max-width:100%;max-height:200px;border-radius:6px;margin-bottom:8px;" class="preview-img">
           <button type="button" class="remove-image-btn" data-room-idx="${idx}" style="background:transparent;border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Remove</button>
         </div>
       </div>
     `;
-    
+
     uploadsEl.appendChild(uploadSection);
   });
   
@@ -3236,11 +3260,19 @@ document.getElementById('submit-images-btn')?.addEventListener('click', async ()
   btn.disabled = true;
   
   try {
-    /* Send images + order ID to the real backend (updates the existing
-       Sheets row for this order rather than creating a new one). */
+    /* Upload each real photo to Cloudinary first — turns a huge base64
+       string into a short, real, hosted URL that fits in a Sheets cell. */
+    const rawImages = window.currentOrderData.roomImages || {};
+    const hostedImages = {};
+    for (const idx of Object.keys(rawImages)) {
+      hostedImages[idx] = await uploadToCloudinary(rawImages[idx]);
+    }
+
+    /* Send the resulting URLs + order ID to the real backend (updates the
+       existing Sheets row for this order rather than creating a new one). */
     const payload = {
       orderId: window.currentOrderData.orderId,
-      images: window.currentOrderData.roomImages || {}
+      images: hostedImages
     };
 
     const res = await fetch(ORDERS_API_URL, {
