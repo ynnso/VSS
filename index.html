@@ -2035,6 +2035,22 @@ function updateProgress() {
     }
   }
 
+  /* While a card's drawer is actively open and NOT YET staged (picking a
+     room/style ID), hide the pinned bar entirely instead of trying to pad
+     around it — nobody's tapping Finalize mid-edit, and this removes any
+     possibility of overlap regardless of how tall that open drawer gets.
+     Scoped to exclude already-staged cards: drawer-open never actually
+     gets cleared once a card reaches drawer-hero-mode, so checking the
+     class alone would hide the bar forever after the first staged card. */
+  const hasOpenEditingDrawer = Array.from(document.querySelectorAll('.room-tile-grid.drawer-open')).some(grid => {
+    const card = grid.closest('.placeholder-card');
+    const drawer = card && card.querySelector('.studio-drawer');
+    return drawer && !drawer.classList.contains('drawer-hero-mode');
+  });
+  if (cardActionRow && hasOpenEditingDrawer) {
+    cardActionRow.style.display = 'none';
+  }
+
   /* Step 3 */
   if (consent) {
     const radioSel = document.querySelector('input[name="preference"]:checked');
