@@ -1867,6 +1867,27 @@ body:has(#slide-1.active){padding-bottom:0;}
   .room-tile-grid{gap:20px;}
   .placeholder-card .room-header{padding:32px 32px 28px;}
 }
+
+/* ── Round 7: bigger room card that fills Slide 2; icon scales with tile; equal top/bottom padding ── */
+.room-tile-grid{--tile-h:150px;}
+.room-tile{--tile-bg:var(--tint);min-height:var(--tile-h);}
+.room-tile:hover{--tile-bg:#fff;}
+.room-tile.selected{--tile-bg:var(--brand-tint);}
+.room-tile svg{--icon:calc((var(--tile-h) - 46px) * 0.72);width:var(--icon) !important;height:var(--icon) !important;}
+.room-tile svg *{vector-effect:non-scaling-stroke;}
+.room-tile svg[viewBox]{stroke-width:3px;}
+.room-tile svg[viewBox^="0 -1.05"]{stroke:var(--tile-bg);stroke-width:max(0px,calc(var(--icon) * 2 / 48 - 3px));}
+@media(min-width:681px){
+  .room-tile-grid{--tile-h:clamp(190px,calc((100vh - 501px) / 2),340px);}
+  .slide2-body{padding-top:calc(24px + 4.5vh);padding-bottom:110px;}
+  .room-tile-label{font-size:clamp(15px,calc(var(--tile-h) * 0.075),19px);}
+}
+@media(min-width:1000px){
+  #section-2{max-width:940px !important;}
+  .slide2-body > *,.slide2-header .slide-step-header,
+  .placeholder-card,.placeholder-container.single-card .placeholder-card,.placeholder-container.multi-card .placeholder-card,
+  .card-action-buttons,.progress-hint{max-width:940px !important;}
+}
 </style>
 </head>
 <body>
