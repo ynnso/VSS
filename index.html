@@ -1827,6 +1827,18 @@ body:has(#slide-1.active){padding-bottom:0;}
   .hero-micro{font-size:13px;margin-top:20px;}
 }
 @media(max-width:480px){.wm-name{font-size:16px;letter-spacing:0.10em;}}
+
+/* ── Round 3: stepper lines stop at the circle edge, wordmark centered in the space above the headline, heavier 'Choose Your' ── */
+.step-dot{background:#f1f3f5;}
+.step-item[data-state="active"] .step-dot{background:#fbe4e6;}
+.step-item[data-state="complete"] .step-dot{background:var(--ink);}
+.step-dot{position:relative;z-index:2;}
+@media(min-width:681px){
+  #slide-1{align-items:stretch;}
+  .hero-1col{justify-content:flex-start;padding-top:0;}
+  .hero-wordmark{flex:1 1 auto;display:flex;align-items:center;justify-content:center;margin:0;padding:12px 0 28px;width:100%;}
+}
+.hero-h1{font-weight:300;}
 </style>
 </head>
 <body>
