@@ -1804,6 +1804,29 @@ body::before{display:none;}
 #submit-images-btn:hover{background:var(--slate) !important;}
 .restore-btn-yes{background:var(--ink);}
 #slide-3 input[type="text"],#slide-3 input[type="email"],#slide-4 input[type="text"]{background:#fff !important;}
+
+/* ── Round 2: hero scale, red Style, Virtual Staging Studio label, title-case stepper ── */
+.step-text{text-transform:none;letter-spacing:0.02em;font-size:11px;}
+.wm-name{font-size:18px;font-weight:600;letter-spacing:0.12em;color:var(--ink);}
+.hero-wordmark{margin-bottom:56px;}
+.hero-h1{margin-bottom:44px;}
+.hero-h1-line2{color:var(--brand);margin-bottom:12px;padding-bottom:0.12em;}
+.hero-sub{margin-bottom:44px;}
+.hero-micro{margin-top:20px;}
+body:has(#slide-1.active){padding-bottom:0;}
+@media(min-width:681px){.hero-sub{font-size:16px;}.hero-micro{font-size:11px;}}
+@media(min-width:900px){
+  .hero-1col{max-width:1100px;padding:4vh 64px 6vh;}
+  .hero-wordmark{margin-bottom:clamp(28px,5vh,72px);}
+  .wm-name{font-size:24px;}
+  .hero-h1{font-size:clamp(3.5rem,min(7vw,9.5vh),7.5rem);margin-bottom:clamp(24px,4vh,56px);}
+  .hero-h1-line2{padding-bottom:0.16em;}
+  .hero-sub{font-size:clamp(18px,2.6vh,22px);max-width:640px;margin-bottom:clamp(28px,4.5vh,56px);}
+  .hero-cta-area{width:auto;max-width:none;min-width:520px;}
+  .hero-cta-area .btn-catalog{height:clamp(68px,9vh,88px);font-size:clamp(20px,2.8vh,24px) !important;}
+  .hero-micro{font-size:13px;margin-top:20px;}
+}
+@media(max-width:480px){.wm-name{font-size:16px;letter-spacing:0.10em;}}
 </style>
 </head>
 <body>
@@ -1826,7 +1849,7 @@ body::before{display:none;}
     <div class="step-item" id="step-item-3" data-state="locked" onclick="stepClick(3)">
       <div class="step-line"></div>
       <div class="step-dot" id="step-dot-3">3</div>
-      <div class="step-text">Confirm</div>
+      <div class="step-text">Submit</div>
     </div>
   </div>
 </div>
@@ -1838,8 +1861,6 @@ body::before{display:none;}
   <div class="hero-1col">
 
     <div class="hero-wordmark">
-      <span class="wm-mono">S2S</span>
-      <span class="wm-sep"></span>
       <span class="wm-name">Virtual Staging Studio</span>
     </div>
 
