@@ -18,7 +18,7 @@
   --field-bg:rgba(20,20,20,0.04); --s2s-green:#30D158; --s2s-green-dark:#28C24A;
   --border-soft:rgba(20,20,20,0.09); --border-medium:rgba(20,20,20,0.14);
   --soft-red:#FFECEA; --section-accent:rgba(200,20,0,0.08);
-  --topbar-h:56px;
+  --topbar-h:64px;
 }
 
 /* ── BASE ── */
@@ -1891,9 +1891,9 @@ body:has(#slide-1.active){padding-bottom:0;}
 
 /* ── Round 8: card sized to fit even with the Style ID drawer open; centered between title and action bar ── */
 @media(min-width:681px){
-  .room-tile-grid{--tile-h:clamp(150px,calc((100vh - 570px) / 2),340px);}
+  .room-tile-grid{--tile-h:clamp(150px,calc((100vh - 578px) / 2),340px);}
   .slide2-header{padding-bottom:0;}
-  .slide2-body{display:flex;flex-direction:column;min-height:calc(100vh - 156px);padding:0 16px 92px !important;box-sizing:border-box;}
+  .slide2-body{display:flex;flex-direction:column;min-height:calc(100vh - 164px);padding:0 16px 92px !important;box-sizing:border-box;}
   body:has(#slide-2.active){padding-bottom:0;}
   .slide2-body .placeholder-card{margin-bottom:0 !important;}
   #section-2{margin-top:auto !important;margin-bottom:auto !important;}
@@ -1912,10 +1912,52 @@ body:has(#slide-1.active){padding-bottom:0;}
 .hero-room-icon svg{width:100%;height:100%;}
 .hero-info-bar .overlay-confirm{font-size:var(--info-fs);height:calc(var(--info-fs) * 1.75);padding:0 calc(var(--info-fs) * 0.8);}
 .hero-note-btn{font-size:var(--info-fs);}
-.hero-notes-row{padding-left:19px;}
+.hero-notes-row{padding-left:19px;margin-top:calc(var(--info-fs) * -0.77);}
 .hero-note-btn svg{width:calc(var(--info-fs) * 0.9);height:calc(var(--info-fs) * 0.9);}
 #slide-2 .back-chevron{top:calc((40px - 34px) / 2);}
 @media(min-width:681px){#slide-2 .back-chevron{top:calc((56px - 34px) / 2);}}
+
+/* ── Round 10: stepper +20% without green, plain back/close icons, Approve styled like Enter Gallery, tighter info rows ── */
+.stepper-wrapper{max-width:504px;}
+.step-dot{width:26px;height:26px;font-size:13px;}
+.step-text{font-size:13px;margin-top:6px;}
+.step-line{top:12px;}
+.step-item[data-state="complete"] .step-dot{box-shadow:none;}
+@media(max-width:480px){
+  .step-dot{width:29px;height:29px;font-size:14px;}
+  .step-text{font-size:12px;}
+  .step-line{top:14px;}
+}
+.back-chevron,.back-chevron:hover{background:transparent;border:none;box-shadow:none;}
+.back-chevron:hover{color:var(--brand);}
+.card-delete-x,.card-delete-x:hover{background:transparent;border:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;}
+.card-delete-x{color:var(--ink);font-size:14px;width:28px;height:28px;filter:drop-shadow(0 0 2px rgba(255,255,255,0.9));}
+.card-delete-x:hover{color:var(--brand);}
+.hero-room-icon{width:calc(var(--info-fs) * 1.2);height:calc(var(--info-fs) * 1.2);align-self:center;}
+.hero-info-bar .overlay-confirm.ready{
+  position:relative;overflow:hidden;
+  height:calc(var(--info-fs) * 2.3);padding:0 calc(var(--info-fs) * 1.2);
+  background:transparent;color:var(--ink);
+  border:1.5px solid rgba(10,10,11,0.75);box-shadow:none;animation:none;
+  font-weight:400;letter-spacing:0.12em;
+  transition:border-color 0.3s ease;
+}
+.hero-info-bar .overlay-confirm.ready::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 120%,rgba(225,29,42,0.22) 0%,transparent 70%);
+  animation:ctaRedPulse 2.8s ease-in-out infinite;transform-origin:center bottom;
+  pointer-events:none;z-index:0;
+}
+.hero-info-bar .overlay-confirm.ready::after{
+  content:'';position:absolute;top:0;left:-100%;bottom:0;width:60%;
+  background:linear-gradient(90deg,transparent 0%,rgba(10,10,11,0.04) 40%,rgba(10,10,11,0.09) 50%,rgba(10,10,11,0.04) 60%,transparent 100%);
+  transform:skewX(-15deg);pointer-events:none;z-index:1;transition:none;
+}
+.hero-info-bar .overlay-confirm.ready > *{position:relative;z-index:2;}
+@media(hover:hover){
+  .hero-info-bar .overlay-confirm.ready:hover{border-color:var(--ink);}
+  .hero-info-bar .overlay-confirm.ready:hover::after{animation:shimmerSweep 1.3s cubic-bezier(0.25,0.1,0.25,1) forwards;}
+}
 </style>
 </head>
 <body>
