@@ -2002,6 +2002,20 @@ body:has(#slide-1.active){padding-bottom:0;}
 .hero-notes-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .hero-notes-row .overlay-confirm{margin-left:auto;flex-shrink:0;}
 .hero-notes-row{margin-top:calc(var(--info-fs) * -0.2);}
+
+/* ── Round 15: chip = Style ID width; halved Add Room / Finalize padding; one CTA font size ── */
+.hero-notes-row .overlay-confirm,.hero-notes-row .overlay-confirm.ready,.hero-notes-row .overlay-confirm.verified{padding:0;justify-content:center;white-space:nowrap;}
+@media(min-width:681px){
+  .card-action-btn{flex:0 0 354px;font-size:20px;}
+  .hero-cta-area .btn-catalog,.btn-submit-compact{font-size:20px !important;}
+}
+
+.hero-notes-row{padding-left:19px;padding-right:16px;}
+.hero-note-btn{white-space:nowrap;}
+@media(max-width:480px){
+  .hero-notes-inner{gap:6px;}
+  .hero-note-btn{gap:4px;}
+}
 </style>
 </head>
 <body>
@@ -2077,7 +2091,7 @@ body:has(#slide-1.active){padding-bottom:0;}
         <p class="progress-hint" id="finalizeHint" style="display:none;"></p>
         <div class="card-action-buttons">
           <button class="card-action-btn card-action-add locked-section" id="addCardButton" type="button">+ Add Room</button>
-          <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">Finalize <span class="finalize-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="0" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg></span></button>
+          <button class="card-action-btn card-action-submit locked-section" id="goToSubmitBtn" type="button">Finalize <span class="finalize-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="9 5 16 12 9 19"/></svg></span></button>
         </div>
       </div>
     </div>
@@ -3831,6 +3845,26 @@ document.getElementById('submit-images-btn')?.addEventListener('click', async ()
 /* Initialize Slide 4 on page load */
 document.addEventListener('DOMContentLoaded', initSlide4);
 
+
+/* Keep the Approve / Approved chip exactly as wide as the 'Style ID nnnn' text above it */
+(function syncApproveWidth() {
+  let queued = false;
+  function run() {
+    queued = false;
+    document.querySelectorAll('.placeholder-card').forEach(card => {
+      const chip = card.querySelector('.overlay-confirm');
+      const lbl  = card.querySelector('.hero-id-label');
+      const val  = card.querySelector('.hero-id-value');
+      if (!chip || !lbl || !val || !lbl.offsetParent || !val.textContent.trim()) return;
+      const w = Math.round(val.getBoundingClientRect().right - lbl.getBoundingClientRect().left);
+      if (w > 0 && chip.style.width !== w + 'px') chip.style.width = w + 'px';
+    });
+  }
+  function queue() { if (!queued) { queued = true; requestAnimationFrame(run); } }
+  new MutationObserver(queue).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class', 'style'] });
+  window.addEventListener('resize', queue);
+  queue();
+})();
 </script>
 </body>
 </html>
