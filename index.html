@@ -1888,6 +1888,16 @@ body:has(#slide-1.active){padding-bottom:0;}
   .placeholder-card,.placeholder-container.single-card .placeholder-card,.placeholder-container.multi-card .placeholder-card,
   .card-action-buttons,.progress-hint{max-width:940px !important;}
 }
+
+/* ── Round 8: card sized to fit even with the Style ID drawer open; centered between title and action bar ── */
+@media(min-width:681px){
+  .room-tile-grid{--tile-h:clamp(150px,calc((100vh - 570px) / 2),340px);}
+  .slide2-header{padding-bottom:0;}
+  .slide2-body{display:flex;flex-direction:column;min-height:calc(100vh - 156px);padding:0 16px 92px !important;box-sizing:border-box;}
+  body:has(#slide-2.active){padding-bottom:0;}
+  .slide2-body .placeholder-card{margin-bottom:0 !important;}
+  #section-2{margin-top:auto !important;margin-bottom:auto !important;}
+}
 </style>
 </head>
 <body>
