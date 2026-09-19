@@ -1845,6 +1845,28 @@ body:has(#slide-1.active){padding-bottom:0;}
 #slide-2 .slide-step-title::after{display:none;}
 .slide2-header{border-bottom:none;}
 #finalizeHint{display:none !important;}
+
+/* ── Round 5: Slide 2 spacing ── */
+.slide2-header{padding:28px 0 22px;}
+#slide-2 .slide-step-title{font-size:40px;color:var(--brand);margin-bottom:0;}
+.slide2-body{padding:32px 16px 190px;}
+.room-tile svg{width:64px !important;height:64px !important;}
+.room-tile svg[viewBox="0 0 24 24"]{stroke-width:1.15;}
+.room-tile svg[viewBox="0 0 32 32"]{stroke-width:1.5;}
+.room-tile svg[viewBox^="0 -1.05"]{stroke-width:0.2;}
+.card-action-row{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px));}
+@media(min-width:681px){
+  .slide2-header{padding:44px 0 36px;}
+  #slide-2 .slide-step-title{font-size:56px;}
+  .slide2-body{padding:40px 16px 150px;}
+  .room-tile{min-height:clamp(170px,26vh,280px);}
+  .room-tile svg{width:80px !important;height:80px !important;}
+  .room-tile svg[viewBox="0 0 24 24"]{stroke-width:0.9;}
+  .room-tile svg[viewBox="0 0 32 32"]{stroke-width:1.2;}
+  .room-tile svg[viewBox^="0 -1.05"]{stroke-width:0.1;}
+  .room-tile-label{font-size:15px;}
+  .room-tile-grid{gap:16px;}
+}
 </style>
 </head>
 <body>
