@@ -558,7 +558,7 @@ body::before{
   flex-shrink:0;
 }
 .hero-info-bar-spacer { flex:1; min-width:8px; }
-.hero-info-bar .overlay-confirm { flex-shrink:0; }
+.hero-notes-row .overlay-confirm { flex-shrink:0; }
 
 /* Mobile — scale info bar down so chip never bleeds */
 @media(max-width:480px){
@@ -1910,7 +1910,7 @@ body:has(#slide-1.active){padding-bottom:0;}
 .hero-id-label,.hero-id-value,.hero-room-name{font-size:var(--info-fs);}
 .hero-room-icon{width:calc(var(--info-fs) * 1.15);height:calc(var(--info-fs) * 1.15);margin-left:calc(var(--info-fs) * 0.7);}
 .hero-room-icon svg{width:100%;height:100%;}
-.hero-info-bar .overlay-confirm{font-size:var(--info-fs);height:calc(var(--info-fs) * 1.75);padding:0 calc(var(--info-fs) * 0.8);}
+.hero-notes-row .overlay-confirm{font-size:var(--info-fs);height:calc(var(--info-fs) * 1.75);padding:0 calc(var(--info-fs) * 0.8);}
 .hero-note-btn{font-size:var(--info-fs);}
 .hero-notes-row{padding-left:19px;margin-top:calc(var(--info-fs) * -0.77);}
 .hero-note-btn svg{width:calc(var(--info-fs) * 0.9);height:calc(var(--info-fs) * 0.9);}
@@ -1934,7 +1934,7 @@ body:has(#slide-1.active){padding-bottom:0;}
 .card-delete-x{color:var(--ink);font-size:14px;width:28px;height:28px;filter:drop-shadow(0 0 2px rgba(255,255,255,0.9));}
 .card-delete-x:hover{color:var(--brand);}
 .hero-room-icon{width:calc(var(--info-fs) * 1.2);height:calc(var(--info-fs) * 1.2);align-self:center;}
-.hero-info-bar .overlay-confirm.ready{
+.hero-notes-row .overlay-confirm.ready{
   position:relative;overflow:hidden;
   height:calc(var(--info-fs) * 2.3);padding:0 calc(var(--info-fs) * 1.2);
   background:transparent;color:var(--ink);
@@ -1942,21 +1942,21 @@ body:has(#slide-1.active){padding-bottom:0;}
   font-weight:400;letter-spacing:0.12em;
   transition:border-color 0.3s ease;
 }
-.hero-info-bar .overlay-confirm.ready::before{
+.hero-notes-row .overlay-confirm.ready::before{
   content:'';position:absolute;inset:0;
   background:radial-gradient(ellipse at 50% 120%,rgba(225,29,42,0.22) 0%,transparent 70%);
   animation:ctaRedPulse 2.8s ease-in-out infinite;transform-origin:center bottom;
   pointer-events:none;z-index:0;
 }
-.hero-info-bar .overlay-confirm.ready::after{
+.hero-notes-row .overlay-confirm.ready::after{
   content:'';position:absolute;top:0;left:-100%;bottom:0;width:60%;
   background:linear-gradient(90deg,transparent 0%,rgba(10,10,11,0.04) 40%,rgba(10,10,11,0.09) 50%,rgba(10,10,11,0.04) 60%,transparent 100%);
   transform:skewX(-15deg);pointer-events:none;z-index:1;transition:none;
 }
-.hero-info-bar .overlay-confirm.ready > *{position:relative;z-index:2;}
+.hero-notes-row .overlay-confirm.ready > *{position:relative;z-index:2;}
 @media(hover:hover){
-  .hero-info-bar .overlay-confirm.ready:hover{border-color:var(--ink);}
-  .hero-info-bar .overlay-confirm.ready:hover::after{animation:shimmerSweep 1.3s cubic-bezier(0.25,0.1,0.25,1) forwards;}
+  .hero-notes-row .overlay-confirm.ready:hover{border-color:var(--ink);}
+  .hero-notes-row .overlay-confirm.ready:hover::after{animation:shimmerSweep 1.3s cubic-bezier(0.25,0.1,0.25,1) forwards;}
 }
 
 /* ── Round 11: no arrow button, link text/icon order, no red trim on drawer, notes aligned + larger, chip-sized Approve, larger chevron ── */
@@ -1968,7 +1968,7 @@ body:has(#slide-1.active){padding-bottom:0;}
   font-size:var(--info-fs) !important;line-height:1.3 !important;border-radius:0 !important;
   min-height:calc(var(--info-fs) * 2.3) !important;padding:8px 12px !important;
 }
-.hero-info-bar .overlay-confirm.ready{height:calc(var(--info-fs) * 1.7);padding:0 calc(var(--info-fs) * 0.75);}
+.hero-notes-row .overlay-confirm.ready{height:calc(var(--info-fs) * 1.7);padding:0 calc(var(--info-fs) * 0.75);}
 .back-chevron{width:40px;height:40px;}
 .back-chevron svg{width:24px;height:24px;}
 #slide-2 .back-chevron{top:0;}
@@ -1991,6 +1991,17 @@ body:has(#slide-1.active){padding-bottom:0;}
 @media(min-width:1000px){#slide-3 > *,#section-3{max-width:940px !important;}}
 #final-submit{width:fit-content !important;min-width:354px;max-width:100% !important;margin:0 auto 40px !important;}
 #submitHint{text-align:center;}
+
+/* ── Round 14: 2-row info layout — row 1: room (left) / Style ID (right); row 2: requests (left) / Approve (right) ── */
+.hero-room-icon{order:1;margin-left:0;}
+.hero-room-name{order:2;}
+.hero-info-bar-spacer{order:3;flex:1;}
+.hero-id-label{order:4;}
+.hero-id-value{order:5;}
+.hero-info-bar{padding-left:15px;padding-right:12px;}
+.hero-notes-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.hero-notes-row .overlay-confirm{margin-left:auto;flex-shrink:0;}
+.hero-notes-row{margin-top:calc(var(--info-fs) * -0.2);}
 </style>
 </head>
 <body>
@@ -2815,14 +2826,13 @@ function createCard(restoreData, editorsChoice) {
                 <span class="hero-room-icon drawer-status-icon-hero"></span>
                 <span class="hero-room-name drawer-room-label-hero"></span>
                 <span class="hero-info-bar-spacer"></span>
-                <button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button>
               </div>
               <div class="drawer-footer-left" style="display:none;">
                 <button class="drawer-add-note-btn add-notes-btn" type="button"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Any special requests?</button>
               </div>
             </div>
             <div class="hero-notes-row">
-              <button class="drawer-add-note-btn add-notes-btn hero-note-btn" type="button"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Any special requests?</button>
+              <div class="hero-notes-inner"><button class="drawer-add-note-btn add-notes-btn hero-note-btn" type="button"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Any special requests?</button><button class="overlay-confirm" type="button" style="display:none;"><span class="confirm-check" style="display:none;">✓</span><span class="confirm-label">Approve</span></button></div>
             </div>
             <div class="notes-content" style="display:none;padding:0 0 8px;">
               <textarea placeholder="Note for the editor..." style="width:100%;background:#f8fafc;border:1px solid #e8e8ea;border-radius:8px;padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:12px;color:#334155;outline:none;resize:none;min-height:32px;"></textarea>
