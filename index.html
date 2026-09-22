@@ -2156,6 +2156,16 @@ body:has(#slide-1.active){padding-bottom:0;}
 /* Left-justify the option card titles (Done for You / I'll wait...) */
 .option-title{justify-content:flex-start;text-align:left;}
 .option-content{text-align:left;}
+
+/* ══════════════════════════════════════════════════════════════
+   ROUND 19 — soft grey-to-white page gradient (kills the header/body
+   color seam that read as a stray border under the stepper), the
+   turnaround hint gone too, order-summary row pulled flush to the
+   photo edge.
+   ══════════════════════════════════════════════════════════════ */
+body{background:linear-gradient(180deg,#edf2f7 0%,#f8fafc 55%,#ffffff 100%) !important;}
+#top-progress-container{border-bottom:none !important;box-shadow:none !important;}
+#submitHint{display:none !important;}
 </style>
 </head>
 <body>
@@ -2533,7 +2543,7 @@ function updateOrderSummary() {
           ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Room preview">`
           : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><span style="font-size:40px;color:#94a3b8;">📷</span></div>'}
       </div>
-      <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+      <div style="padding:12px 2px 14px;display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;">
           <span style="display:flex;align-items:center;gap:6px;min-width:0;">
             <span style="flex-shrink:0;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#334155;">${roomIcon}</span>
