@@ -2166,6 +2166,18 @@ body:has(#slide-1.active){padding-bottom:0;}
 body{background:linear-gradient(180deg,#edf2f7 0%,#f8fafc 55%,#ffffff 100%) !important;}
 #top-progress-container{border-bottom:none !important;box-shadow:none !important;}
 #submitHint{display:none !important;}
+
+/* ══════════════════════════════════════════════════════════════
+   ROUND 20 — kill the last hairline under the stepper for real (no
+   more blur/alpha on that bar, solid opaque fill instead), tighten
+   the room-card info rows' vertical rhythm.
+   ══════════════════════════════════════════════════════════════ */
+#top-progress-container{
+  background:#edf2f7 !important;
+  backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+}
+.hero-info-bar{padding-top:6px !important;padding-bottom:4px !important;}
+.hero-notes-row{padding-top:0 !important;padding-bottom:6px !important;margin-top:calc(var(--info-fs) * -0.35) !important;}
 </style>
 </head>
 <body>
