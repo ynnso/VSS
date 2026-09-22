@@ -2125,6 +2125,37 @@ body:has(#slide-1.active){padding-bottom:0;}
 
 /* ── Style ID digits red everywhere (card footer + order summary) ── */
 .hero-id-value{color:var(--brand) !important;}
+
+/* ══════════════════════════════════════════════════════════════
+   ROUND 18 — stepper divider gone, Enter Gallery/Submit red fill,
+   Slide 3 option cards left-justified. Content removals (the
+   "Choose Done for You..." line, the checkmark icon, the "Select a
+   delivery option" hint) are done in the HTML/JS above, not here.
+   ══════════════════════════════════════════════════════════════ */
+#top-progress-container{border-bottom:none;}
+
+/* Enter Gallery / Submit — solid red fill instead of ink outline */
+.hero-cta-area .btn-catalog,
+.btn-submit-compact{
+  background:var(--brand) !important;color:#fff !important;
+  border-color:var(--brand) !important;
+}
+.hero-cta-area .btn-catalog::before,
+.btn-submit-compact::before{display:none;}
+.hero-cta-area .btn-catalog::after,
+.btn-submit-compact::after{
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.10) 40%,rgba(255,255,255,0.20) 50%,rgba(255,255,255,0.10) 60%,transparent 100%) !important;
+}
+@media(hover:hover){
+  .hero-cta-area .btn-catalog:hover,
+  .btn-submit-compact:not(.locked-section):hover{
+    background:var(--brand-dark) !important;border-color:var(--brand-dark) !important;
+  }
+}
+
+/* Left-justify the option card titles (Done for You / I'll wait...) */
+.option-title{justify-content:flex-start;text-align:left;}
+.option-content{text-align:left;}
 </style>
 </head>
 <body>
@@ -2235,19 +2266,11 @@ body:has(#slide-1.active){padding-bottom:0;}
       </div>
     </div>
 
-    <!-- Section Header -->
-    <div style="margin-bottom:24px;text-align:center;">
-      <h3 style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:600;color:#0a0a0b;margin:0 0 8px;letter-spacing:0.02em;">Choose Done for You for the fastest, hassle-free delivery at no extra cost.</h3>
-    </div>
-
     <!-- Option A: Done for You -->
     <label class="option-card option-recommended" style="margin-bottom:16px;">
       <input type="radio" name="preference" value="A">
       <div class="option-content">
         <div class="option-title">
-          <span style="width:22px;height:22px;display:inline-flex;align-items:center;flex-shrink:0;color:#e11d2a;">
-            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
           Done for You
           <span class="recommended-badge">RECOMMENDED</span>
         </div>
@@ -2512,8 +2535,8 @@ function updateOrderSummary() {
       </div>
       <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;">
-          <span style="display:flex;align-items:center;gap:8px;min-width:0;">
-            <span style="flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;color:#334155;">${roomIcon}</span>
+          <span style="display:flex;align-items:center;gap:6px;min-width:0;">
+            <span style="flex-shrink:0;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:#334155;">${roomIcon}</span>
             <span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#0a0a0b;white-space:nowrap;">${roomType}</span>
           </span>
           <span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:#0a0a0b;white-space:nowrap;flex-shrink:0;">Style ID <span style="color:#e11d2a;">${styleId}</span></span>
@@ -2647,8 +2670,7 @@ function updateProgress() {
     const submitHint = document.getElementById('submitHint');
     if (submitHint) {
       if (!radioSel) {
-        submitHint.textContent = 'Select a delivery option to continue';
-        submitHint.style.display = 'block';
+        submitHint.style.display = 'none';
       } else if (!(tat && tat.checked)) {
         submitHint.textContent = 'Confirm the turnaround acknowledgment to continue';
         submitHint.style.display = 'block';
