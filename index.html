@@ -2038,6 +2038,93 @@ body:has(#slide-1.active){padding-bottom:0;}
 
 .studio-drawer.drawer-hero-mode.card-img-collapsed .drawer-img-wrap{display:none !important;}
 .studio-drawer.drawer-hero-mode.card-img-collapsed{cursor:pointer;}
+
+/* ══════════════════════════════════════════════════════════════
+   ROUND 17 — CTA system rebuilt (one shared spec for all 4 buttons,
+   auto-width pill instead of full-width bar so padding cuts are
+   actually visible), stepper breathing room, +30% headers, bigger
+   Slide-2 card, real gap between stacked room cards, Style ID red
+   in both places.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Stepper: a bit more air at the top, same 64px box ── */
+#top-progress-container{padding:13px 0 5px;}
+.step-text{margin-top:4px;}
+
+/* ── CTA system — Enter Gallery / Submit / Add Room / Finalize all
+   share one spec now. Auto-width pill (not stretched to fill its
+   slot), so cutting padding actually shrinks the visible button
+   while its slot/wrapper stays the same size. ── */
+.hero-cta-area{display:flex;flex-direction:column;align-items:center;}
+/* Standalone CTAs — Enter Gallery, Submit: full-size pill, plenty of room */
+.hero-cta-area .btn-catalog,
+.btn-submit-compact{
+  width:auto !important;height:auto !important;
+  padding:11px 20px !important;
+  font-size:23px !important;
+  gap:10px !important;
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+}
+#final-submit{min-width:0 !important;width:auto !important;}
+.cta-arrow svg,.submit-arrow svg{width:24px !important;height:24px !important;}
+/* Two-in-a-row CTAs — Add Room, Finalize: same pill family (border, shape,
+   colors, hover shimmer) but sized to actually fit two side by side on a
+   393px phone — same font can't fit twice, so this tier is a bit smaller */
+.card-action-btn{
+  width:auto !important;height:auto !important;
+  padding:10px 16px !important;
+  font-size:16px !important;letter-spacing:0.05em !important;
+  gap:8px !important;
+  flex:1 1 0 !important;min-width:0;
+  white-space:nowrap !important;overflow:hidden;text-overflow:ellipsis;
+}
+.finalize-arrow svg{width:16px !important;height:16px !important;}
+.card-action-buttons{gap:14px !important;}
+@media(min-width:681px){
+  .hero-cta-area .btn-catalog,
+  .btn-submit-compact{
+    padding:14px 26px !important;
+    font-size:26px !important;
+    gap:12px !important;
+  }
+  .cta-arrow svg,.submit-arrow svg{width:28px !important;height:28px !important;}
+  .card-action-btn{
+    padding:14px 26px !important;
+    font-size:24px !important;letter-spacing:0.1em !important;
+    gap:10px !important;
+    flex:0 0 auto !important;
+  }
+  .finalize-arrow svg{width:22px !important;height:22px !important;}
+  .card-action-buttons{gap:28px !important;}
+}
+
+/* ── Slide 2 & 3 headers +30% ── */
+#slide-2 .slide-step-title,#slide-3 .slide-step-title{font-size:52px;}
+@media(min-width:681px){
+  #slide-2 .slide-step-title,#slide-3 .slide-step-title{font-size:73px;}
+}
+
+/* ── Slide 2 room card bigger (less empty space around it) ── */
+.room-tile-grid{--tile-h:185px;}
+@media(min-width:681px){
+  .room-tile-grid{--tile-h:clamp(150px,calc((100vh - 578px) / 2 * 1.2),400px);}
+}
+
+/* ── Real gap between stacked room cards so a collapsed card and
+   the next fresh card never read as one fused block ── */
+.multi-card .placeholder-card{margin-bottom:32px;}
+.slide2-body .placeholder-card{margin-bottom:32px !important;}
+.placeholder-card{
+  border:1px solid rgba(10,10,11,0.16);
+  box-shadow:0 10px 28px rgba(10,10,11,0.12);
+}
+
+/* ── Slide 2 CTA row: more breathing room off the bottom edge ── */
+.card-action-row{padding-bottom:calc(48px + env(safe-area-inset-bottom,0px));}
+
+/* ── Style ID digits red everywhere (card footer + order summary) ── */
+.hero-id-value{color:var(--brand) !important;}
 </style>
 </head>
 <body>
@@ -2424,12 +2511,12 @@ function updateOrderSummary() {
           : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><span style="font-size:40px;color:#94a3b8;">📷</span></div>'}
       </div>
       <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;">
+          <span style="display:flex;align-items:center;gap:8px;min-width:0;">
             <span style="flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;color:#334155;">${roomIcon}</span>
-            <span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#0a0a0b;">${roomType}</span>
-          </div>
-          <div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:#0a0a0b;">Style ID <span style="color:#e11d2a;">${styleId}</span></div>
+            <span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#0a0a0b;white-space:nowrap;">${roomType}</span>
+          </span>
+          <span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:#0a0a0b;white-space:nowrap;flex-shrink:0;">Style ID <span style="color:#e11d2a;">${styleId}</span></span>
         </div>
         ${notes ? `<div style="font-family:'Montserrat',sans-serif;font-size:12px;color:#334155;"><span style="color:#64748b;">Special request:</span> ${notes}</div>` : ''}
       </div>
